@@ -1,0 +1,43 @@
+This file contains information regarding what this project is about.
+
+
+### Introduction
+
+The ultimate goal of this project is to understand how memorised facts are stored in the weights of transformer models. In order to do this, I've created a toy model, which is a one layer transformer with two tokens as input and one token as output. I would like to fully understand how many facts this toy model can learn, as a function of various dimensions, and more imporantly, how this information is encoded.
+
+A fact is defined as two input tokens followed by one output token. These are randomly generated. It's important for the experiment that there is no general systematic solution to learning the facts.
+
+In the code, I can turn on and off various parts of the toy model, in order to see which parts matters.
+
+I want to test how many facts various architectures can learns and see how this scales with size.
+
+I'm also going to try to match this performance with my own hand coded model. I.e. a model with the same architecture, but where I set the wights though some algorithm that isn't learning thoug gradient decent.
+
+
+
+### Conclusions
+
+As expected, ff_recidual, GELU/ReLU, and norm, does not affect the total number of learned facts much. Except that ReLU and norm=False sometimes lead to unstable training which show up as low number of facts learned, or at least thats what it looks like.
+
+
+
+#### Various notes
+
+I generaly use the same number for all dimensions including vocab size, except for input_vocab_size which is doubble the size of all other dimensions. The reason for this is that if it was the same as the other dimensions, the best models would just learn all possible facts.
+
+
+
+### Experiment Logs
+
+## Experiment 1
+
+First atempt at training every model architecture variant.
+There where a bug in the code at the time. The alternative embeddings for when attention is tuned off was not included in the set of trained parameters. 
+
+All results from this experiment where attention=False are invalid
+All results from this experiment where attention=True are valid
+
+
+## Experiment 2
+
+Second atempt at training every model architecture variant.

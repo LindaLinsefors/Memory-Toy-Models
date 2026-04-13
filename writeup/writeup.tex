@@ -1,0 +1,267 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{parskip}
+\usepackage{xcolor}
+\usepackage{pifont}
+
+\newcommand{\cmark}{{\color{green!70!black}\ding{51}}}
+\newcommand{\xmark}{{\color{red}\ding{55}}}
+
+\title{Memory in Toy Transformer Models}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+The goal of this project is to understand how memorised facts are stored in the weights of transformer models. To isolate the mechanisms involved, we study a minimal \emph{toy model}: a single-layer transformer that receives two input tokens and must produce one output token. A \emph{fact} is defined as a specific pair of input tokens mapped to a specific output token; the mapping is random, so the model cannot exploit any systematic structure and must genuinely memorise each fact.
+
+By selectively enabling or disabling components of the architecture---attention, feed-forward layers, biases, normalisation, residual connections---we can measure how many facts each configuration can learn as a function of its dimensions. In addition, we attempt to match the trained model's performance with a hand-coded weight-setting algorithm (i.e.\ not learned via gradient descent) to gain further insight into the encoding.
+
+\section{Model Architecture}
+\label{sec:architecture}
+
+The model, \textsc{MemoryToyModel}, is a single-layer transformer whose components can be toggled on or off via a set of architectural flags. All configurable options are collected in a \textsc{ModelSettings} object; the full list is summarised in Table~\ref{tab:settings} and described below.
+
+\subsection{Overview}
+
+The forward pass proceeds through three stages:
+\begin{enumerate}
+    \item \textbf{Embedding.} The input tokens are mapped into a $d_\text{residual}$-dimensional residual stream. The precise mechanism depends on whether attention is enabled (see Section~\ref{sec:embedding}).
+    \item \textbf{Feed-forward block} (optional). A two-layer MLP transforms the residual-stream vector (see Section~\ref{sec:ff}).
+    \item \textbf{Output head.} A final linear projection maps the residual stream to logits over the output vocabulary.
+\end{enumerate}
+
+\subsection{Embedding and Attention}
+\label{sec:embedding}
+
+Two modes are available, controlled by the \texttt{attention} flag.
+
+\paragraph{With attention (\texttt{attention = True}).}
+Each input token is embedded via a learned token embedding $W_E \in \mathbb{R}^{V_\text{in} \times d_\text{residual}}$ and summed with a learned positional embedding $W_P \in \mathbb{R}^{T \times d_\text{residual}}$, where $T$ is the sequence length (typically~2) and $V_\text{in}$ is the input vocabulary size. The resulting sequence is passed through an optional RMSNorm and then through a single causal self-attention layer with $n_\text{heads}$ heads (Section~\ref{sec:attention}). A residual connection adds the attention output back to the embedding. Only the representation at the \emph{last} sequence position is retained for subsequent processing.
+
+\paragraph{Without attention (\texttt{attention = False}).}
+A separate embedding matrix $W_{E_i} \in \mathbb{R}^{V_\text{in}\times d_\text{residual}}$ is learned for each input position $i \in \{1,\dots,T\}$. The residual-stream vector is the element-wise sum of all position embeddings:
+\[
+    x = \sum_{i=1}^{T} W_{E_i}[\text{token}_i].
+\]
+This removes the attention mechanism entirely, replacing it with a simple additive composition of per-position embeddings.
+
+\subsection{Causal Self-Attention}
+\label{sec:attention}
+
+When attention is enabled, the model uses multi-head causal (masked) self-attention. A single linear projection produces queries, keys, and values ($Q$, $K$, $V$), which are split across $n_\text{heads}$ heads, each of dimension $d_\text{head} = d_\text{residual} / n_\text{heads}$. Attention scores are computed as:
+\[
+    \text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_\text{head}}} + M\right) V,
+\]
+where $M$ is a causal mask that sets future positions to $-\infty$. The outputs of all heads are concatenated and projected back to $d_\text{residual}$ dimensions via a learned linear map. Notably, no bias is used in the attention projections.
+
+\subsection{Feed-Forward Block}
+\label{sec:ff}
+
+When enabled (\texttt{ff = True}), the feed-forward block is a standard two-layer MLP:
+\[
+    \text{FF}(x) = W_2\, \sigma\!\left(W_1 x + b_1\right) + b_2,
+\]
+where $W_1 \in \mathbb{R}^{d_\text{ff} \times d_\text{residual}}$, $W_2 \in \mathbb{R}^{d_\text{residual} \times d_\text{ff}}$, and $\sigma$ is a configurable activation function (GELU by default; ReLU is also supported). Biases $b_1, b_2$ are included only when \texttt{bias = True}. The input to the MLP is optionally normalised with RMSNorm (controlled by \texttt{norms}).
+
+A residual connection around the feed-forward block is controlled by the flag \texttt{ff\_residual}:
+\[
+    x \leftarrow
+    \begin{cases}
+        x + \text{FF}(\text{Norm}(x)) & \text{if } \texttt{ff\_residual = True},\\
+        \text{FF}(\text{Norm}(x)) & \text{otherwise}.
+    \end{cases}
+\]
+
+\subsection{Output Head}
+
+The residual-stream vector is passed through a final RMSNorm (if \texttt{norms = True}) and then a linear projection $W_H \in \mathbb{R}^{V_\text{out} \times d_\text{residual}}$ (with optional bias) to produce logits over the output vocabulary of size $V_\text{out}$.
+
+\subsection{Configuration Summary}
+
+\begin{table}[ht]
+\centering
+\caption{Model settings and their descriptions.}
+\label{tab:settings}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Parameter} & \textbf{Default} & \textbf{Description} \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Data dimensions}} \\
+\texttt{seq\_len}            & 2     & Number of input tokens per fact \\
+\texttt{input\_vocab\_size}  & 32    & Size of the input token vocabulary \\
+\texttt{output\_vocab\_size} & 16    & Size of the output token vocabulary \\
+\texttt{n\_facts}            & 64    & Number of facts to memorise \\
+\texttt{seed}                & 42    & Random seed for fact generation \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Internal dimensions}} \\
+\texttt{d\_residual}         & 16    & Residual-stream (embedding) dimension \\
+\texttt{n\_heads}            & 1     & Number of attention heads \\
+\texttt{d\_ff}               & 16    & Hidden dimension of the feed-forward block \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Architectural toggles}} \\
+\texttt{attention}           & True  & Enable causal self-attention \\
+\texttt{ff}                  & True  & Enable feed-forward block \\
+\texttt{bias}                & True  & Include bias terms in linear layers \\
+\texttt{norms}               & True  & Use RMSNorm (otherwise identity) \\
+\texttt{ff\_residual}        & True  & Residual connection around FF block \\
+\texttt{ff\_activation\_type}& GELU  & Activation function (GELU or ReLU) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Fact Generation}
+
+Facts are generated deterministically from the random seed. Each fact consists of \texttt{seq\_len} input tokens drawn (without replacement at the tuple level) from the input vocabulary and a target token assigned cyclically from the output vocabulary ($\text{target}_i = i \bmod V_\text{out}$). This ensures a uniform distribution over output classes while the input--output mapping remains arbitrary, preventing the model from learning a simple rule.
+
+
+\section{Training}
+
+The model is trained with the Adam optimiser, using binary cross-entropy with logits as the loss function (applied to one-hot encoded targets). Two accuracy metrics are tracked:
+\begin{itemize}[nosep]
+    \item \textbf{Accuracy}: the fraction of (fact, output-class) pairs for which the sign of the logit matches the one-hot label.
+    \item \textbf{Best-guess accuracy}: the fraction of facts for which $\arg\max$ of the logits equals the correct target.
+\end{itemize}
+Training supports optional early stopping: it halts when perfect monitored accuracy is reached, or when the monitored accuracy has not improved for a specified number of patience epochs.
+
+
+\section{Experiment: Which architectural components matter for fact memorisation?}
+\label{sec:e2-3att}
+
+The results of this experiment are shown in Table \ref{tab:e2-3att}, which reports the maximum number of facts successfully memorised for each architectural configuration. Outliers are highlighted with a \fbox{box} and the highest value in each row is shown in \textbf{bold}.
+
+The results comes from four diffrent runs: \texttt{experiment\_log\_3att\_duplicate}, \texttt{experiment\_log\_3att}, \texttt{experiment\_log}, and \texttt{E1/experiment\_log}. For the last one only results with attentions are included becasue of a bugg in the code for non-attention cases, during that run. 
+
+\subsection{Comments on outliers}
+Outliers are highlighted with a \fbox{box}. Almost all outliers are low values, which indicates that they are due to training failures. The one exception is the high outlier of 768 facts memorised for the configuration with Attention, FF, Norms, Residual, Bias, and ReLU activation. I don't now what's up with that, but I think it indicates that higher number of facts is generaly possible, whith a bit of luck, and/or longer training.
+
+There are lots of outliers in the experiments which did not run mulitple attempts for each number of facts. This shows that running multiple attempts is important for avoiding being misled by training failures.
+
+\subsection{Attention and FF obviously matters}
+Including Attention or not, and incluing a Feed-Forward block or not, obviouly matters, which is also confirmed in table \ref{tab:e2-3att}. 
+
+Notice that excluding Attention leads to more facts memorised. This is not supprising. The reason is beause the attention replacement is more powerfull than the attention itself. 
+
+Next we'll go over the other settings one by one, in order of least expected importance.
+
+
+\begin{table}[ht]
+\centering
+\caption{Maximum facts memorised per architectural configuration ($d_{\text{residual}}=16$, $d_{\text{ff}}=16$). Columns Dup, 3att, and Orig correspond to \texttt{experiment\_log\_3att\_duplicate}, \texttt{experiment\_log\_3att}, and \texttt{experiment\_log}, respectively. E1 corresponds to \texttt{E1/experiment\_log} (attention-only configurations). The highest value in each row is shown in \textbf{bold}.}
+\label{tab:e2-3att}
+\begin{tabular}{@{}cccccc cccc@{}}
+\toprule
+ & & & & & & \multicolumn{4}{c}{\textbf{Max Facts}} \\
+\cmidrule(l){7-10}
+\textbf{Attention} & \textbf{FF} & \textbf{Norms} & \textbf{Residual} & \textbf{Bias} & \textbf{Activation} & \textbf{Dup} & \textbf{3att} & \textbf{Orig} & \textbf{E1} \\
+\midrule
+\cmark & \cmark & \cmark & \cmark & \cmark & GELU & 568 & \textbf{576} & \fbox{248} & 528 \\
+\cmark & \cmark & \cmark & \cmark & \cmark & ReLU & 536 & 536 & \fbox{\textbf{768}} & 368 \\
+\cmark & \cmark & \cmark & \cmark & \xmark & GELU & 560 & \textbf{576} & \textbf{576} & 512 \\
+\cmark & \cmark & \cmark & \cmark & \xmark & ReLU & \textbf{536} & 504 & 496 & 512 \\
+\cmark & \cmark & \cmark & \xmark & \cmark & GELU & 504 & 504 & 464 & \textbf{520} \\
+\cmark & \cmark & \cmark & \xmark & \cmark & ReLU & 456 & \textbf{512} & 432 & \fbox{56} \\
+\cmark & \cmark & \cmark & \xmark & \xmark & GELU & \textbf{528} & \textbf{528} & \fbox{120} & 480 \\
+\cmark & \cmark & \cmark & \xmark & \xmark & ReLU & 368 & \textbf{384} & 288 & 320 \\
+\cmark & \cmark & \xmark & \cmark & \cmark & GELU & \textbf{304} & 264 & \fbox{48} & \fbox{80} \\
+\cmark & \cmark & \xmark & \cmark & \cmark & ReLU & \textbf{432} & 304 & \fbox{160} & \fbox{160} \\
+\cmark & \cmark & \xmark & \cmark & \xmark & GELU & 368 & \textbf{424} & \fbox{152} & 288 \\
+\cmark & \cmark & \xmark & \cmark & \xmark & ReLU & 416 & \textbf{512} & \fbox{96} & \fbox{120} \\
+\cmark & \cmark & \xmark & \xmark & \cmark & GELU & \textbf{384} & 232 & 304 & 256 \\
+\cmark & \cmark & \xmark & \xmark & \cmark & ReLU & 248 & \textbf{368} & 320 & 296 \\
+\cmark & \cmark & \xmark & \xmark & \xmark & GELU & 280 & 240 & 224 & \textbf{336} \\
+\cmark & \cmark & \xmark & \xmark & \xmark & ReLU & 320 & 272 & \textbf{352} & \fbox{8} \\
+\midrule
+\cmark & \xmark & \cmark & N/A & N/A & N/A & \textbf{256} & \textbf{256} & 200 & \fbox{24} \\
+\cmark & \xmark & \xmark & N/A & N/A & N/A & \textbf{48} & \textbf{48} & 24 & 32 \\
+\midrule
+\xmark & \cmark & \cmark & \cmark & \cmark & GELU & \textbf{832} & 792 & 808 & \\
+\xmark & \cmark & \cmark & \cmark & \cmark & ReLU & 808 & 816 & \textbf{832} & \\
+\xmark & \cmark & \cmark & \cmark & \xmark & GELU & \textbf{744} & \textbf{744} & 728 & \\
+\xmark & \cmark & \cmark & \cmark & \xmark & ReLU & \textbf{744} & 736 & 728 & \\
+\xmark & \cmark & \cmark & \xmark & \cmark & GELU & \textbf{792} & 768 & 768 & \\
+\xmark & \cmark & \cmark & \xmark & \cmark & ReLU & \textbf{704} & 632 & 680 & \\
+\xmark & \cmark & \cmark & \xmark & \xmark & GELU & 576 & \textbf{584} & 568 & \\
+\xmark & \cmark & \cmark & \xmark & \xmark & ReLU & 480 & \textbf{512} & \fbox{248} & \\
+\xmark & \cmark & \xmark & \cmark & \cmark & GELU & 688 & \textbf{696} & 680 & \\
+\xmark & \cmark & \xmark & \cmark & \cmark & ReLU & 672 & \textbf{688} & 672 & \\
+\xmark & \cmark & \xmark & \cmark & \xmark & GELU & 648 & 648 & \textbf{688} & \\
+\xmark & \cmark & \xmark & \cmark & \xmark & ReLU & \textbf{672} & \textbf{672} & \textbf{672} & \\
+\xmark & \cmark & \xmark & \xmark & \cmark & GELU & 536 & 560 & \textbf{576} & \\
+\xmark & \cmark & \xmark & \xmark & \cmark & ReLU & \textbf{552} & 544 & 544 & \\
+\xmark & \cmark & \xmark & \xmark & \xmark & GELU & 536 & \textbf{544} & 536 & \\
+\xmark & \cmark & \xmark & \xmark & \xmark & ReLU & 544 & \textbf{552} & 504 & \\
+\midrule
+\xmark & \xmark & \cmark & N/A & N/A & N/A & 240 & 248 & \textbf{256} & \\
+\xmark & \xmark & \xmark & N/A & N/A & N/A & \textbf{64} & \textbf{64} & \textbf{64} & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Does GELU vs RELU matter? - Probably not much}
+I don't think GELU vs ReLU has a significant impact on the maximum number of facts that can be learned. The main reason for this conclusion is that niether GELU nor RELU consistently outperform the other option, across the different architectural configurations.
+
+Looking at table \ref{tab:e2-3att}, we can see that the choice of activation function (GELU vs ReLU) does not have a consistent impact on the maximum number of facts memorised across different architectural configurations. Comparing GELU vs ReLU for each combination of the otther settings, we find that \textbf{GELU have higher Max Facts in 9 cases, ReLU have higher Max Facts in 5 cases, and they score equaly in 2 cases.}
+
+Most of the time the diffrence in Max Facts is small, except for
+\begin{itemize}
+    \item Attention: \cmark, FF: \cmark, Norms: \cmark, Residual: \cmark, Bias: \cmark \\ where the difference is 576 vs 768, in favour of ReLU.
+    \item Attention: \cmark, FF: \cmark, Norms: \cmark, Residual: \xmark, Bias: \xmark \\ where the difference is 528 vs 384 in favour of GELU.
+    \item Attention: \cmark, FF: \cmark, Norms: \xmark, Residual: \cmark, Bias: \cmark \\ where the difference is 304 vs 432 in favour of ReLU.
+\end{itemize}
+
+I think these are due to training instabilities rather than a significant fact learning capacity between ReLU and GELU.
+
+\subsection{Does including a Bias matter - Probably not much}
+Including Bias or not in the feed-forward block does not seem to have a bit more impact than the choice of activation function. Bias mostly does better than No Bias, but there are some counter examples.
+
+Looking at table \ref{tab:e2-3att}, we can see that the inclusion of a Bias in the FF module, does not have a consistent impact on the maximum number of facts memorised across different architectural configurations. Comparing Bias vs No Bias for each combination of the otther settings, we find that \textbf{Bias have higher Max Facts in 11 cases, No Bias have higher Max Facts in 3 cases, and they score equaly in 1 case.}
+
+The largest differences in Max Facts between Bias and No Bias are observed in the following configurations:
+\begin{itemize}
+    \item Attention: \cmark, FF: \cmark, Norms: \cmark, Residual: \cmark, Activation: ReLU \\ where the difference is 768 vs 536 in favour of Bias.
+    \item Attention: \xmark, FF: \cmark, Norms: \cmark, Residual: \xmark, Activation: GELU \\ where the difference is 792 vs 584 in favour of Bias.
+    \item Attention: \xmark, FF: \cmark, Norms: \cmark, Residual: \xmark, Activation: ReLU \\ where the difference is 704 vs 512 in favour of Bias.
+\end{itemize}
+
+There are some effects of including the Bias. The effect size is bigger than for GELU vs ReLU. But this effect should decreese as the network scales, so going forward, I will chose not to worry about this.
+
+\subsection{Does including a Residual connection matter? - Yes}
+
+Looking at table \ref{tab:e2-3att}, we can see that the inclusion of a Residual connection in parallel to the FF module, has a mostly consistent impact on the maximum number of facts memorised across different architectural configurations. Comparing Residual vs No Residual for each combination of the other settings, we find that \textbf{Residual have higher Max Facts in 15 cases, No Residual have higher Max Facts in 1 case.}
+
+The one case where No Residual outperforms Residual is:
+\begin{itemize}
+    \item Attention: \cmark, FF: \cmark, Norms: \xmark, Bias: \cmark, Activation: GELU \\ where the difference is 308 vs 384 in favour of No Residual.
+\end{itemize}
+
+For the rest of the configurantions, Residual outperforms no Residual with 5.1\% - 50.0\% (25.9\% average) more Facts memorised. 
+
+
+
+\subsection{Does including a Layer Norms matter? - Yes}
+
+Looking at table \ref{tab:e2-3att}, we can see that the inclusion of a Layer Norms, has a mostly consistent impact on the maximum number of facts memorised across different architectural configurations. Comparing Layer Norms vs No Layer Norms for each combination of the other settings, we find that \textbf{Layer Norms have higher Max Facts in 17 cases, No Layer Norms have higher Max Facts in 1 case.}
+
+The one case where No Layer Norms outperforms Layer Norms is:
+\begin{itemize}
+    \item Attention: \xmark, FF: \cmark, Norms: \xmark, Bias: \xmark, Activation: GELU \\ where the difference is 512 vs 552 in favour of No Layer Norms.
+\end{itemize}
+
+The inclusion of Layer Norm has a much large inpact on when there is no FF module. Excluing the two no FF cases, and the configuration mentioned above, Layer Norms outperforms no Layer Norms with 4.7\% - 89.5\% (32.0\% average) more Facts memorised.
+
+When there is no FF module, Layer Norms outperforms no Layer Norms with 300.0\% - 433.3\% (366.7\% average) more Facts memorised.
+
+
+\end{document}

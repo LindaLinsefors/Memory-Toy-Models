@@ -1,0 +1,936 @@
+============================================================
+  Name       : E1__ff____GELU
+  Max facts  : 224
+  Timestamp  : 2026-04-08T13:59:46.295169
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : True
+    bias                     : False
+    norms                    : False
+    ff_residual              : False
+    ff_activation_type       : GELU
+  Extra:
+    wandb_group              : E1__ff___GELU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1__ff____ReLU
+  Max facts  : 224
+  Timestamp  : 2026-04-08T14:14:45.920424
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : True
+    bias                     : False
+    norms                    : False
+    ff_residual              : False
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1__ff___ReLU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1__ff___ffres_GELU
+  Max facts  : 272
+  Timestamp  : 2026-04-08T14:48:35.713751
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : True
+    bias                     : False
+    norms                    : False
+    ff_residual              : True
+    ff_activation_type       : GELU
+  Extra:
+    wandb_group              : E1__ff__ffres_GELU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1__ff___ffres_ReLU
+  Max facts  : 272
+  Timestamp  : 2026-04-08T15:40:40.955028
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : True
+    bias                     : False
+    norms                    : False
+    ff_residual              : True
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1__ff__ffres_ReLU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1__ff__norms__GELU
+  Max facts  : 232
+  Timestamp  : 2026-04-08T16:07:04.932768
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : True
+    bias                     : False
+    norms                    : True
+    ff_residual              : False
+    ff_activation_type       : GELU
+  Extra:
+    wandb_group              : E1__ff_norms__GELU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1__ff__norms__ReLU
+  Max facts  : 200
+  Timestamp  : 2026-04-08T16:33:43.646435
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : True
+    bias                     : False
+    norms                    : True
+    ff_residual              : False
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1__ff_norms__ReLU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1__ff__norms_ffres_GELU
+  Max facts  : 304
+  Timestamp  : 2026-04-08T17:27:20.733788
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : True
+    bias                     : False
+    norms                    : True
+    ff_residual              : True
+    ff_activation_type       : GELU
+  Extra:
+    wandb_group              : E1__ff_norms_ffres_GELU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1__ff__norms_ffres_ReLU
+  Max facts  : 280
+  Timestamp  : 2026-04-08T17:58:50.444778
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : True
+    bias                     : False
+    norms                    : True
+    ff_residual              : True
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1__ff_norms_ffres_ReLU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1__ff_bias___GELU
+  Max facts  : 264
+  Timestamp  : 2026-04-08T18:16:13.754035
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : True
+    bias                     : True
+    norms                    : False
+    ff_residual              : False
+    ff_activation_type       : GELU
+  Extra:
+    wandb_group              : E1__ff___GELU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1__ff_bias___ReLU
+  Max facts  : 232
+  Timestamp  : 2026-04-08T18:22:35.321587
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : True
+    bias                     : True
+    norms                    : False
+    ff_residual              : False
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1__ff___ReLU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1__ff_bias__ffres_GELU
+  Max facts  : 296
+  Timestamp  : 2026-04-08T18:41:18.545336
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : True
+    bias                     : True
+    norms                    : False
+    ff_residual              : True
+    ff_activation_type       : GELU
+  Extra:
+    wandb_group              : E1__ff__ffres_GELU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1__ff_bias__ffres_ReLU
+  Max facts  : 280
+  Timestamp  : 2026-04-08T19:03:09.841166
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : True
+    bias                     : True
+    norms                    : False
+    ff_residual              : True
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1__ff__ffres_ReLU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1__ff_bias_norms__GELU
+  Max facts  : 288
+  Timestamp  : 2026-04-08T19:45:48.489462
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : True
+    bias                     : True
+    norms                    : True
+    ff_residual              : False
+    ff_activation_type       : GELU
+  Extra:
+    wandb_group              : E1__ff_norms__GELU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1__ff_bias_norms__ReLU
+  Max facts  : 248
+  Timestamp  : 2026-04-08T20:11:36.832339
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : True
+    bias                     : True
+    norms                    : True
+    ff_residual              : False
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1__ff_norms__ReLU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1__ff_bias_norms_ffres_GELU
+  Max facts  : 312
+  Timestamp  : 2026-04-08T21:01:41.358324
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : True
+    bias                     : True
+    norms                    : True
+    ff_residual              : True
+    ff_activation_type       : GELU
+  Extra:
+    wandb_group              : E1__ff_norms_ffres_GELU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1__ff_bias_norms_ffres_ReLU
+  Max facts  : 296
+  Timestamp  : 2026-04-08T21:57:20.253820
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : True
+    bias                     : True
+    norms                    : True
+    ff_residual              : True
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1__ff_norms_ffres_ReLU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn_ff____GELU
+  Max facts  : 336
+  Timestamp  : 2026-04-08T22:53:18.494794
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : True
+    bias                     : False
+    norms                    : False
+    ff_residual              : False
+    ff_activation_type       : GELU
+  Extra:
+    wandb_group              : E1_attn_ff___GELU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn_ff____ReLU
+  Max facts  : 8
+  Timestamp  : 2026-04-08T23:37:25.457762
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : True
+    bias                     : False
+    norms                    : False
+    ff_residual              : False
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1_attn_ff___ReLU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn_ff___ffres_GELU
+  Max facts  : 288
+  Timestamp  : 2026-04-09T00:25:28.376963
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : True
+    bias                     : False
+    norms                    : False
+    ff_residual              : True
+    ff_activation_type       : GELU
+  Extra:
+    wandb_group              : E1_attn_ff__ffres_GELU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn_ff___ffres_ReLU
+  Max facts  : 120
+  Timestamp  : 2026-04-09T00:38:40.635347
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : True
+    bias                     : False
+    norms                    : False
+    ff_residual              : True
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1_attn_ff__ffres_ReLU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn_ff__norms__GELU
+  Max facts  : 480
+  Timestamp  : 2026-04-09T01:20:23.292550
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : True
+    bias                     : False
+    norms                    : True
+    ff_residual              : False
+    ff_activation_type       : GELU
+  Extra:
+    wandb_group              : E1_attn_ff_norms__GELU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn_ff__norms__ReLU
+  Max facts  : 320
+  Timestamp  : 2026-04-09T01:53:51.955938
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : True
+    bias                     : False
+    norms                    : True
+    ff_residual              : False
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1_attn_ff_norms__ReLU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn_ff__norms_ffres_GELU
+  Max facts  : 512
+  Timestamp  : 2026-04-09T02:55:04.478558
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : True
+    bias                     : False
+    norms                    : True
+    ff_residual              : True
+    ff_activation_type       : GELU
+  Extra:
+    wandb_group              : E1_attn_ff_norms_ffres_GELU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn_ff__norms_ffres_ReLU
+  Max facts  : 512
+  Timestamp  : 2026-04-09T04:07:25.636136
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : True
+    bias                     : False
+    norms                    : True
+    ff_residual              : True
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1_attn_ff_norms_ffres_ReLU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn_ff_bias___GELU
+  Max facts  : 256
+  Timestamp  : 2026-04-09T04:48:03.792400
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : True
+    bias                     : True
+    norms                    : False
+    ff_residual              : False
+    ff_activation_type       : GELU
+  Extra:
+    wandb_group              : E1_attn_ff___GELU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn_ff_bias___ReLU
+  Max facts  : 296
+  Timestamp  : 2026-04-09T05:18:56.751434
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : True
+    bias                     : True
+    norms                    : False
+    ff_residual              : False
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1_attn_ff___ReLU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn_ff_bias__ffres_GELU
+  Max facts  : 80
+  Timestamp  : 2026-04-09T05:45:08.795937
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : True
+    bias                     : True
+    norms                    : False
+    ff_residual              : True
+    ff_activation_type       : GELU
+  Extra:
+    wandb_group              : E1_attn_ff__ffres_GELU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn_ff_bias__ffres_ReLU
+  Max facts  : 160
+  Timestamp  : 2026-04-09T06:10:53.027679
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : True
+    bias                     : True
+    norms                    : False
+    ff_residual              : True
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1_attn_ff__ffres_ReLU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn_ff_bias_norms__GELU
+  Max facts  : 520
+  Timestamp  : 2026-04-09T07:28:50.746453
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : True
+    bias                     : True
+    norms                    : True
+    ff_residual              : False
+    ff_activation_type       : GELU
+  Extra:
+    wandb_group              : E1_attn_ff_norms__GELU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn_ff_bias_norms__ReLU
+  Max facts  : 56
+  Timestamp  : 2026-04-09T07:55:06.238403
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : True
+    bias                     : True
+    norms                    : True
+    ff_residual              : False
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1_attn_ff_norms__ReLU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn_ff_bias_norms_ffres_GELU
+  Max facts  : 528
+  Timestamp  : 2026-04-09T08:58:58.920865
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : True
+    bias                     : True
+    norms                    : True
+    ff_residual              : True
+    ff_activation_type       : GELU
+  Extra:
+    wandb_group              : E1_attn_ff_norms_ffres_GELU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn_ff_bias_norms_ffres_ReLU
+  Max facts  : 368
+  Timestamp  : 2026-04-09T09:20:41.326300
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : True
+    bias                     : True
+    norms                    : True
+    ff_residual              : True
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1_attn_ff_norms_ffres_ReLU
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1___
+  Max facts  : 40
+  Timestamp  : 2026-04-09T09:29:11.845275
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : False
+    bias                     : True
+    norms                    : False
+    ff_residual              : True
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1___
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1___norms
+  Max facts  : 40
+  Timestamp  : 2026-04-09T09:38:21.338556
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : False
+    ff                       : False
+    bias                     : True
+    norms                    : True
+    ff_residual              : True
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1___norms
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn__
+  Max facts  : 32
+  Timestamp  : 2026-04-09T09:55:55.833222
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : False
+    bias                     : True
+    norms                    : False
+    ff_residual              : True
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1_attn__
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+
+============================================================
+  Name       : E1_attn__norms
+  Max facts  : 24
+  Timestamp  : 2026-04-09T10:27:13.008654
+  Settings:
+    seq_len                  : 2
+    input_vocab_size         : 32
+    output_vocab_size        : 16
+    n_facts                  : 64
+    seed                     : 42
+    d_residual               : 16
+    n_heads                  : 1
+    d_ff                     : 16
+    attention                : True
+    ff                       : False
+    bias                     : True
+    norms                    : True
+    ff_residual              : True
+    ff_activation_type       : ReLU
+  Extra:
+    wandb_group              : E1_attn__norms
+    n_epochs                 : 50000
+    lr                       : [0.01, 0.003, 0.001]
+    patience                 : 5000
+============================================================
+

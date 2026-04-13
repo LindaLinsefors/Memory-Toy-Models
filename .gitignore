@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Weights & Biases
+wandb/
+
+# LaTeX build artifacts
+writeup/*.aux
+writeup/*.fdb_latexmk
+writeup/*.fls
+writeup/*.log
+writeup/*.out
+writeup/*.synctex.gz
+writeup/*.bbl
+writeup/*.blg
+writeup/*.toc
+writeup/*.lof
+writeup/*.lot
+
+# Test logs
+*test_log*
+
+# PDF (uncomment if you want to track the writeup PDF)
+# writeup/*.pdf
