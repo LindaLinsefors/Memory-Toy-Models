@@ -150,3 +150,5 @@ max_facts = find_max_facts(settings_old, log_to_wandb=True, wandb_log_every=10, 
 time_end = time.time()
 print(f"Time taken: {time_end - time_start} seconds")
 # %%
+5
+# %%
