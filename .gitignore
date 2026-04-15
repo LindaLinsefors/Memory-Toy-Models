@@ -25,5 +25,8 @@ writeup/*.lot
 # Test logs
 *test_log*
 
+# Side quests
+side_quests/
+
 # PDF (uncomment if you want to track the writeup PDF)
 # writeup/*.pdf

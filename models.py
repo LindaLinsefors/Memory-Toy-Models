@@ -144,7 +144,7 @@ class MemoryToyModel(nn.Module):
 
 
 
-def train_model(model, n_epochs=2000, lr=1e-2, 
+def train_model(model, n_epochs=2000, lr=1e-2, optimizer_type='Adam', grad_clip_norm=None,
                 log_to_wandb=True, wandb_log_every=10, 
                 wandb_project=WANDB_PROJECT, wandb_group='test',
                 early_stopping = False, patience = 100, verbose = True,
@@ -183,7 +183,11 @@ def train_model(model, n_epochs=2000, lr=1e-2,
     if log_to_wandb and wandb.run is not None:
         epoch_offset = wandb.run.summary.get("epoch", 0)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    if optimizer_type == 'Adam':
+        optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    elif optimizer_type == 'AdamW':
+        optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
+
     one_hot_targets = F.one_hot(targets, model.settings.output_vocab_size)
 
     # Early stopping state
@@ -201,6 +205,8 @@ def train_model(model, n_epochs=2000, lr=1e-2,
         loss = F.binary_cross_entropy_with_logits(logits,one_hot_targets.float())
 
         loss.backward()
+        if grad_clip_norm is not None:
+            torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip_norm)
         optimizer.step()
 
         loss_val = loss.item()

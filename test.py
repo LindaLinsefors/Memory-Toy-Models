@@ -285,6 +285,25 @@ def test_train_model_no_attention():
     model = MemoryToyModel(s)
     train_model(model, n_epochs=10, log_to_wandb=False, early_stopping=False)
 
+def test_train_model_adamw():
+    s = ModelSettings(seq_len=2, input_vocab_size=8, output_vocab_size=4,
+                      n_facts=10, d_residual=16, n_heads=1, d_ff=32)
+    model = MemoryToyModel(s)
+    train_model(model, n_epochs=10, optimizer_type='AdamW', log_to_wandb=False, early_stopping=False)
+
+def test_train_model_grad_clip():
+    s = ModelSettings(seq_len=2, input_vocab_size=8, output_vocab_size=4,
+                      n_facts=10, d_residual=16, n_heads=1, d_ff=32)
+    model = MemoryToyModel(s)
+    train_model(model, n_epochs=10, grad_clip_norm=1.0, log_to_wandb=False, early_stopping=False)
+
+def test_train_model_adamw_with_grad_clip():
+    s = ModelSettings(seq_len=2, input_vocab_size=8, output_vocab_size=4,
+                      n_facts=10, d_residual=16, n_heads=1, d_ff=32)
+    model = MemoryToyModel(s)
+    train_model(model, n_epochs=10, optimizer_type='AdamW', grad_clip_norm=1.0,
+                log_to_wandb=False, early_stopping=False)
+
 
 # ==============================================================================
 # capacity_search tests
@@ -307,11 +326,14 @@ def test_try_n_facts_runs():
     """_try_n_facts should run and return a bool."""
     s = ModelSettings(seq_len=1, input_vocab_size=8, output_vocab_size=2,
                       n_facts=4, d_residual=16, n_heads=1, d_ff=32)
-    result = _try_n_facts(s, n_facts=4, n_epochs=10, lr=[1e-2], patience=5,
+    result = _try_n_facts(s, n_facts=4, n_epochs=10, lr=[1e-2],
+                          optimizer_type='Adam', grad_clip_norm=None,
+                          patience=5,
                           log_to_wandb=False, wandb_group='test',
                           wandb_log_every=10, verbose=False,
                           name_function=name_function_n_facts,
-                          train_for='accuracy')
+                          target_accuracy='accuracy',
+                          threshold_for_continued_search=0.0)
     assert isinstance(result, bool)
 
 
@@ -320,11 +342,14 @@ def test_try_n_facts_overrides_n_facts():
     s = ModelSettings(seq_len=1, input_vocab_size=8, output_vocab_size=2,
                       n_facts=999, d_residual=16, n_heads=1, d_ff=32)
     # Should not crash even though settings.n_facts=999 exceeds vocab capacity
-    result = _try_n_facts(s, n_facts=4, n_epochs=10, lr=[1e-2], patience=5,
+    result = _try_n_facts(s, n_facts=4, n_epochs=10, lr=[1e-2],
+                          optimizer_type='Adam', grad_clip_norm=None,
+                          patience=5,
                           log_to_wandb=False, wandb_group='test',
                           wandb_log_every=10, verbose=False,
                           name_function=name_function_n_facts,
-                          train_for='accuracy')
+                          target_accuracy='accuracy',
+                          threshold_for_continued_search=0.0)
     assert isinstance(result, bool)
 
 
@@ -381,25 +406,23 @@ def _log_base_path():
     return os.path.join(_LOG_TEST_DIR, "test_log")
 
 
-def test_log_result_creates_txt_and_jsonl(clean_log_test_dir):
+def test_log_result_creates_jsonl(clean_log_test_dir):
     settings = ModelSettings()
     path = _log_base_path()
     log_result("run_1", max_facts=42, settings=settings, filepath=path)
-    assert os.path.exists(path + ".txt")
     assert os.path.exists(path + ".jsonl")
 
 
-def test_log_result_txt_contains_expected_fields(clean_log_test_dir):
+def test_log_result_jsonl_contains_expected_fields(clean_log_test_dir):
     settings = ModelSettings(d_residual=32, n_heads=4)
     path = _log_base_path()
     log_result("my_run", max_facts=99, settings=settings, filepath=path)
-    txt = open(path + ".txt", encoding="utf-8").read()
-    assert "my_run" in txt
-    assert "99" in txt
-    assert "d_residual" in txt
-    assert "32" in txt
-    assert "n_heads" in txt
-    assert "4" in txt
+    with open(path + ".jsonl", encoding="utf-8") as f:
+        record = json.loads(f.readline())
+    assert record["name"] == "my_run"
+    assert record["max_facts"] == 99
+    assert record["settings"]["d_residual"] == 32
+    assert record["settings"]["n_heads"] == 4
 
 
 def test_log_result_jsonl_is_valid_json(clean_log_test_dir):
@@ -436,9 +459,6 @@ def test_log_result_with_extra(clean_log_test_dir):
         record = json.loads(f.readline())
     assert record["extra"]["lr"] == [0.01, 0.001]
     assert record["extra"]["patience"] == 500
-    txt = open(path + ".txt", encoding="utf-8").read()
-    assert "patience" in txt
-    assert "500" in txt
 
 
 def test_log_result_appends_multiple_runs(clean_log_test_dir):

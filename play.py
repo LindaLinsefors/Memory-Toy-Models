@@ -152,3 +152,24 @@ print(f"Time taken: {time_end - time_start} seconds")
 # %%
 5
 # %%
+
+settings = ModelSettings(seq_len=2, 
+                             input_vocab_size=64, 
+                             output_vocab_size=32, 
+                             d_residual=32, 
+                             d_ff=32,
+                             attention=True, 
+                             ff=True, bias=True, 
+                             norms = False, 
+                             ff_residual=False, 
+                             ff_activation_type='GELU')
+
+for [grad_clip_norm] in [None, 1.0]:
+    for optimizer_type in ['Adam', 'AdamW']:
+        group = f"playground_grad_clip_{grad_clip_norm}"
+
+        time_start = time.time()
+        max_facts = find_max_facts(settings, log_to_wandb=True, wandb_log_every=1, wandb_group=group,
+                                patience=3000, n_epochs=30000, lr=[1e-2, 3e-3, 1e-3], grad_clip_norm=grad_clip_norm)
+        time_end = time.time()
+        print(f"Time taken: {time_end - time_start} seconds")
