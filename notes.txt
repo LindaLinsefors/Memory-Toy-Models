@@ -41,3 +41,10 @@ All results from this experiment where attention=True are valid
 ## Experiment 2
 
 Second atempt at training every model architecture variant.
+
+
+
+
+
+Smothing makes training a bit more stable but hurts accuracy a lot. Not worth it.
+Unclear if clipiping and/or switching from Adam to AdamW makes any diffrence. 

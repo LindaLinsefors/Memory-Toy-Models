@@ -48,7 +48,7 @@ def find_max_facts(settings: ModelSettings,
                    verbose: bool = True,
                    name_function = name_function_n_facts,
                    target_accuracy: str = 'accuracy',
-                   threshold_for_continued_search: float = 0.99) -> int:
+                   threshold_to_continue: float = 0.99) -> int:
     """Binary search for the maximum number of facts a model architecture can learn.
 
     Args:
@@ -64,7 +64,7 @@ def find_max_facts(settings: ModelSettings,
         wandb_log_every: How often to log to W&B (in epochs).
         verbose:       Print progress during the search.
         target_accuracy:     Metric to train for ('accuracy' or 'best_guess_accuracy').
-        threshold_for_continued_search: 
+        threshold_to_continue: 
                        Minimum accuracy required to continue searching with a lower learning rate.
     Returns:
         The maximum n_facts for which the model achieved perfect accuracy
@@ -98,7 +98,7 @@ def find_max_facts(settings: ModelSettings,
                                    verbose=verbose,
                                    name_function=name_function,
                                    target_accuracy=target_accuracy,
-                                   threshold_for_continued_search=threshold_for_continued_search)
+                                   threshold_to_continue=threshold_to_continue)
             if success:
                 learned = True
                 break
@@ -132,7 +132,7 @@ def _try_n_facts(base_settings: ModelSettings,
                  verbose: bool,
                  name_function: callable,
                  target_accuracy: str,
-                 threshold_for_continued_search: float) -> bool:
+                 threshold_to_continue: float) -> bool:
     """Train a model with the given n_facts. Returns True if it achieves perfect accuracy."""
     trial_settings = copy.deepcopy(base_settings)
     trial_settings.n_facts = n_facts
@@ -152,12 +152,13 @@ def _try_n_facts(base_settings: ModelSettings,
         success, best_accuracy = train_model(
                                     model, n_epochs=n_epochs, lr=lr_value, 
                                     optimizer_type=optimizer_type, grad_clip_norm=grad_clip_norm,
-                                    log_to_wandb=log_to_wandb, wandb_log_every=wandb_log_every, wandb_group=wandb_group,
+                                    log_to_wandb=log_to_wandb, wandb_log_every=wandb_log_every, 
+                                    wandb_finish=False, wandb_group=wandb_group,
                                     early_stopping=True, patience=patience, verbose=verbose,
                                     target_accuracy = target_accuracy)
         if success:
             break  # stop if we found a learning rate that works
-        if best_accuracy < threshold_for_continued_search:
+        if best_accuracy < threshold_to_continue:
             break  # stop if accuracy is very low, unlikely to improve with more training
 
     if log_to_wandb:

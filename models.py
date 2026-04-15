@@ -144,9 +144,10 @@ class MemoryToyModel(nn.Module):
 
 
 
-def train_model(model, n_epochs=2000, lr=1e-2, optimizer_type='Adam', grad_clip_norm=None,
-                log_to_wandb=True, wandb_log_every=10, 
-                wandb_project=WANDB_PROJECT, wandb_group='test',
+def train_model(model, n_epochs=2000, lr=1e-2, 
+                optimizer_type='Adam', grad_clip_norm=None, smoothing=None,
+                log_to_wandb=True, wandb_log_every=10, wandb_finish=True,
+                wandb_project=WANDB_PROJECT, wandb_group='test', wandb_name=None,
                 early_stopping = False, patience = 100, verbose = True,
                 target_accuracy = 'accuracy') -> bool:
     """Train a MemoryToyModel on its stored facts.
@@ -157,6 +158,7 @@ def train_model(model, n_epochs=2000, lr=1e-2, optimizer_type='Adam', grad_clip_
         lr: Learning rate (defaults to 1e-2).
         log_every: Print loss every this many epochs (0 to disable).
         wandb_log_every: Log to wandb every this many epochs.
+        wandb_finish: Whether to call wandb.finish() at the end of training (to properly close the run).
         wandb_project: W&B project name. If provided, logs to wandb.
         wandb_group: W&B group name. If provided, logs to wandb.
         early_stopping: Whether to stop training early if accuracy plateaus.
@@ -175,6 +177,7 @@ def train_model(model, n_epochs=2000, lr=1e-2, optimizer_type='Adam', grad_clip_
             project=wandb_project,
             group=wandb_group,
             config=vars(model.settings),
+            name=wandb_name,
         )
 
     # Determine epoch offset from existing wandb run so consecutive
@@ -188,7 +191,12 @@ def train_model(model, n_epochs=2000, lr=1e-2, optimizer_type='Adam', grad_clip_
     elif optimizer_type == 'AdamW':
         optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
 
-    one_hot_targets = F.one_hot(targets, model.settings.output_vocab_size)
+    one_hot_targets = F.one_hot(targets, model.settings.output_vocab_size).float()
+
+    if smoothing is None:
+        loss_targets = one_hot_targets
+    else:
+        loss_targets = torch.ones_like(one_hot_targets) * smoothing + one_hot_targets * (1 - 2*smoothing)
 
     # Early stopping state
     best_accuracy = None
@@ -202,7 +210,7 @@ def train_model(model, n_epochs=2000, lr=1e-2, optimizer_type='Adam', grad_clip_
         optimizer.zero_grad()
         
         logits = model(inputs)
-        loss = F.binary_cross_entropy_with_logits(logits,one_hot_targets.float())
+        loss = F.binary_cross_entropy_with_logits(logits, loss_targets)
 
         loss.backward()
         if grad_clip_norm is not None:
@@ -247,6 +255,8 @@ def train_model(model, n_epochs=2000, lr=1e-2, optimizer_type='Adam', grad_clip_
     if log_to_wandb:
         wandb.log({"learned_all_facts": monitored_accuracy==1.0, 
                    "early_stopping_triggered": early_stopping_triggered})
+    if wandb_finish:
+        wandb.finish()
 
     return monitored_accuracy == 1.0, best_accuracy
 

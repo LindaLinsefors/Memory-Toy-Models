@@ -333,7 +333,7 @@ def test_try_n_facts_runs():
                           wandb_log_every=10, verbose=False,
                           name_function=name_function_n_facts,
                           target_accuracy='accuracy',
-                          threshold_for_continued_search=0.0)
+                          threshold_to_continue=0.0)
     assert isinstance(result, bool)
 
 
@@ -349,7 +349,7 @@ def test_try_n_facts_overrides_n_facts():
                           wandb_log_every=10, verbose=False,
                           name_function=name_function_n_facts,
                           target_accuracy='accuracy',
-                          threshold_for_continued_search=0.0)
+                          threshold_to_continue=0.0)
     assert isinstance(result, bool)
 
 

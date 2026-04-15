@@ -24,14 +24,14 @@ experiment_dir = "E3"
 os.makedirs(experiment_dir, exist_ok=True)
 
 testing = False
-model_type = 'full' # 'full' or 'reduced'
+model_type = 'reduced' # 'full' or 'reduced'
 
 log_to_wandb = True
 lr = [1e-2, 3e-3, 1e-3]
 patience = 5000
 n_epochs = 50000
 target_accuracy = 'accuracy'
-threshold_for_continued_search = 0.99
+threshold_to_continue = 0.99
 number_of_attempts = 3
 log_path = os.path.join(experiment_dir, f"{model_type}_model_log")
 
@@ -76,7 +76,7 @@ def run_sub_experiment(settings: ModelSettings, name: str):
                                 patience=patience, n_epochs=n_epochs, lr=lr, precision=precision,
                                 verbose = True, name_function=name_function, target_accuracy=target_accuracy,
                                 number_of_attempts=number_of_attempts, 
-                                threshold_for_continued_search=threshold_for_continued_search)
+                                threshold_to_continue=threshold_to_continue)
     
     print(f"Max facts learned: {max_facts}\n")
     
@@ -86,7 +86,7 @@ def run_sub_experiment(settings: ModelSettings, name: str):
         "lr": lr,
         "patience": patience,
         "target_accuracy": target_accuracy,
-        "threshold_for_continued_search": threshold_for_continued_search,
+        "threshold_to_continue": threshold_to_continue,
     })
 
 
@@ -108,4 +108,6 @@ for d in [16, 32, 64, 128]:
 
 
 
+# %%
+4
 # %%

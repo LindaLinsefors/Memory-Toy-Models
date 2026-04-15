@@ -12,6 +12,8 @@
 \usepackage{xcolor}
 \usepackage{pifont}
 \usepackage[margin=0.5cm]{caption}
+\usepackage{changepage}
+\usepackage{array}
 \usepackage{arydshln}
 
 \newcommand{\cmark}{{\color{green!70!black}\ding{51}}}
@@ -152,6 +154,51 @@ The model is trained with the Adam optimiser, using binary cross-entropy with lo
     \item \textbf{Best-guess accuracy}: the fraction of facts for which $\arg\max$ of the logits equals the correct target.
 \end{itemize}
 Training supports optional early stopping: it halts when perfect monitored accuracy is reached, or when the monitored accuracy has not improved for a specified number of patience epochs.
+
+\begin{table}[ht]
+\begin{adjustwidth}{-2cm}{-2cm}
+\centering
+\begin{tabular}{@{}ll l>{\raggedright\arraybackslash} m{9cm}@{}}
+\toprule
+\textbf{Parameter} & \shortstack[l]{\textbf{Supported} \\ \textbf{by code}} & \shortstack[l]{\textbf{Used in} \\ \textbf{experiments}} & \textbf{Description} \\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Training parameters}} \\
+\hdashline[1pt/3pt]
+\texttt{n\_epochs}         & int            & 50\,000               & Maximum training epochs \\
+\hdashline[1pt/3pt]
+\texttt{lr}                & float          & 1e-2, 3e-3, 1e-3      & Learning rate \\
+\hdashline[1pt/3pt]
+\texttt{optimizer\_type}   & Adam, AdamW    & Adam                  & Optimiser \\
+\hdashline[1pt/3pt]
+\texttt{grad\_clip\_norm}  & float or None  & None                  & Gradient clipping norm \\
+\hdashline[1pt/3pt]
+\texttt{smoothing}         & float or None  & None                  & Label smoothing factor \\
+\hdashline[1pt/3pt]
+\texttt{early\_stopping}   & True/False     & True                  & Enable early stopping \\
+\hdashline[1pt/3pt]
+\texttt{patience}          & int            & 3\,000--5\,000        & Epochs without improvement before stopping \\
+\hdashline[1pt/3pt]
+\texttt{target\_accuracy}  & \parbox[c]{3cm}{\vspace{2pt}\raggedright\texttt{accuracy}, {\footnotesize\texttt{best\_guess\_accuracy}}\vspace{2pt}} & \texttt{accuracy} & Monitored metric for early stopping \\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Capacity search parameters}} \\
+\hdashline[1pt/3pt]
+\texttt{lr}                & list of floats          & [1e-2, 3e-3, 1e-3]            
+& Learning rates, used sequentially. When progress has stalled or max epochs reached, continue with the next learning rate. \\
+\hdashline[1pt/3pt]
+\texttt{precision}                          & int            & 8            
+& Binary search stops when the remaining search interval is smaller than this value. \\
+\hdashline[1pt/3pt]
+\texttt{number\_of\_attempts}               & int            & 1, 3         
+& Number of times to try to learn each number of facts, re-starting with a new randomly initialised model each time. \\
+\hdashline[1pt/3pt]
+{\small\texttt{threshold\_to\_continue}}  & float          & 0.99         
+& If the monitored accuracy is below this threshold, when it's time to move on to the next learning rate, just give up instead. \\
+\bottomrule
+\end{tabular}
+\caption{Training and capacity-search parameters. ``Supported by code'' lists the types or values accepted by \texttt{train\_model} and \texttt{find\_max\_facts}; ``Used in experiments'' lists the values actually used in the recorded runs.}
+\label{tab:training-params}
+\end{adjustwidth}
+\end{table}
 
 
 \section{Experiment: Which architectural components matter for fact memorisation?}

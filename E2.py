@@ -38,14 +38,14 @@ patience = 5000
 n_epochs = 50000
 precision = 8
 target_accuracy = 'accuracy'
-threshold_for_continued_search = 0.99
+threshold_to_continue = 0.99
 number_of_attempts = 1
 log_path = os.path.join(experiment_dir, "experiment_log")
 
 if best_guess_accuracy:
     target_accuracy = 'best_guess_accuracy'
     log_path += "_bgacc"
-    threshold_for_continued_search = 0.90
+    threshold_to_continue = 0.90
 
 if extra_patience:
     patience = 30000
@@ -96,7 +96,7 @@ def run_sub_experiment(settings: ModelSettings, name: str):
                                 patience=patience, n_epochs=n_epochs, lr=lr, precision=precision,
                                 verbose = False, name_function=name_function, target_accuracy=target_accuracy,
                                 number_of_attempts=number_of_attempts, 
-                                threshold_for_continued_search=threshold_for_continued_search)
+                                threshold_to_continue=threshold_to_continue)
     
     print(f"Max facts learned: {max_facts}\n")
     
@@ -106,7 +106,7 @@ def run_sub_experiment(settings: ModelSettings, name: str):
         "lr": lr,
         "patience": patience,
         "target_accuracy": target_accuracy,
-        "threshold_for_continued_search": threshold_for_continued_search,
+        "threshold_to_continue": threshold_to_continue,
     })
 
 
