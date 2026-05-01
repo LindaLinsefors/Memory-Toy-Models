@@ -27,9 +27,11 @@ os.makedirs(experiment_dir, exist_ok=True)
 
 testing = False
 extra_patience = False
-best_guess_accuracy = False
-three_attempts = True
+three_attempts = False
 duplicate_experiment = True
+three_attempts_long = True
+
+loss_type = 'CE' # 'BCE' or 'CE'
 
 
 log_to_wandb = True
@@ -41,13 +43,16 @@ target_accuracy = 'accuracy'
 threshold_to_continue = 0.99
 number_of_attempts = 1
 log_path = os.path.join(experiment_dir, "experiment_log")
+verbose = False
 
-if best_guess_accuracy:
+if loss_type == 'CE':
     target_accuracy = 'best_guess_accuracy'
-    log_path += "_bgacc"
-    threshold_to_continue = 0.90
+    log_path += "_CE"
+    threshold_to_continue = 0.95
+    if not three_attempts:
+        threshold_to_continue = 0.9
 
-if extra_patience:
+if extra_patience: # I never used this one, it would take forever...
     patience = 30000
     n_epochs = 100000
     log_path += '_ep'
@@ -56,6 +61,11 @@ if three_attempts:
     number_of_attempts = 3
     patience = 3000
     log_path += '_3att'
+
+if three_attempts_long:
+    number_of_attempts = 3
+    log_path += '_3att_long'
+    verbose = True
 
 if duplicate_experiment:
     log_path += '_duplicate'
@@ -84,9 +94,9 @@ def run_sub_experiment(settings: ModelSettings, name: str):
     print(f"Running capacity search for: {name}")
 
 
-    if best_guess_accuracy:
+    if loss_type == 'CE':
         def name_function(settings: ModelSettings) -> str:
-            return f"{name}_{settings.n_facts}_bgacc"
+            return f"{name}_{settings.n_facts}_CE"
     else:
         def name_function(settings: ModelSettings) -> str:
             return f"{name}_{settings.n_facts}"
@@ -94,9 +104,9 @@ def run_sub_experiment(settings: ModelSettings, name: str):
 
     max_facts = find_max_facts(settings, log_to_wandb=log_to_wandb, wandb_log_every=10, wandb_group=name,
                                 patience=patience, n_epochs=n_epochs, lr=lr, precision=precision,
-                                verbose = False, name_function=name_function, target_accuracy=target_accuracy,
+                                verbose = verbose, name_function=name_function, target_accuracy=target_accuracy,
                                 number_of_attempts=number_of_attempts, 
-                                threshold_to_continue=threshold_to_continue)
+                                threshold_to_continue=threshold_to_continue, loss_type=loss_type)
     
     print(f"Max facts learned: {max_facts}\n")
     
@@ -107,6 +117,9 @@ def run_sub_experiment(settings: ModelSettings, name: str):
         "patience": patience,
         "target_accuracy": target_accuracy,
         "threshold_to_continue": threshold_to_continue,
+        "precision": precision,
+        "number_of_attempts": number_of_attempts,
+        "loss_type": loss_type,
     })
 
 
@@ -144,4 +157,6 @@ for attention in [False, True]:
         name = f"{experiment_dir}_{'attn' if attention else ''}__{'norms' if norms else ''}"
         run_sub_experiment(settings, name)
 
+# %%
+5
 # %%

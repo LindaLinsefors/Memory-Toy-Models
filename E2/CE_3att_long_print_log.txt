@@ -1,0 +1,3254 @@
+Running capacity search for: E2__ff____GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 169: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 10158: accuracy stable at 97.27% for 5000 epochs.
+Early stopping at epoch 10262: accuracy stable at 97.66% for 5000 epochs.
+Early stopping at epoch 8432: accuracy stable at 97.92% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 15264: accuracy stable at 99.74% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.74% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.74% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 16528: accuracy stable at 97.66% for 5000 epochs.
+Early stopping at epoch 16258: accuracy stable at 99.09% for 5000 epochs.
+Early stopping at epoch 9170: accuracy stable at 99.22% for 5000 epochs.
+✗  failed to learn 768 facts. Now searching: 513 - 767
+Trying n_facts = 640 ...
+  Attempt 1/3
+Early stopping at epoch 750: perfect accuracy reached.
+✓  learned all 640 facts. Now searching: 641 - 767
+Trying n_facts = 704 ...
+  Attempt 1/3
+Early stopping at epoch 6372: accuracy stable at 99.72% for 5000 epochs.
+Early stopping at epoch 3845: perfect accuracy reached.
+✓  learned all 704 facts. Now searching: 705 - 767
+Trying n_facts = 736 ...
+  Attempt 1/3
+Early stopping at epoch 9863: accuracy stable at 99.59% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.59% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.59% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 11794: accuracy stable at 98.91% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.91% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.91% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 9184: accuracy stable at 99.59% for 5000 epochs.
+Early stopping at epoch 9806: accuracy stable at 99.86% for 5000 epochs.
+Early stopping at epoch 4261: perfect accuracy reached.
+✓  learned all 736 facts. Now searching: 737 - 767
+Trying n_facts = 752 ...
+  Attempt 1/3
+Early stopping at epoch 9580: accuracy stable at 98.54% for 5000 epochs.
+Early stopping at epoch 9279: accuracy stable at 98.67% for 5000 epochs.
+Early stopping at epoch 8805: accuracy stable at 99.07% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 15085: accuracy stable at 99.87% for 5000 epochs.
+Early stopping at epoch 6894: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 17774: accuracy stable at 98.80% for 5000 epochs.
+Early stopping at epoch 9225: accuracy stable at 98.94% for 5000 epochs.
+Early stopping at epoch 9037: accuracy stable at 99.34% for 5000 epochs.
+✗  failed to learn 752 facts. Now searching: 737 - 751
+Trying n_facts = 744 ...
+  Attempt 1/3
+Early stopping at epoch 8289: perfect accuracy reached.
+✓  learned all 744 facts. Now searching: 745 - 751
+
+Max learnable facts: 744
+Max facts learned: 744
+
+Running capacity search for: E2__ff____ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 194: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 23276: accuracy stable at 96.74% for 5000 epochs.
+Early stopping at epoch 6585: accuracy stable at 96.74% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 96.74% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 25364: accuracy stable at 98.44% for 5000 epochs.
+Early stopping at epoch 8934: accuracy stable at 98.83% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.83% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 9586: accuracy stable at 92.06% for 5000 epochs.
+Early stopping at epoch 28344: accuracy stable at 94.01% for 5000 epochs.
+Early stopping at epoch 5005: accuracy stable at 94.01% for 5000 epochs.
+✗  failed to learn 768 facts. Now searching: 513 - 767
+Trying n_facts = 640 ...
+  Attempt 1/3
+Early stopping at epoch 1524: perfect accuracy reached.
+✓  learned all 640 facts. Now searching: 641 - 767
+Trying n_facts = 704 ...
+  Attempt 1/3
+Early stopping at epoch 8252: accuracy stable at 99.29% for 5000 epochs.
+Early stopping at epoch 6565: accuracy stable at 99.57% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.57% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 10595: accuracy stable at 95.74% for 5000 epochs.
+Early stopping at epoch 10551: accuracy stable at 96.45% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 96.45% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 8700: accuracy stable at 97.44% for 5000 epochs.
+Early stopping at epoch 5605: accuracy stable at 97.59% for 5000 epochs.
+Early stopping at epoch 6406: accuracy stable at 97.73% for 5000 epochs.
+✗  failed to learn 704 facts. Now searching: 641 - 703
+Trying n_facts = 672 ...
+  Attempt 1/3
+Early stopping at epoch 13392: accuracy stable at 96.58% for 5000 epochs.
+Early stopping at epoch 5271: accuracy stable at 97.17% for 5000 epochs.
+Early stopping at epoch 12094: accuracy stable at 97.92% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 7915: accuracy stable at 99.85% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.85% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.85% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 8007: accuracy stable at 99.26% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.26% for 5000 epochs.
+Early stopping at epoch 5476: accuracy stable at 99.40% for 5000 epochs.
+✗  failed to learn 672 facts. Now searching: 641 - 671
+Trying n_facts = 656 ...
+  Attempt 1/3
+Early stopping at epoch 7665: accuracy stable at 99.70% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.70% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.70% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 7864: accuracy stable at 99.85% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.85% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.85% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 6344: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+✗  failed to learn 656 facts. Now searching: 641 - 655
+Trying n_facts = 648 ...
+  Attempt 1/3
+Early stopping at epoch 8904: accuracy stable at 99.07% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.07% for 5000 epochs.
+Early stopping at epoch 6061: accuracy stable at 99.23% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 7025: accuracy stable at 98.77% for 5000 epochs.
+Early stopping at epoch 8726: accuracy stable at 98.92% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.92% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 7130: accuracy stable at 99.85% for 5000 epochs.
+Early stopping at epoch 1588: perfect accuracy reached.
+✓  learned all 648 facts. Now searching: 649 - 655
+
+Max learnable facts: 648
+Max facts learned: 648
+
+Running capacity search for: E2__ff___ffres_GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 148: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 742: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 12283: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 35254: accuracy stable at 94.06% for 5000 epochs.
+Early stopping at epoch 35148: accuracy stable at 98.13% for 5000 epochs.
+Early stopping at epoch 13457: accuracy stable at 98.54% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 36573: accuracy stable at 94.79% for 5000 epochs.
+Early stopping at epoch 18137: accuracy stable at 95.94% for 5000 epochs.
+Early stopping at epoch 15908: accuracy stable at 96.56% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 15853: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 40954: accuracy stable at 88.91% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 99.70%
+Early stopping at epoch 1042: perfect accuracy reached.
+✓  learned all 992 facts. Now searching: 993 - 1024
+Trying n_facts = 1008 ...
+  Attempt 1/3
+Early stopping at epoch 27566: accuracy stable at 86.71% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 90.08%
+Early stopping at epoch 16340: accuracy stable at 92.26% for 5000 epochs.
+Early stopping at epoch 10184: accuracy stable at 92.66% for 5000 epochs.
+  Attempt 3/3
+Finished 50000 epochs. Final accuracy: 99.21%
+Early stopping at epoch 9324: perfect accuracy reached.
+✓  learned all 1008 facts. Now searching: 1009 - 1024
+Trying n_facts = 1016 ...
+  Attempt 1/3
+Early stopping at epoch 35346: accuracy stable at 90.26% for 5000 epochs.
+Early stopping at epoch 19514: accuracy stable at 93.11% for 5000 epochs.
+Early stopping at epoch 5014: accuracy stable at 92.91% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 29896: accuracy stable at 90.35% for 5000 epochs.
+Early stopping at epoch 6444: accuracy stable at 90.45% for 5000 epochs.
+Early stopping at epoch 16606: accuracy stable at 91.63% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 26954: accuracy stable at 99.70% for 5000 epochs.
+Early stopping at epoch 3586: perfect accuracy reached.
+✓  learned all 1016 facts. Now searching: 1017 - 1024
+
+Max learnable facts: 1016
+Max facts learned: 1016
+
+Running capacity search for: E2__ff___ffres_ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 172: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 1141: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 5683: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 94.90%
+Early stopping at epoch 21062: accuracy stable at 96.98% for 5000 epochs.
+Early stopping at epoch 6760: accuracy stable at 97.19% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 95.00%
+Early stopping at epoch 29370: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 43139: accuracy stable at 86.19% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 90.12%
+Early stopping at epoch 37604: accuracy stable at 93.35% for 5000 epochs.
+Early stopping at epoch 5043: accuracy stable at 93.45% for 5000 epochs.
+  Attempt 3/3
+Finished 50000 epochs. Final accuracy: 68.55%
+Early stopping at epoch 15701: accuracy stable at 94.56% for 5000 epochs.
+Early stopping at epoch 21853: accuracy stable at 95.46% for 5000 epochs.
+✗  failed to learn 992 facts. Now searching: 961 - 991
+Trying n_facts = 976 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 94.36%
+Early stopping at epoch 20439: accuracy stable at 96.82% for 5000 epochs.
+Early stopping at epoch 20910: accuracy stable at 98.16% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 56.56%
+Early stopping at epoch 19163: accuracy stable at 94.57% for 5000 epochs.
+Early stopping at epoch 30237: accuracy stable at 96.72% for 5000 epochs.
+  Attempt 3/3
+Finished 50000 epochs. Final accuracy: 63.42%
+Early stopping at epoch 31169: accuracy stable at 95.08% for 5000 epochs.
+Early stopping at epoch 15001: accuracy stable at 96.00% for 5000 epochs.
+✗  failed to learn 976 facts. Now searching: 961 - 975
+Trying n_facts = 968 ...
+  Attempt 1/3
+Early stopping at epoch 24498: accuracy stable at 88.43% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 89.88%
+Early stopping at epoch 11569: accuracy stable at 91.43% for 5000 epochs.
+Early stopping at epoch 16022: accuracy stable at 93.18% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 34221: accuracy stable at 93.49% for 5000 epochs.
+Early stopping at epoch 40161: accuracy stable at 95.97% for 5000 epochs.
+Early stopping at epoch 18054: accuracy stable at 96.90% for 5000 epochs.
+✗  failed to learn 968 facts. Now searching: 961 - 967
+
+Max learnable facts: 960
+Max facts learned: 960
+
+Running capacity search for: E2__ff_norms___GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 181: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 6639: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 49996: accuracy stable at 90.51% for 5000 epochs.
+Early stopping at epoch 46824: accuracy stable at 97.77% for 5000 epochs.
+Early stopping at epoch 11134: accuracy stable at 98.66% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 45203: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 33189: accuracy stable at 78.13% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 17347: accuracy stable at 84.17% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 45745: accuracy stable at 88.75% for 5000 epochs.
+✗  failed to learn 960 facts. Now searching: 897 - 959
+Trying n_facts = 928 ...
+  Attempt 1/3
+Early stopping at epoch 21557: accuracy stable at 86.42% for 5000 epochs.
+Early stopping at epoch 25682: accuracy stable at 93.53% for 5000 epochs.
+Early stopping at epoch 17254: accuracy stable at 94.50% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 45211: accuracy stable at 85.67% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 21384: accuracy stable at 80.06% for 5000 epochs.
+✗  failed to learn 928 facts. Now searching: 897 - 927
+Trying n_facts = 912 ...
+  Attempt 1/3
+Early stopping at epoch 17708: accuracy stable at 84.65% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 18367: accuracy stable at 84.10% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 20150: accuracy stable at 87.17% for 5000 epochs.
+✗  failed to learn 912 facts. Now searching: 897 - 911
+Trying n_facts = 904 ...
+  Attempt 1/3
+Early stopping at epoch 28075: accuracy stable at 82.96% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 49103: accuracy stable at 91.70% for 5000 epochs.
+Early stopping at epoch 19297: accuracy stable at 93.03% for 5000 epochs.
+Early stopping at epoch 8871: accuracy stable at 96.24% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 32325: accuracy stable at 87.94% for 5000 epochs.
+✗  failed to learn 904 facts. Now searching: 897 - 903
+
+Max learnable facts: 896
+Max facts learned: 896
+
+Running capacity search for: E2__ff_norms___ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 5778: accuracy stable at 75.00% for 5000 epochs.
+Early stopping at epoch 6387: accuracy stable at 75.59% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 5606: accuracy stable at 83.79% for 5000 epochs.
+Early stopping at epoch 5146: accuracy stable at 83.20% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 5543: accuracy stable at 79.88% for 5000 epochs.
+Early stopping at epoch 7670: accuracy stable at 78.71% for 5000 epochs.
+✗  failed to learn 512 facts. Now searching: 1 - 511
+Trying n_facts = 256 ...
+  Attempt 1/3
+Early stopping at epoch 104: perfect accuracy reached.
+✓  learned all 256 facts. Now searching: 257 - 511
+Trying n_facts = 384 ...
+  Attempt 1/3
+Early stopping at epoch 5188: accuracy stable at 96.88% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 96.35% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 96.09% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 269: perfect accuracy reached.
+✓  learned all 384 facts. Now searching: 385 - 511
+Trying n_facts = 448 ...
+  Attempt 1/3
+Early stopping at epoch 5339: accuracy stable at 82.37% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 81.47% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 5332: accuracy stable at 94.42% for 5000 epochs.
+Early stopping at epoch 7103: accuracy stable at 93.30% for 5000 epochs.
+Early stopping at epoch 5112: accuracy stable at 93.53% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 8238: accuracy stable at 96.43% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 94.64% for 5000 epochs.
+Early stopping at epoch 5946: accuracy stable at 95.31% for 5000 epochs.
+✗  failed to learn 448 facts. Now searching: 385 - 447
+Trying n_facts = 416 ...
+  Attempt 1/3
+Early stopping at epoch 5255: accuracy stable at 81.73% for 5000 epochs.
+Early stopping at epoch 5116: accuracy stable at 81.25% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 5606: accuracy stable at 98.56% for 5000 epochs.
+Early stopping at epoch 9291: accuracy stable at 98.56% for 5000 epochs.
+Early stopping at epoch 9264: accuracy stable at 98.32% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 5599: accuracy stable at 98.80% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.32% for 5000 epochs.
+Early stopping at epoch 7582: accuracy stable at 98.80% for 5000 epochs.
+✗  failed to learn 416 facts. Now searching: 385 - 415
+Trying n_facts = 400 ...
+  Attempt 1/3
+Early stopping at epoch 5163: accuracy stable at 99.75% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.25% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.00% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 5327: accuracy stable at 47.00% for 5000 epochs.
+Early stopping at epoch 6908: accuracy stable at 48.25% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 232: perfect accuracy reached.
+✓  learned all 400 facts. Now searching: 401 - 415
+Trying n_facts = 408 ...
+  Attempt 1/3
+Early stopping at epoch 221: perfect accuracy reached.
+✓  learned all 408 facts. Now searching: 409 - 415
+
+Max learnable facts: 408
+Max facts learned: 408
+
+Running capacity search for: E2__ff_norms__ffres_GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 159: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 807: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 3311: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 10928: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 22216: perfect accuracy reached.
+✓  learned all 992 facts. Now searching: 993 - 1024
+Trying n_facts = 1008 ...
+  Attempt 1/3
+Early stopping at epoch 27648: perfect accuracy reached.
+✓  learned all 1008 facts. Now searching: 1009 - 1024
+Trying n_facts = 1016 ...
+  Attempt 1/3
+Early stopping at epoch 36856: accuracy stable at 98.13% for 5000 epochs.
+Early stopping at epoch 3687: perfect accuracy reached.
+✓  learned all 1016 facts. Now searching: 1017 - 1024
+
+Max learnable facts: 1016
+Max facts learned: 1016
+
+Running capacity search for: E2__ff_norms__ffres_ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 180: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 642: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 5886: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 23160: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 9808: perfect accuracy reached.
+✓  learned all 992 facts. Now searching: 993 - 1024
+Trying n_facts = 1008 ...
+  Attempt 1/3
+Early stopping at epoch 27746: perfect accuracy reached.
+✓  learned all 1008 facts. Now searching: 1009 - 1024
+Trying n_facts = 1016 ...
+  Attempt 1/3
+Early stopping at epoch 34285: accuracy stable at 97.24% for 5000 epochs.
+Early stopping at epoch 19189: perfect accuracy reached.
+✓  learned all 1016 facts. Now searching: 1017 - 1024
+
+Max learnable facts: 1016
+Max facts learned: 1016
+
+Running capacity search for: E2__ff__bias__GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 212: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 9499: accuracy stable at 98.44% for 5000 epochs.
+Early stopping at epoch 7815: accuracy stable at 98.83% for 5000 epochs.
+Early stopping at epoch 7634: accuracy stable at 98.96% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 7230: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 38665: accuracy stable at 87.95% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 38836: accuracy stable at 85.60% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 42833: accuracy stable at 86.38% for 5000 epochs.
+✗  failed to learn 896 facts. Now searching: 769 - 895
+Trying n_facts = 832 ...
+  Attempt 1/3
+Early stopping at epoch 24960: accuracy stable at 95.43% for 5000 epochs.
+Early stopping at epoch 20141: accuracy stable at 96.75% for 5000 epochs.
+Early stopping at epoch 8632: accuracy stable at 96.88% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 14286: perfect accuracy reached.
+✓  learned all 832 facts. Now searching: 833 - 895
+Trying n_facts = 864 ...
+  Attempt 1/3
+Early stopping at epoch 32836: accuracy stable at 90.39% for 5000 epochs.
+Early stopping at epoch 9037: accuracy stable at 90.51% for 5000 epochs.
+Early stopping at epoch 16247: accuracy stable at 92.36% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 16551: accuracy stable at 86.11% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 20458: perfect accuracy reached.
+✓  learned all 864 facts. Now searching: 865 - 895
+Trying n_facts = 880 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 98.86%
+Early stopping at epoch 9828: accuracy stable at 99.66% for 5000 epochs.
+Early stopping at epoch 7480: accuracy stable at 100.00% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 11840: accuracy stable at 87.95% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 16710: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+✗  failed to learn 880 facts. Now searching: 865 - 879
+Trying n_facts = 872 ...
+  Attempt 1/3
+Early stopping at epoch 29283: accuracy stable at 85.67% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 34949: accuracy stable at 88.42% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 39741: accuracy stable at 93.69% for 5000 epochs.
+Finished 50000 epochs. Final accuracy: 97.25%
+Early stopping at epoch 13204: accuracy stable at 99.89% for 5000 epochs.
+✗  failed to learn 872 facts. Now searching: 865 - 871
+
+Max learnable facts: 864
+Max facts learned: 864
+
+Running capacity search for: E2__ff__bias__ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 179: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 32846: accuracy stable at 99.74% for 5000 epochs.
+Early stopping at epoch 3279: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 30632: accuracy stable at 84.49% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 27839: accuracy stable at 81.81% for 5000 epochs.
+  Attempt 3/3
+Finished 50000 epochs. Final accuracy: 85.71%
+✗  failed to learn 896 facts. Now searching: 769 - 895
+Trying n_facts = 832 ...
+  Attempt 1/3
+Early stopping at epoch 24415: accuracy stable at 88.70% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 41602: accuracy stable at 92.79% for 5000 epochs.
+Early stopping at epoch 33838: accuracy stable at 95.79% for 5000 epochs.
+Early stopping at epoch 10951: accuracy stable at 97.24% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 23979: accuracy stable at 89.54% for 5000 epochs.
+Early stopping at epoch 8823: accuracy stable at 90.99% for 5000 epochs.
+Early stopping at epoch 7329: accuracy stable at 90.99% for 5000 epochs.
+✗  failed to learn 832 facts. Now searching: 769 - 831
+Trying n_facts = 800 ...
+  Attempt 1/3
+Early stopping at epoch 11067: perfect accuracy reached.
+✓  learned all 800 facts. Now searching: 801 - 831
+Trying n_facts = 816 ...
+  Attempt 1/3
+Early stopping at epoch 21004: accuracy stable at 95.47% for 5000 epochs.
+Early stopping at epoch 7572: accuracy stable at 95.59% for 5000 epochs.
+Early stopping at epoch 5548: accuracy stable at 95.83% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 30576: accuracy stable at 92.89% for 5000 epochs.
+Early stopping at epoch 8813: accuracy stable at 90.20% for 5000 epochs.
+Early stopping at epoch 8862: accuracy stable at 93.75% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 19947: accuracy stable at 97.43% for 5000 epochs.
+Early stopping at epoch 9436: accuracy stable at 97.55% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 97.55% for 5000 epochs.
+✗  failed to learn 816 facts. Now searching: 801 - 815
+Trying n_facts = 808 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 95.17%
+Early stopping at epoch 12153: accuracy stable at 97.28% for 5000 epochs.
+Early stopping at epoch 12211: accuracy stable at 98.02% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 24472: accuracy stable at 98.27% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.27% for 5000 epochs.
+Early stopping at epoch 8183: accuracy stable at 98.27% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 28411: accuracy stable at 89.48% for 5000 epochs.
+Early stopping at epoch 7643: accuracy stable at 95.05% for 5000 epochs.
+Early stopping at epoch 12696: accuracy stable at 95.67% for 5000 epochs.
+✗  failed to learn 808 facts. Now searching: 801 - 807
+
+Max learnable facts: 800
+Max facts learned: 800
+
+Running capacity search for: E2__ff__bias_ffres_GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 155: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 861: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 4034: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 32725: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 22916: accuracy stable at 95.67% for 5000 epochs.
+Early stopping at epoch 5041: accuracy stable at 95.87% for 5000 epochs.
+Early stopping at epoch 22618: accuracy stable at 96.57% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 49228: accuracy stable at 95.26% for 5000 epochs.
+Early stopping at epoch 14578: accuracy stable at 96.37% for 5000 epochs.
+Early stopping at epoch 6092: accuracy stable at 96.57% for 5000 epochs.
+  Attempt 3/3
+Finished 50000 epochs. Final accuracy: 98.39%
+Early stopping at epoch 17718: accuracy stable at 99.29% for 5000 epochs.
+Early stopping at epoch 8587: accuracy stable at 99.60% for 5000 epochs.
+✗  failed to learn 992 facts. Now searching: 961 - 991
+Trying n_facts = 976 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 99.59%
+Early stopping at epoch 8775: accuracy stable at 99.90% for 5000 epochs.
+Early stopping at epoch 5818: accuracy stable at 100.00% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 43403: accuracy stable at 94.16% for 5000 epochs.
+Early stopping at epoch 31514: accuracy stable at 96.62% for 5000 epochs.
+Early stopping at epoch 5025: accuracy stable at 96.72% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 39959: accuracy stable at 97.13% for 5000 epochs.
+Early stopping at epoch 11394: accuracy stable at 97.75% for 5000 epochs.
+Early stopping at epoch 32066: accuracy stable at 99.80% for 5000 epochs.
+✗  failed to learn 976 facts. Now searching: 961 - 975
+Trying n_facts = 968 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 99.07%
+Early stopping at epoch 9754: accuracy stable at 99.59% for 5000 epochs.
+Early stopping at epoch 13626: accuracy stable at 99.90% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 29309: accuracy stable at 99.17% for 5000 epochs.
+Early stopping at epoch 13070: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 44721: accuracy stable at 96.80% for 5000 epochs.
+Early stopping at epoch 27424: accuracy stable at 98.86% for 5000 epochs.
+Early stopping at epoch 8932: accuracy stable at 99.59% for 5000 epochs.
+✗  failed to learn 968 facts. Now searching: 961 - 967
+
+Max learnable facts: 960
+Max facts learned: 960
+
+Running capacity search for: E2__ff__bias_ffres_ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 170: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 923: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 21545: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 81.35%
+Early stopping at epoch 40798: accuracy stable at 97.92% for 5000 epochs.
+Early stopping at epoch 5024: accuracy stable at 98.02% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 99.17%
+Early stopping at epoch 9228: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 93.25%
+Early stopping at epoch 47808: accuracy stable at 98.99% for 5000 epochs.
+Early stopping at epoch 12131: accuracy stable at 99.60% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 33965: accuracy stable at 89.82% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 39473: accuracy stable at 96.67% for 5000 epochs.
+Early stopping at epoch 14951: accuracy stable at 97.78% for 5000 epochs.
+Early stopping at epoch 40406: accuracy stable at 99.70% for 5000 epochs.
+✗  failed to learn 992 facts. Now searching: 961 - 991
+Trying n_facts = 976 ...
+  Attempt 1/3
+Early stopping at epoch 36092: accuracy stable at 87.19% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 48785: accuracy stable at 92.21% for 5000 epochs.
+Early stopping at epoch 19936: accuracy stable at 93.65% for 5000 epochs.
+Early stopping at epoch 5073: accuracy stable at 93.65% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 48990: accuracy stable at 97.85% for 5000 epochs.
+Early stopping at epoch 11202: accuracy stable at 98.16% for 5000 epochs.
+Early stopping at epoch 5025: accuracy stable at 98.16% for 5000 epochs.
+✗  failed to learn 976 facts. Now searching: 961 - 975
+Trying n_facts = 968 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 97.21%
+Early stopping at epoch 13298: accuracy stable at 98.35% for 5000 epochs.
+Early stopping at epoch 10621: accuracy stable at 98.55% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 96.49%
+Early stopping at epoch 29757: accuracy stable at 98.24% for 5000 epochs.
+Early stopping at epoch 7345: accuracy stable at 98.55% for 5000 epochs.
+  Attempt 3/3
+Finished 50000 epochs. Final accuracy: 100.00%
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+✗  failed to learn 968 facts. Now searching: 961 - 967
+
+Max learnable facts: 960
+Max facts learned: 960
+
+Running capacity search for: E2__ff_norms_bias__GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 162: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 1703: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 8323: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 11255: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 42031: perfect accuracy reached.
+✓  learned all 992 facts. Now searching: 993 - 1024
+Trying n_facts = 1008 ...
+  Attempt 1/3
+Early stopping at epoch 11719: perfect accuracy reached.
+✓  learned all 1008 facts. Now searching: 1009 - 1024
+Trying n_facts = 1016 ...
+  Attempt 1/3
+Early stopping at epoch 30477: accuracy stable at 89.67% for 5000 epochs.
+Early stopping at epoch 42210: accuracy stable at 99.70% for 5000 epochs.
+Early stopping at epoch 6704: accuracy stable at 99.90% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 25655: perfect accuracy reached.
+✓  learned all 1016 facts. Now searching: 1017 - 1024
+
+Max learnable facts: 1016
+Max facts learned: 1016
+
+Running capacity search for: E2__ff_norms_bias__ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 270: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 4525: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 10988: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 26780: accuracy stable at 90.63% for 5000 epochs.
+Early stopping at epoch 9947: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 39074: perfect accuracy reached.
+✓  learned all 992 facts. Now searching: 993 - 1024
+Trying n_facts = 1008 ...
+  Attempt 1/3
+Early stopping at epoch 32466: accuracy stable at 93.55% for 5000 epochs.
+Early stopping at epoch 40358: perfect accuracy reached.
+✓  learned all 1008 facts. Now searching: 1009 - 1024
+Trying n_facts = 1016 ...
+  Attempt 1/3
+Early stopping at epoch 43007: accuracy stable at 93.01% for 5000 epochs.
+Early stopping at epoch 20292: accuracy stable at 93.70% for 5000 epochs.
+Early stopping at epoch 10810: accuracy stable at 95.87% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 32371: accuracy stable at 98.82% for 5000 epochs.
+Early stopping at epoch 6012: accuracy stable at 99.31% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.31% for 5000 epochs.
+  Attempt 3/3
+Finished 50000 epochs. Final accuracy: 94.29%
+Early stopping at epoch 28023: accuracy stable at 99.61% for 5000 epochs.
+Early stopping at epoch 10291: accuracy stable at 99.90% for 5000 epochs.
+✗  failed to learn 1016 facts. Now searching: 1009 - 1015
+
+Max learnable facts: 1008
+Max facts learned: 1008
+
+Running capacity search for: E2__ff_norms_bias_ffres_GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 144: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 498: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 1385: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 11203: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 16945: perfect accuracy reached.
+✓  learned all 992 facts. Now searching: 993 - 1024
+Trying n_facts = 1008 ...
+  Attempt 1/3
+Early stopping at epoch 27935: perfect accuracy reached.
+✓  learned all 1008 facts. Now searching: 1009 - 1024
+Trying n_facts = 1016 ...
+  Attempt 1/3
+Early stopping at epoch 10996: perfect accuracy reached.
+✓  learned all 1016 facts. Now searching: 1017 - 1024
+
+Max learnable facts: 1016
+Max facts learned: 1016
+
+Running capacity search for: E2__ff_norms_bias_ffres_ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 176: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 822: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 4387: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 7633: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 9986: perfect accuracy reached.
+✓  learned all 992 facts. Now searching: 993 - 1024
+Trying n_facts = 1008 ...
+  Attempt 1/3
+Early stopping at epoch 15372: perfect accuracy reached.
+✓  learned all 1008 facts. Now searching: 1009 - 1024
+Trying n_facts = 1016 ...
+  Attempt 1/3
+Early stopping at epoch 21838: perfect accuracy reached.
+✓  learned all 1016 facts. Now searching: 1017 - 1024
+
+Max learnable facts: 1016
+Max facts learned: 1016
+
+Running capacity search for: E2_attn_ff____GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 26038: accuracy stable at 23.24% for 5000 epochs.
+Early stopping at epoch 14821: accuracy stable at 25.39% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 14436: accuracy stable at 84.77% for 5000 epochs.
+Early stopping at epoch 20890: accuracy stable at 99.02% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.83% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 8605: accuracy stable at 91.41% for 5000 epochs.
+Early stopping at epoch 7853: accuracy stable at 95.31% for 5000 epochs.
+Early stopping at epoch 10524: accuracy stable at 96.09% for 5000 epochs.
+✗  failed to learn 512 facts. Now searching: 1 - 511
+Trying n_facts = 256 ...
+  Attempt 1/3
+Early stopping at epoch 1710: perfect accuracy reached.
+✓  learned all 256 facts. Now searching: 257 - 511
+Trying n_facts = 384 ...
+  Attempt 1/3
+Early stopping at epoch 1397: perfect accuracy reached.
+✓  learned all 384 facts. Now searching: 385 - 511
+Trying n_facts = 448 ...
+  Attempt 1/3
+Early stopping at epoch 17384: accuracy stable at 99.55% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.55% for 5000 epochs.
+Early stopping at epoch 8495: accuracy stable at 99.55% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 2204: perfect accuracy reached.
+✓  learned all 448 facts. Now searching: 449 - 511
+Trying n_facts = 480 ...
+  Attempt 1/3
+Early stopping at epoch 26020: accuracy stable at 97.50% for 5000 epochs.
+Early stopping at epoch 16186: accuracy stable at 98.33% for 5000 epochs.
+Early stopping at epoch 6682: accuracy stable at 99.58% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 10247: accuracy stable at 99.38% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.38% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.38% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 13011: accuracy stable at 87.08% for 5000 epochs.
+Early stopping at epoch 11658: accuracy stable at 91.04% for 5000 epochs.
+Early stopping at epoch 15642: accuracy stable at 93.96% for 5000 epochs.
+✗  failed to learn 480 facts. Now searching: 449 - 479
+Trying n_facts = 464 ...
+  Attempt 1/3
+Early stopping at epoch 5636: accuracy stable at 74.35% for 5000 epochs.
+Early stopping at epoch 8951: accuracy stable at 74.78% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 17837: perfect accuracy reached.
+✓  learned all 464 facts. Now searching: 465 - 479
+Trying n_facts = 472 ...
+  Attempt 1/3
+Early stopping at epoch 8015: accuracy stable at 99.58% for 5000 epochs.
+Early stopping at epoch 5105: accuracy stable at 99.79% for 5000 epochs.
+Early stopping at epoch 2394: perfect accuracy reached.
+✓  learned all 472 facts. Now searching: 473 - 479
+
+Max learnable facts: 472
+Max facts learned: 472
+
+Running capacity search for: E2_attn_ff____ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 11625: accuracy stable at 48.44% for 5000 epochs.
+Early stopping at epoch 17716: accuracy stable at 53.91% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 9398: accuracy stable at 97.66% for 5000 epochs.
+Early stopping at epoch 6708: accuracy stable at 98.44% for 5000 epochs.
+Early stopping at epoch 6055: accuracy stable at 98.44% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 6826: accuracy stable at 90.04% for 5000 epochs.
+Early stopping at epoch 12446: accuracy stable at 91.80% for 5000 epochs.
+Early stopping at epoch 18152: accuracy stable at 94.73% for 5000 epochs.
+✗  failed to learn 512 facts. Now searching: 1 - 511
+Trying n_facts = 256 ...
+  Attempt 1/3
+Early stopping at epoch 3044: perfect accuracy reached.
+✓  learned all 256 facts. Now searching: 257 - 511
+Trying n_facts = 384 ...
+  Attempt 1/3
+Early stopping at epoch 6478: accuracy stable at 97.40% for 5000 epochs.
+Early stopping at epoch 5668: accuracy stable at 98.18% for 5000 epochs.
+Early stopping at epoch 12212: accuracy stable at 98.44% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 12857: accuracy stable at 90.36% for 5000 epochs.
+Early stopping at epoch 21482: accuracy stable at 95.05% for 5000 epochs.
+Early stopping at epoch 8418: accuracy stable at 96.35% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 10894: accuracy stable at 98.96% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.96% for 5000 epochs.
+Early stopping at epoch 10039: accuracy stable at 99.48% for 5000 epochs.
+✗  failed to learn 384 facts. Now searching: 257 - 383
+Trying n_facts = 320 ...
+  Attempt 1/3
+Early stopping at epoch 11380: accuracy stable at 99.06% for 5000 epochs.
+Early stopping at epoch 5120: accuracy stable at 99.06% for 5000 epochs.
+Early stopping at epoch 5257: accuracy stable at 99.06% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 982: perfect accuracy reached.
+✓  learned all 320 facts. Now searching: 321 - 383
+Trying n_facts = 352 ...
+  Attempt 1/3
+Early stopping at epoch 7581: accuracy stable at 77.84% for 5000 epochs.
+Early stopping at epoch 12096: accuracy stable at 81.82% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 8222: accuracy stable at 99.72% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.72% for 5000 epochs.
+Early stopping at epoch 4190: perfect accuracy reached.
+✓  learned all 352 facts. Now searching: 353 - 383
+Trying n_facts = 368 ...
+  Attempt 1/3
+Early stopping at epoch 5328: perfect accuracy reached.
+✓  learned all 368 facts. Now searching: 369 - 383
+Trying n_facts = 376 ...
+  Attempt 1/3
+Early stopping at epoch 8970: accuracy stable at 94.41% for 5000 epochs.
+Early stopping at epoch 14011: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 13591: accuracy stable at 99.47% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.47% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.47% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 12493: accuracy stable at 99.73% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.73% for 5000 epochs.
+Early stopping at epoch 9304: accuracy stable at 100.00% for 5000 epochs.
+✗  failed to learn 376 facts. Now searching: 369 - 375
+
+Max learnable facts: 368
+Max facts learned: 368
+
+Running capacity search for: E2_attn_ff___ffres_GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 9700: accuracy stable at 95.31% for 5000 epochs.
+Early stopping at epoch 10437: accuracy stable at 95.12% for 5000 epochs.
+Early stopping at epoch 5535: accuracy stable at 96.09% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 10306: accuracy stable at 99.80% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.80% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.80% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 20244: accuracy stable at 98.83% for 5000 epochs.
+Early stopping at epoch 6320: accuracy stable at 99.22% for 5000 epochs.
+Early stopping at epoch 5687: accuracy stable at 99.41% for 5000 epochs.
+✗  failed to learn 512 facts. Now searching: 1 - 511
+Trying n_facts = 256 ...
+  Attempt 1/3
+Early stopping at epoch 5878: accuracy stable at 99.61% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.61% for 5000 epochs.
+Early stopping at epoch 577: perfect accuracy reached.
+✓  learned all 256 facts. Now searching: 257 - 511
+Trying n_facts = 384 ...
+  Attempt 1/3
+Early stopping at epoch 7159: accuracy stable at 96.88% for 5000 epochs.
+Early stopping at epoch 10070: accuracy stable at 98.44% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.44% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 7987: accuracy stable at 99.74% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.74% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.74% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 15577: accuracy stable at 99.74% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.74% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.74% for 5000 epochs.
+✗  failed to learn 384 facts. Now searching: 257 - 383
+Trying n_facts = 320 ...
+  Attempt 1/3
+Early stopping at epoch 5609: accuracy stable at 99.38% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.38% for 5000 epochs.
+Early stopping at epoch 8974: accuracy stable at 99.69% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 6324: accuracy stable at 99.69% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.69% for 5000 epochs.
+Early stopping at epoch 2439: perfect accuracy reached.
+✓  learned all 320 facts. Now searching: 321 - 383
+Trying n_facts = 352 ...
+  Attempt 1/3
+Early stopping at epoch 7111: accuracy stable at 99.72% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.72% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.72% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 9864: accuracy stable at 95.74% for 5000 epochs.
+Early stopping at epoch 5111: accuracy stable at 95.74% for 5000 epochs.
+Early stopping at epoch 5180: accuracy stable at 96.02% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 7030: accuracy stable at 99.15% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.15% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.15% for 5000 epochs.
+✗  failed to learn 352 facts. Now searching: 321 - 351
+Trying n_facts = 336 ...
+  Attempt 1/3
+Early stopping at epoch 1626: perfect accuracy reached.
+✓  learned all 336 facts. Now searching: 337 - 351
+Trying n_facts = 344 ...
+  Attempt 1/3
+Early stopping at epoch 509: perfect accuracy reached.
+✓  learned all 344 facts. Now searching: 345 - 351
+
+Max learnable facts: 344
+Max facts learned: 344
+
+Running capacity search for: E2_attn_ff___ffres_ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 25114: accuracy stable at 99.80% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.80% for 5000 epochs.
+Early stopping at epoch 74: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 16046: accuracy stable at 82.03% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 26522: accuracy stable at 85.03% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 25546: accuracy stable at 90.23% for 5000 epochs.
+Early stopping at epoch 16134: accuracy stable at 92.45% for 5000 epochs.
+Early stopping at epoch 9621: accuracy stable at 93.10% for 5000 epochs.
+✗  failed to learn 768 facts. Now searching: 513 - 767
+Trying n_facts = 640 ...
+  Attempt 1/3
+Early stopping at epoch 37458: accuracy stable at 97.66% for 5000 epochs.
+Early stopping at epoch 14280: accuracy stable at 99.22% for 5000 epochs.
+Early stopping at epoch 6235: accuracy stable at 99.22% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 13529: accuracy stable at 95.63% for 5000 epochs.
+Early stopping at epoch 8255: accuracy stable at 97.03% for 5000 epochs.
+Early stopping at epoch 7777: accuracy stable at 97.50% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 35330: accuracy stable at 94.22% for 5000 epochs.
+Early stopping at epoch 11161: accuracy stable at 95.78% for 5000 epochs.
+Early stopping at epoch 22727: accuracy stable at 96.72% for 5000 epochs.
+✗  failed to learn 640 facts. Now searching: 513 - 639
+Trying n_facts = 576 ...
+  Attempt 1/3
+Early stopping at epoch 25401: accuracy stable at 90.62% for 5000 epochs.
+Early stopping at epoch 5267: accuracy stable at 98.61% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.61% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 46389: accuracy stable at 99.48% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.48% for 5000 epochs.
+Early stopping at epoch 5714: accuracy stable at 99.48% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 16313: perfect accuracy reached.
+✓  learned all 576 facts. Now searching: 577 - 639
+Trying n_facts = 608 ...
+  Attempt 1/3
+Early stopping at epoch 12635: accuracy stable at 88.82% for 5000 epochs.
+Early stopping at epoch 12778: accuracy stable at 93.42% for 5000 epochs.
+Early stopping at epoch 12143: accuracy stable at 94.08% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 29465: accuracy stable at 91.45% for 5000 epochs.
+Early stopping at epoch 18244: accuracy stable at 94.41% for 5000 epochs.
+Early stopping at epoch 13062: accuracy stable at 96.22% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 15863: accuracy stable at 89.97% for 5000 epochs.
+Early stopping at epoch 14791: accuracy stable at 97.20% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 97.20% for 5000 epochs.
+✗  failed to learn 608 facts. Now searching: 577 - 607
+Trying n_facts = 592 ...
+  Attempt 1/3
+Early stopping at epoch 28798: accuracy stable at 95.61% for 5000 epochs.
+Early stopping at epoch 14408: accuracy stable at 96.45% for 5000 epochs.
+Early stopping at epoch 5041: accuracy stable at 96.62% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 21166: accuracy stable at 90.20% for 5000 epochs.
+Early stopping at epoch 11727: accuracy stable at 93.41% for 5000 epochs.
+Early stopping at epoch 5404: accuracy stable at 93.75% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 15998: accuracy stable at 97.13% for 5000 epochs.
+Early stopping at epoch 6024: accuracy stable at 98.48% for 5000 epochs.
+Early stopping at epoch 5789: accuracy stable at 98.99% for 5000 epochs.
+✗  failed to learn 592 facts. Now searching: 577 - 591
+Trying n_facts = 584 ...
+  Attempt 1/3
+Early stopping at epoch 30289: accuracy stable at 95.89% for 5000 epochs.
+Early stopping at epoch 23471: accuracy stable at 98.29% for 5000 epochs.
+Early stopping at epoch 5104: accuracy stable at 98.29% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 21515: accuracy stable at 90.75% for 5000 epochs.
+Early stopping at epoch 8873: accuracy stable at 95.72% for 5000 epochs.
+Early stopping at epoch 13094: accuracy stable at 97.09% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 15979: perfect accuracy reached.
+✓  learned all 584 facts. Now searching: 585 - 591
+
+Max learnable facts: 584
+Max facts learned: 584
+
+Running capacity search for: E2_attn_ff_norms___GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 1706: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 46241: accuracy stable at 91.41% for 5000 epochs.
+Early stopping at epoch 7637: accuracy stable at 91.80% for 5000 epochs.
+Early stopping at epoch 10995: accuracy stable at 93.10% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 34633: accuracy stable at 99.48% for 5000 epochs.
+Early stopping at epoch 6333: accuracy stable at 99.74% for 5000 epochs.
+Early stopping at epoch 5155: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 17009: accuracy stable at 79.02% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 20054: accuracy stable at 73.66% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 23731: accuracy stable at 75.00% for 5000 epochs.
+✗  failed to learn 896 facts. Now searching: 769 - 895
+Trying n_facts = 832 ...
+  Attempt 1/3
+Early stopping at epoch 24404: accuracy stable at 90.38% for 5000 epochs.
+Early stopping at epoch 47192: accuracy stable at 94.35% for 5000 epochs.
+Early stopping at epoch 7515: accuracy stable at 94.47% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 8397: accuracy stable at 82.21% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 29208: accuracy stable at 85.10% for 5000 epochs.
+Early stopping at epoch 35082: accuracy stable at 90.75% for 5000 epochs.
+Early stopping at epoch 21727: accuracy stable at 92.07% for 5000 epochs.
+✗  failed to learn 832 facts. Now searching: 769 - 831
+Trying n_facts = 800 ...
+  Attempt 1/3
+Early stopping at epoch 10917: accuracy stable at 75.00% for 5000 epochs.
+Early stopping at epoch 26097: accuracy stable at 89.75% for 5000 epochs.
+Early stopping at epoch 40737: accuracy stable at 94.62% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 32231: accuracy stable at 92.37% for 5000 epochs.
+Early stopping at epoch 26724: accuracy stable at 94.62% for 5000 epochs.
+Early stopping at epoch 21132: accuracy stable at 95.25% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 25453: accuracy stable at 91.37% for 5000 epochs.
+Early stopping at epoch 20105: accuracy stable at 93.75% for 5000 epochs.
+Early stopping at epoch 5692: accuracy stable at 93.75% for 5000 epochs.
+✗  failed to learn 800 facts. Now searching: 769 - 799
+Trying n_facts = 784 ...
+  Attempt 1/3
+Early stopping at epoch 7171: accuracy stable at 83.16% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 20203: accuracy stable at 94.77% for 5000 epochs.
+Early stopping at epoch 16420: accuracy stable at 96.43% for 5000 epochs.
+Early stopping at epoch 18208: accuracy stable at 97.96% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 38980: accuracy stable at 98.21% for 5000 epochs.
+Early stopping at epoch 9071: accuracy stable at 98.72% for 5000 epochs.
+Early stopping at epoch 5815: accuracy stable at 98.72% for 5000 epochs.
+✗  failed to learn 784 facts. Now searching: 769 - 783
+Trying n_facts = 776 ...
+  Attempt 1/3
+Early stopping at epoch 10354: accuracy stable at 90.98% for 5000 epochs.
+Early stopping at epoch 14204: accuracy stable at 94.97% for 5000 epochs.
+Early stopping at epoch 17032: accuracy stable at 96.39% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 7915: accuracy stable at 81.57% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 36278: accuracy stable at 97.42% for 5000 epochs.
+Early stopping at epoch 10683: accuracy stable at 97.94% for 5000 epochs.
+Early stopping at epoch 5829: accuracy stable at 98.32% for 5000 epochs.
+✗  failed to learn 776 facts. Now searching: 769 - 775
+
+Max learnable facts: 768
+Max facts learned: 768
+
+Running capacity search for: E2_attn_ff_norms___ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 5307: accuracy stable at 29.30% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 5421: accuracy stable at 30.86% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 5414: accuracy stable at 12.30% for 5000 epochs.
+✗  failed to learn 512 facts. Now searching: 1 - 511
+Trying n_facts = 256 ...
+  Attempt 1/3
+Early stopping at epoch 5355: accuracy stable at 99.22% for 5000 epochs.
+Early stopping at epoch 2868: perfect accuracy reached.
+✓  learned all 256 facts. Now searching: 257 - 511
+Trying n_facts = 384 ...
+  Attempt 1/3
+Early stopping at epoch 5361: accuracy stable at 22.66% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 5760: accuracy stable at 15.89% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 5138: accuracy stable at 38.02% for 5000 epochs.
+✗  failed to learn 384 facts. Now searching: 257 - 383
+Trying n_facts = 320 ...
+  Attempt 1/3
+Early stopping at epoch 5120: perfect accuracy reached.
+✓  learned all 320 facts. Now searching: 321 - 383
+Trying n_facts = 352 ...
+  Attempt 1/3
+Early stopping at epoch 388: perfect accuracy reached.
+✓  learned all 352 facts. Now searching: 353 - 383
+Trying n_facts = 368 ...
+  Attempt 1/3
+Early stopping at epoch 6766: accuracy stable at 16.03% for 5000 epochs.
+Early stopping at epoch 6140: accuracy stable at 16.30% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 5476: accuracy stable at 15.76% for 5000 epochs.
+Early stopping at epoch 5684: accuracy stable at 16.03% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 5175: accuracy stable at 30.43% for 5000 epochs.
+Early stopping at epoch 8194: accuracy stable at 29.89% for 5000 epochs.
+✗  failed to learn 368 facts. Now searching: 353 - 367
+Trying n_facts = 360 ...
+  Attempt 1/3
+Early stopping at epoch 1090: perfect accuracy reached.
+✓  learned all 360 facts. Now searching: 361 - 367
+
+Max learnable facts: 360
+Max facts learned: 360
+
+Running capacity search for: E2_attn_ff_norms__ffres_GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 9529: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 35379: accuracy stable at 98.05% for 5000 epochs.
+Early stopping at epoch 14003: accuracy stable at 99.61% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.61% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 99.74%
+Early stopping at epoch 5406: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 13841: accuracy stable at 78.35% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 11606: accuracy stable at 83.26% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 13713: accuracy stable at 89.17% for 5000 epochs.
+Early stopping at epoch 33272: accuracy stable at 93.75% for 5000 epochs.
+Early stopping at epoch 17175: accuracy stable at 94.64% for 5000 epochs.
+✗  failed to learn 896 facts. Now searching: 769 - 895
+Trying n_facts = 832 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 96.15%
+Early stopping at epoch 14037: accuracy stable at 97.60% for 5000 epochs.
+Early stopping at epoch 5982: accuracy stable at 97.72% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 13416: accuracy stable at 95.91% for 5000 epochs.
+Early stopping at epoch 9770: accuracy stable at 98.56% for 5000 epochs.
+Early stopping at epoch 18849: accuracy stable at 99.28% for 5000 epochs.
+  Attempt 3/3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Running capacity search for: E2__ff____GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 169: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 10158: accuracy stable at 97.27% for 5000 epochs.
+Early stopping at epoch 10262: accuracy stable at 97.66% for 5000 epochs.
+Early stopping at epoch 8432: accuracy stable at 97.92% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 15264: accuracy stable at 99.74% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.74% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.74% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 16528: accuracy stable at 97.66% for 5000 epochs.
+Early stopping at epoch 16258: accuracy stable at 99.09% for 5000 epochs.
+Early stopping at epoch 9170: accuracy stable at 99.22% for 5000 epochs.
+✗  failed to learn 768 facts. Now searching: 513 - 767
+Trying n_facts = 640 ...
+  Attempt 1/3
+Early stopping at epoch 750: perfect accuracy reached.
+✓  learned all 640 facts. Now searching: 641 - 767
+Trying n_facts = 704 ...
+  Attempt 1/3
+Early stopping at epoch 6372: accuracy stable at 99.72% for 5000 epochs.
+Early stopping at epoch 3845: perfect accuracy reached.
+✓  learned all 704 facts. Now searching: 705 - 767
+Trying n_facts = 736 ...
+  Attempt 1/3
+Early stopping at epoch 9863: accuracy stable at 99.59% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.59% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.59% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 11794: accuracy stable at 98.91% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.91% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.91% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 9184: accuracy stable at 99.59% for 5000 epochs.
+Early stopping at epoch 9806: accuracy stable at 99.86% for 5000 epochs.
+Early stopping at epoch 4261: perfect accuracy reached.
+✓  learned all 736 facts. Now searching: 737 - 767
+Trying n_facts = 752 ...
+  Attempt 1/3
+Early stopping at epoch 9580: accuracy stable at 98.54% for 5000 epochs.
+Early stopping at epoch 9279: accuracy stable at 98.67% for 5000 epochs.
+Early stopping at epoch 8805: accuracy stable at 99.07% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 15085: accuracy stable at 99.87% for 5000 epochs.
+Early stopping at epoch 6894: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 17774: accuracy stable at 98.80% for 5000 epochs.
+Early stopping at epoch 9225: accuracy stable at 98.94% for 5000 epochs.
+Early stopping at epoch 9037: accuracy stable at 99.34% for 5000 epochs.
+✗  failed to learn 752 facts. Now searching: 737 - 751
+Trying n_facts = 744 ...
+  Attempt 1/3
+Early stopping at epoch 8289: perfect accuracy reached.
+✓  learned all 744 facts. Now searching: 745 - 751
+
+Max learnable facts: 744
+Max facts learned: 744
+
+Running capacity search for: E2__ff____ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 194: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 23276: accuracy stable at 96.74% for 5000 epochs.
+Early stopping at epoch 6585: accuracy stable at 96.74% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 96.74% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 25364: accuracy stable at 98.44% for 5000 epochs.
+Early stopping at epoch 8934: accuracy stable at 98.83% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.83% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 9586: accuracy stable at 92.06% for 5000 epochs.
+Early stopping at epoch 28344: accuracy stable at 94.01% for 5000 epochs.
+Early stopping at epoch 5005: accuracy stable at 94.01% for 5000 epochs.
+✗  failed to learn 768 facts. Now searching: 513 - 767
+Trying n_facts = 640 ...
+  Attempt 1/3
+Early stopping at epoch 1524: perfect accuracy reached.
+✓  learned all 640 facts. Now searching: 641 - 767
+Trying n_facts = 704 ...
+  Attempt 1/3
+Early stopping at epoch 8252: accuracy stable at 99.29% for 5000 epochs.
+Early stopping at epoch 6565: accuracy stable at 99.57% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.57% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 10595: accuracy stable at 95.74% for 5000 epochs.
+Early stopping at epoch 10551: accuracy stable at 96.45% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 96.45% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 8700: accuracy stable at 97.44% for 5000 epochs.
+Early stopping at epoch 5605: accuracy stable at 97.59% for 5000 epochs.
+Early stopping at epoch 6406: accuracy stable at 97.73% for 5000 epochs.
+✗  failed to learn 704 facts. Now searching: 641 - 703
+Trying n_facts = 672 ...
+  Attempt 1/3
+Early stopping at epoch 13392: accuracy stable at 96.58% for 5000 epochs.
+Early stopping at epoch 5271: accuracy stable at 97.17% for 5000 epochs.
+Early stopping at epoch 12094: accuracy stable at 97.92% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 7915: accuracy stable at 99.85% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.85% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.85% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 8007: accuracy stable at 99.26% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.26% for 5000 epochs.
+Early stopping at epoch 5476: accuracy stable at 99.40% for 5000 epochs.
+✗  failed to learn 672 facts. Now searching: 641 - 671
+Trying n_facts = 656 ...
+  Attempt 1/3
+Early stopping at epoch 7665: accuracy stable at 99.70% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.70% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.70% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 7864: accuracy stable at 99.85% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.85% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.85% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 6344: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+✗  failed to learn 656 facts. Now searching: 641 - 655
+Trying n_facts = 648 ...
+  Attempt 1/3
+Early stopping at epoch 8904: accuracy stable at 99.07% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.07% for 5000 epochs.
+Early stopping at epoch 6061: accuracy stable at 99.23% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 7025: accuracy stable at 98.77% for 5000 epochs.
+Early stopping at epoch 8726: accuracy stable at 98.92% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.92% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 7130: accuracy stable at 99.85% for 5000 epochs.
+Early stopping at epoch 1588: perfect accuracy reached.
+✓  learned all 648 facts. Now searching: 649 - 655
+
+Max learnable facts: 648
+Max facts learned: 648
+
+Running capacity search for: E2__ff___ffres_GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 148: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 742: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 12283: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 35254: accuracy stable at 94.06% for 5000 epochs.
+Early stopping at epoch 35148: accuracy stable at 98.13% for 5000 epochs.
+Early stopping at epoch 13457: accuracy stable at 98.54% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 36573: accuracy stable at 94.79% for 5000 epochs.
+Early stopping at epoch 18137: accuracy stable at 95.94% for 5000 epochs.
+Early stopping at epoch 15908: accuracy stable at 96.56% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 15853: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 40954: accuracy stable at 88.91% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 99.70%
+Early stopping at epoch 1042: perfect accuracy reached.
+✓  learned all 992 facts. Now searching: 993 - 1024
+Trying n_facts = 1008 ...
+  Attempt 1/3
+Early stopping at epoch 27566: accuracy stable at 86.71% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 90.08%
+Early stopping at epoch 16340: accuracy stable at 92.26% for 5000 epochs.
+Early stopping at epoch 10184: accuracy stable at 92.66% for 5000 epochs.
+  Attempt 3/3
+Finished 50000 epochs. Final accuracy: 99.21%
+Early stopping at epoch 9324: perfect accuracy reached.
+✓  learned all 1008 facts. Now searching: 1009 - 1024
+Trying n_facts = 1016 ...
+  Attempt 1/3
+Early stopping at epoch 35346: accuracy stable at 90.26% for 5000 epochs.
+Early stopping at epoch 19514: accuracy stable at 93.11% for 5000 epochs.
+Early stopping at epoch 5014: accuracy stable at 92.91% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 29896: accuracy stable at 90.35% for 5000 epochs.
+Early stopping at epoch 6444: accuracy stable at 90.45% for 5000 epochs.
+Early stopping at epoch 16606: accuracy stable at 91.63% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 26954: accuracy stable at 99.70% for 5000 epochs.
+Early stopping at epoch 3586: perfect accuracy reached.
+✓  learned all 1016 facts. Now searching: 1017 - 1024
+
+Max learnable facts: 1016
+Max facts learned: 1016
+
+Running capacity search for: E2__ff___ffres_ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 172: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 1141: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 5683: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 94.90%
+Early stopping at epoch 21062: accuracy stable at 96.98% for 5000 epochs.
+Early stopping at epoch 6760: accuracy stable at 97.19% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 95.00%
+Early stopping at epoch 29370: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 43139: accuracy stable at 86.19% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 90.12%
+Early stopping at epoch 37604: accuracy stable at 93.35% for 5000 epochs.
+Early stopping at epoch 5043: accuracy stable at 93.45% for 5000 epochs.
+  Attempt 3/3
+Finished 50000 epochs. Final accuracy: 68.55%
+Early stopping at epoch 15701: accuracy stable at 94.56% for 5000 epochs.
+Early stopping at epoch 21853: accuracy stable at 95.46% for 5000 epochs.
+✗  failed to learn 992 facts. Now searching: 961 - 991
+Trying n_facts = 976 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 94.36%
+Early stopping at epoch 20439: accuracy stable at 96.82% for 5000 epochs.
+Early stopping at epoch 20910: accuracy stable at 98.16% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 56.56%
+Early stopping at epoch 19163: accuracy stable at 94.57% for 5000 epochs.
+Early stopping at epoch 30237: accuracy stable at 96.72% for 5000 epochs.
+  Attempt 3/3
+Finished 50000 epochs. Final accuracy: 63.42%
+Early stopping at epoch 31169: accuracy stable at 95.08% for 5000 epochs.
+Early stopping at epoch 15001: accuracy stable at 96.00% for 5000 epochs.
+✗  failed to learn 976 facts. Now searching: 961 - 975
+Trying n_facts = 968 ...
+  Attempt 1/3
+Early stopping at epoch 24498: accuracy stable at 88.43% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 89.88%
+Early stopping at epoch 11569: accuracy stable at 91.43% for 5000 epochs.
+Early stopping at epoch 16022: accuracy stable at 93.18% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 34221: accuracy stable at 93.49% for 5000 epochs.
+Early stopping at epoch 40161: accuracy stable at 95.97% for 5000 epochs.
+Early stopping at epoch 18054: accuracy stable at 96.90% for 5000 epochs.
+✗  failed to learn 968 facts. Now searching: 961 - 967
+
+Max learnable facts: 960
+Max facts learned: 960
+
+Running capacity search for: E2__ff_norms___GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 181: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 6639: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 49996: accuracy stable at 90.51% for 5000 epochs.
+Early stopping at epoch 46824: accuracy stable at 97.77% for 5000 epochs.
+Early stopping at epoch 11134: accuracy stable at 98.66% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 45203: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 33189: accuracy stable at 78.13% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 17347: accuracy stable at 84.17% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 45745: accuracy stable at 88.75% for 5000 epochs.
+✗  failed to learn 960 facts. Now searching: 897 - 959
+Trying n_facts = 928 ...
+  Attempt 1/3
+Early stopping at epoch 21557: accuracy stable at 86.42% for 5000 epochs.
+Early stopping at epoch 25682: accuracy stable at 93.53% for 5000 epochs.
+Early stopping at epoch 17254: accuracy stable at 94.50% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 45211: accuracy stable at 85.67% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 21384: accuracy stable at 80.06% for 5000 epochs.
+✗  failed to learn 928 facts. Now searching: 897 - 927
+Trying n_facts = 912 ...
+  Attempt 1/3
+Early stopping at epoch 17708: accuracy stable at 84.65% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 18367: accuracy stable at 84.10% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 20150: accuracy stable at 87.17% for 5000 epochs.
+✗  failed to learn 912 facts. Now searching: 897 - 911
+Trying n_facts = 904 ...
+  Attempt 1/3
+Early stopping at epoch 28075: accuracy stable at 82.96% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 49103: accuracy stable at 91.70% for 5000 epochs.
+Early stopping at epoch 19297: accuracy stable at 93.03% for 5000 epochs.
+Early stopping at epoch 8871: accuracy stable at 96.24% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 32325: accuracy stable at 87.94% for 5000 epochs.
+✗  failed to learn 904 facts. Now searching: 897 - 903
+
+Max learnable facts: 896
+Max facts learned: 896
+
+Running capacity search for: E2__ff_norms___ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 5778: accuracy stable at 75.00% for 5000 epochs.
+Early stopping at epoch 6387: accuracy stable at 75.59% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 5606: accuracy stable at 83.79% for 5000 epochs.
+Early stopping at epoch 5146: accuracy stable at 83.20% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 5543: accuracy stable at 79.88% for 5000 epochs.
+Early stopping at epoch 7670: accuracy stable at 78.71% for 5000 epochs.
+✗  failed to learn 512 facts. Now searching: 1 - 511
+Trying n_facts = 256 ...
+  Attempt 1/3
+Early stopping at epoch 104: perfect accuracy reached.
+✓  learned all 256 facts. Now searching: 257 - 511
+Trying n_facts = 384 ...
+  Attempt 1/3
+Early stopping at epoch 5188: accuracy stable at 96.88% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 96.35% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 96.09% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 269: perfect accuracy reached.
+✓  learned all 384 facts. Now searching: 385 - 511
+Trying n_facts = 448 ...
+  Attempt 1/3
+Early stopping at epoch 5339: accuracy stable at 82.37% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 81.47% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 5332: accuracy stable at 94.42% for 5000 epochs.
+Early stopping at epoch 7103: accuracy stable at 93.30% for 5000 epochs.
+Early stopping at epoch 5112: accuracy stable at 93.53% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 8238: accuracy stable at 96.43% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 94.64% for 5000 epochs.
+Early stopping at epoch 5946: accuracy stable at 95.31% for 5000 epochs.
+✗  failed to learn 448 facts. Now searching: 385 - 447
+Trying n_facts = 416 ...
+  Attempt 1/3
+Early stopping at epoch 5255: accuracy stable at 81.73% for 5000 epochs.
+Early stopping at epoch 5116: accuracy stable at 81.25% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 5606: accuracy stable at 98.56% for 5000 epochs.
+Early stopping at epoch 9291: accuracy stable at 98.56% for 5000 epochs.
+Early stopping at epoch 9264: accuracy stable at 98.32% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 5599: accuracy stable at 98.80% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.32% for 5000 epochs.
+Early stopping at epoch 7582: accuracy stable at 98.80% for 5000 epochs.
+✗  failed to learn 416 facts. Now searching: 385 - 415
+Trying n_facts = 400 ...
+  Attempt 1/3
+Early stopping at epoch 5163: accuracy stable at 99.75% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.25% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.00% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 5327: accuracy stable at 47.00% for 5000 epochs.
+Early stopping at epoch 6908: accuracy stable at 48.25% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 232: perfect accuracy reached.
+✓  learned all 400 facts. Now searching: 401 - 415
+Trying n_facts = 408 ...
+  Attempt 1/3
+Early stopping at epoch 221: perfect accuracy reached.
+✓  learned all 408 facts. Now searching: 409 - 415
+
+Max learnable facts: 408
+Max facts learned: 408
+
+Running capacity search for: E2__ff_norms__ffres_GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 159: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 807: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 3311: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 10928: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 22216: perfect accuracy reached.
+✓  learned all 992 facts. Now searching: 993 - 1024
+Trying n_facts = 1008 ...
+  Attempt 1/3
+Early stopping at epoch 27648: perfect accuracy reached.
+✓  learned all 1008 facts. Now searching: 1009 - 1024
+Trying n_facts = 1016 ...
+  Attempt 1/3
+Early stopping at epoch 36856: accuracy stable at 98.13% for 5000 epochs.
+Early stopping at epoch 3687: perfect accuracy reached.
+✓  learned all 1016 facts. Now searching: 1017 - 1024
+
+Max learnable facts: 1016
+Max facts learned: 1016
+
+Running capacity search for: E2__ff_norms__ffres_ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 180: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 642: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 5886: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 23160: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 9808: perfect accuracy reached.
+✓  learned all 992 facts. Now searching: 993 - 1024
+Trying n_facts = 1008 ...
+  Attempt 1/3
+Early stopping at epoch 27746: perfect accuracy reached.
+✓  learned all 1008 facts. Now searching: 1009 - 1024
+Trying n_facts = 1016 ...
+  Attempt 1/3
+Early stopping at epoch 34285: accuracy stable at 97.24% for 5000 epochs.
+Early stopping at epoch 19189: perfect accuracy reached.
+✓  learned all 1016 facts. Now searching: 1017 - 1024
+
+Max learnable facts: 1016
+Max facts learned: 1016
+
+Running capacity search for: E2__ff__bias__GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 212: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 9499: accuracy stable at 98.44% for 5000 epochs.
+Early stopping at epoch 7815: accuracy stable at 98.83% for 5000 epochs.
+Early stopping at epoch 7634: accuracy stable at 98.96% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 7230: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 38665: accuracy stable at 87.95% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 38836: accuracy stable at 85.60% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 42833: accuracy stable at 86.38% for 5000 epochs.
+✗  failed to learn 896 facts. Now searching: 769 - 895
+Trying n_facts = 832 ...
+  Attempt 1/3
+Early stopping at epoch 24960: accuracy stable at 95.43% for 5000 epochs.
+Early stopping at epoch 20141: accuracy stable at 96.75% for 5000 epochs.
+Early stopping at epoch 8632: accuracy stable at 96.88% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 14286: perfect accuracy reached.
+✓  learned all 832 facts. Now searching: 833 - 895
+Trying n_facts = 864 ...
+  Attempt 1/3
+Early stopping at epoch 32836: accuracy stable at 90.39% for 5000 epochs.
+Early stopping at epoch 9037: accuracy stable at 90.51% for 5000 epochs.
+Early stopping at epoch 16247: accuracy stable at 92.36% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 16551: accuracy stable at 86.11% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 20458: perfect accuracy reached.
+✓  learned all 864 facts. Now searching: 865 - 895
+Trying n_facts = 880 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 98.86%
+Early stopping at epoch 9828: accuracy stable at 99.66% for 5000 epochs.
+Early stopping at epoch 7480: accuracy stable at 100.00% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 11840: accuracy stable at 87.95% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 16710: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+✗  failed to learn 880 facts. Now searching: 865 - 879
+Trying n_facts = 872 ...
+  Attempt 1/3
+Early stopping at epoch 29283: accuracy stable at 85.67% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 34949: accuracy stable at 88.42% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 39741: accuracy stable at 93.69% for 5000 epochs.
+Finished 50000 epochs. Final accuracy: 97.25%
+Early stopping at epoch 13204: accuracy stable at 99.89% for 5000 epochs.
+✗  failed to learn 872 facts. Now searching: 865 - 871
+
+Max learnable facts: 864
+Max facts learned: 864
+
+Running capacity search for: E2__ff__bias__ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 179: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 32846: accuracy stable at 99.74% for 5000 epochs.
+Early stopping at epoch 3279: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 30632: accuracy stable at 84.49% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 27839: accuracy stable at 81.81% for 5000 epochs.
+  Attempt 3/3
+Finished 50000 epochs. Final accuracy: 85.71%
+✗  failed to learn 896 facts. Now searching: 769 - 895
+Trying n_facts = 832 ...
+  Attempt 1/3
+Early stopping at epoch 24415: accuracy stable at 88.70% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 41602: accuracy stable at 92.79% for 5000 epochs.
+Early stopping at epoch 33838: accuracy stable at 95.79% for 5000 epochs.
+Early stopping at epoch 10951: accuracy stable at 97.24% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 23979: accuracy stable at 89.54% for 5000 epochs.
+Early stopping at epoch 8823: accuracy stable at 90.99% for 5000 epochs.
+Early stopping at epoch 7329: accuracy stable at 90.99% for 5000 epochs.
+✗  failed to learn 832 facts. Now searching: 769 - 831
+Trying n_facts = 800 ...
+  Attempt 1/3
+Early stopping at epoch 11067: perfect accuracy reached.
+✓  learned all 800 facts. Now searching: 801 - 831
+Trying n_facts = 816 ...
+  Attempt 1/3
+Early stopping at epoch 21004: accuracy stable at 95.47% for 5000 epochs.
+Early stopping at epoch 7572: accuracy stable at 95.59% for 5000 epochs.
+Early stopping at epoch 5548: accuracy stable at 95.83% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 30576: accuracy stable at 92.89% for 5000 epochs.
+Early stopping at epoch 8813: accuracy stable at 90.20% for 5000 epochs.
+Early stopping at epoch 8862: accuracy stable at 93.75% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 19947: accuracy stable at 97.43% for 5000 epochs.
+Early stopping at epoch 9436: accuracy stable at 97.55% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 97.55% for 5000 epochs.
+✗  failed to learn 816 facts. Now searching: 801 - 815
+Trying n_facts = 808 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 95.17%
+Early stopping at epoch 12153: accuracy stable at 97.28% for 5000 epochs.
+Early stopping at epoch 12211: accuracy stable at 98.02% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 24472: accuracy stable at 98.27% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.27% for 5000 epochs.
+Early stopping at epoch 8183: accuracy stable at 98.27% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 28411: accuracy stable at 89.48% for 5000 epochs.
+Early stopping at epoch 7643: accuracy stable at 95.05% for 5000 epochs.
+Early stopping at epoch 12696: accuracy stable at 95.67% for 5000 epochs.
+✗  failed to learn 808 facts. Now searching: 801 - 807
+
+Max learnable facts: 800
+Max facts learned: 800
+
+Running capacity search for: E2__ff__bias_ffres_GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 155: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 861: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 4034: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 32725: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 22916: accuracy stable at 95.67% for 5000 epochs.
+Early stopping at epoch 5041: accuracy stable at 95.87% for 5000 epochs.
+Early stopping at epoch 22618: accuracy stable at 96.57% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 49228: accuracy stable at 95.26% for 5000 epochs.
+Early stopping at epoch 14578: accuracy stable at 96.37% for 5000 epochs.
+Early stopping at epoch 6092: accuracy stable at 96.57% for 5000 epochs.
+  Attempt 3/3
+Finished 50000 epochs. Final accuracy: 98.39%
+Early stopping at epoch 17718: accuracy stable at 99.29% for 5000 epochs.
+Early stopping at epoch 8587: accuracy stable at 99.60% for 5000 epochs.
+✗  failed to learn 992 facts. Now searching: 961 - 991
+Trying n_facts = 976 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 99.59%
+Early stopping at epoch 8775: accuracy stable at 99.90% for 5000 epochs.
+Early stopping at epoch 5818: accuracy stable at 100.00% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 43403: accuracy stable at 94.16% for 5000 epochs.
+Early stopping at epoch 31514: accuracy stable at 96.62% for 5000 epochs.
+Early stopping at epoch 5025: accuracy stable at 96.72% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 39959: accuracy stable at 97.13% for 5000 epochs.
+Early stopping at epoch 11394: accuracy stable at 97.75% for 5000 epochs.
+Early stopping at epoch 32066: accuracy stable at 99.80% for 5000 epochs.
+✗  failed to learn 976 facts. Now searching: 961 - 975
+Trying n_facts = 968 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 99.07%
+Early stopping at epoch 9754: accuracy stable at 99.59% for 5000 epochs.
+Early stopping at epoch 13626: accuracy stable at 99.90% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 29309: accuracy stable at 99.17% for 5000 epochs.
+Early stopping at epoch 13070: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 44721: accuracy stable at 96.80% for 5000 epochs.
+Early stopping at epoch 27424: accuracy stable at 98.86% for 5000 epochs.
+Early stopping at epoch 8932: accuracy stable at 99.59% for 5000 epochs.
+✗  failed to learn 968 facts. Now searching: 961 - 967
+
+Max learnable facts: 960
+Max facts learned: 960
+
+Running capacity search for: E2__ff__bias_ffres_ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 170: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 923: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 21545: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 81.35%
+Early stopping at epoch 40798: accuracy stable at 97.92% for 5000 epochs.
+Early stopping at epoch 5024: accuracy stable at 98.02% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 99.17%
+Early stopping at epoch 9228: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 93.25%
+Early stopping at epoch 47808: accuracy stable at 98.99% for 5000 epochs.
+Early stopping at epoch 12131: accuracy stable at 99.60% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 33965: accuracy stable at 89.82% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 39473: accuracy stable at 96.67% for 5000 epochs.
+Early stopping at epoch 14951: accuracy stable at 97.78% for 5000 epochs.
+Early stopping at epoch 40406: accuracy stable at 99.70% for 5000 epochs.
+✗  failed to learn 992 facts. Now searching: 961 - 991
+Trying n_facts = 976 ...
+  Attempt 1/3
+Early stopping at epoch 36092: accuracy stable at 87.19% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 48785: accuracy stable at 92.21% for 5000 epochs.
+Early stopping at epoch 19936: accuracy stable at 93.65% for 5000 epochs.
+Early stopping at epoch 5073: accuracy stable at 93.65% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 48990: accuracy stable at 97.85% for 5000 epochs.
+Early stopping at epoch 11202: accuracy stable at 98.16% for 5000 epochs.
+Early stopping at epoch 5025: accuracy stable at 98.16% for 5000 epochs.
+✗  failed to learn 976 facts. Now searching: 961 - 975
+Trying n_facts = 968 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 97.21%
+Early stopping at epoch 13298: accuracy stable at 98.35% for 5000 epochs.
+Early stopping at epoch 10621: accuracy stable at 98.55% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 96.49%
+Early stopping at epoch 29757: accuracy stable at 98.24% for 5000 epochs.
+Early stopping at epoch 7345: accuracy stable at 98.55% for 5000 epochs.
+  Attempt 3/3
+Finished 50000 epochs. Final accuracy: 100.00%
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+✗  failed to learn 968 facts. Now searching: 961 - 967
+
+Max learnable facts: 960
+Max facts learned: 960
+
+Running capacity search for: E2__ff_norms_bias__GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 162: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 1703: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 8323: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 11255: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 42031: perfect accuracy reached.
+✓  learned all 992 facts. Now searching: 993 - 1024
+Trying n_facts = 1008 ...
+  Attempt 1/3
+Early stopping at epoch 11719: perfect accuracy reached.
+✓  learned all 1008 facts. Now searching: 1009 - 1024
+Trying n_facts = 1016 ...
+  Attempt 1/3
+Early stopping at epoch 30477: accuracy stable at 89.67% for 5000 epochs.
+Early stopping at epoch 42210: accuracy stable at 99.70% for 5000 epochs.
+Early stopping at epoch 6704: accuracy stable at 99.90% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 25655: perfect accuracy reached.
+✓  learned all 1016 facts. Now searching: 1017 - 1024
+
+Max learnable facts: 1016
+Max facts learned: 1016
+
+Running capacity search for: E2__ff_norms_bias__ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 270: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 4525: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 10988: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 26780: accuracy stable at 90.63% for 5000 epochs.
+Early stopping at epoch 9947: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 39074: perfect accuracy reached.
+✓  learned all 992 facts. Now searching: 993 - 1024
+Trying n_facts = 1008 ...
+  Attempt 1/3
+Early stopping at epoch 32466: accuracy stable at 93.55% for 5000 epochs.
+Early stopping at epoch 40358: perfect accuracy reached.
+✓  learned all 1008 facts. Now searching: 1009 - 1024
+Trying n_facts = 1016 ...
+  Attempt 1/3
+Early stopping at epoch 43007: accuracy stable at 93.01% for 5000 epochs.
+Early stopping at epoch 20292: accuracy stable at 93.70% for 5000 epochs.
+Early stopping at epoch 10810: accuracy stable at 95.87% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 32371: accuracy stable at 98.82% for 5000 epochs.
+Early stopping at epoch 6012: accuracy stable at 99.31% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.31% for 5000 epochs.
+  Attempt 3/3
+Finished 50000 epochs. Final accuracy: 94.29%
+Early stopping at epoch 28023: accuracy stable at 99.61% for 5000 epochs.
+Early stopping at epoch 10291: accuracy stable at 99.90% for 5000 epochs.
+✗  failed to learn 1016 facts. Now searching: 1009 - 1015
+
+Max learnable facts: 1008
+Max facts learned: 1008
+
+Running capacity search for: E2__ff_norms_bias_ffres_GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 144: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 498: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 1385: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 11203: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 16945: perfect accuracy reached.
+✓  learned all 992 facts. Now searching: 993 - 1024
+Trying n_facts = 1008 ...
+  Attempt 1/3
+Early stopping at epoch 27935: perfect accuracy reached.
+✓  learned all 1008 facts. Now searching: 1009 - 1024
+Trying n_facts = 1016 ...
+  Attempt 1/3
+Early stopping at epoch 10996: perfect accuracy reached.
+✓  learned all 1016 facts. Now searching: 1017 - 1024
+
+Max learnable facts: 1016
+Max facts learned: 1016
+
+Running capacity search for: E2__ff_norms_bias_ffres_ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 176: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 822: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 4387: perfect accuracy reached.
+✓  learned all 896 facts. Now searching: 897 - 1024
+Trying n_facts = 960 ...
+  Attempt 1/3
+Early stopping at epoch 7633: perfect accuracy reached.
+✓  learned all 960 facts. Now searching: 961 - 1024
+Trying n_facts = 992 ...
+  Attempt 1/3
+Early stopping at epoch 9986: perfect accuracy reached.
+✓  learned all 992 facts. Now searching: 993 - 1024
+Trying n_facts = 1008 ...
+  Attempt 1/3
+Early stopping at epoch 15372: perfect accuracy reached.
+✓  learned all 1008 facts. Now searching: 1009 - 1024
+Trying n_facts = 1016 ...
+  Attempt 1/3
+Early stopping at epoch 21838: perfect accuracy reached.
+✓  learned all 1016 facts. Now searching: 1017 - 1024
+
+Max learnable facts: 1016
+Max facts learned: 1016
+
+Running capacity search for: E2_attn_ff____GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 26038: accuracy stable at 23.24% for 5000 epochs.
+Early stopping at epoch 14821: accuracy stable at 25.39% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 14436: accuracy stable at 84.77% for 5000 epochs.
+Early stopping at epoch 20890: accuracy stable at 99.02% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.83% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 8605: accuracy stable at 91.41% for 5000 epochs.
+Early stopping at epoch 7853: accuracy stable at 95.31% for 5000 epochs.
+Early stopping at epoch 10524: accuracy stable at 96.09% for 5000 epochs.
+✗  failed to learn 512 facts. Now searching: 1 - 511
+Trying n_facts = 256 ...
+  Attempt 1/3
+Early stopping at epoch 1710: perfect accuracy reached.
+✓  learned all 256 facts. Now searching: 257 - 511
+Trying n_facts = 384 ...
+  Attempt 1/3
+Early stopping at epoch 1397: perfect accuracy reached.
+✓  learned all 384 facts. Now searching: 385 - 511
+Trying n_facts = 448 ...
+  Attempt 1/3
+Early stopping at epoch 17384: accuracy stable at 99.55% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.55% for 5000 epochs.
+Early stopping at epoch 8495: accuracy stable at 99.55% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 2204: perfect accuracy reached.
+✓  learned all 448 facts. Now searching: 449 - 511
+Trying n_facts = 480 ...
+  Attempt 1/3
+Early stopping at epoch 26020: accuracy stable at 97.50% for 5000 epochs.
+Early stopping at epoch 16186: accuracy stable at 98.33% for 5000 epochs.
+Early stopping at epoch 6682: accuracy stable at 99.58% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 10247: accuracy stable at 99.38% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.38% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.38% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 13011: accuracy stable at 87.08% for 5000 epochs.
+Early stopping at epoch 11658: accuracy stable at 91.04% for 5000 epochs.
+Early stopping at epoch 15642: accuracy stable at 93.96% for 5000 epochs.
+✗  failed to learn 480 facts. Now searching: 449 - 479
+Trying n_facts = 464 ...
+  Attempt 1/3
+Early stopping at epoch 5636: accuracy stable at 74.35% for 5000 epochs.
+Early stopping at epoch 8951: accuracy stable at 74.78% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 17837: perfect accuracy reached.
+✓  learned all 464 facts. Now searching: 465 - 479
+Trying n_facts = 472 ...
+  Attempt 1/3
+Early stopping at epoch 8015: accuracy stable at 99.58% for 5000 epochs.
+Early stopping at epoch 5105: accuracy stable at 99.79% for 5000 epochs.
+Early stopping at epoch 2394: perfect accuracy reached.
+✓  learned all 472 facts. Now searching: 473 - 479
+
+Max learnable facts: 472
+Max facts learned: 472
+
+Running capacity search for: E2_attn_ff____ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 11625: accuracy stable at 48.44% for 5000 epochs.
+Early stopping at epoch 17716: accuracy stable at 53.91% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 9398: accuracy stable at 97.66% for 5000 epochs.
+Early stopping at epoch 6708: accuracy stable at 98.44% for 5000 epochs.
+Early stopping at epoch 6055: accuracy stable at 98.44% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 6826: accuracy stable at 90.04% for 5000 epochs.
+Early stopping at epoch 12446: accuracy stable at 91.80% for 5000 epochs.
+Early stopping at epoch 18152: accuracy stable at 94.73% for 5000 epochs.
+✗  failed to learn 512 facts. Now searching: 1 - 511
+Trying n_facts = 256 ...
+  Attempt 1/3
+Early stopping at epoch 3044: perfect accuracy reached.
+✓  learned all 256 facts. Now searching: 257 - 511
+Trying n_facts = 384 ...
+  Attempt 1/3
+Early stopping at epoch 6478: accuracy stable at 97.40% for 5000 epochs.
+Early stopping at epoch 5668: accuracy stable at 98.18% for 5000 epochs.
+Early stopping at epoch 12212: accuracy stable at 98.44% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 12857: accuracy stable at 90.36% for 5000 epochs.
+Early stopping at epoch 21482: accuracy stable at 95.05% for 5000 epochs.
+Early stopping at epoch 8418: accuracy stable at 96.35% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 10894: accuracy stable at 98.96% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.96% for 5000 epochs.
+Early stopping at epoch 10039: accuracy stable at 99.48% for 5000 epochs.
+✗  failed to learn 384 facts. Now searching: 257 - 383
+Trying n_facts = 320 ...
+  Attempt 1/3
+Early stopping at epoch 11380: accuracy stable at 99.06% for 5000 epochs.
+Early stopping at epoch 5120: accuracy stable at 99.06% for 5000 epochs.
+Early stopping at epoch 5257: accuracy stable at 99.06% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 982: perfect accuracy reached.
+✓  learned all 320 facts. Now searching: 321 - 383
+Trying n_facts = 352 ...
+  Attempt 1/3
+Early stopping at epoch 7581: accuracy stable at 77.84% for 5000 epochs.
+Early stopping at epoch 12096: accuracy stable at 81.82% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 8222: accuracy stable at 99.72% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.72% for 5000 epochs.
+Early stopping at epoch 4190: perfect accuracy reached.
+✓  learned all 352 facts. Now searching: 353 - 383
+Trying n_facts = 368 ...
+  Attempt 1/3
+Early stopping at epoch 5328: perfect accuracy reached.
+✓  learned all 368 facts. Now searching: 369 - 383
+Trying n_facts = 376 ...
+  Attempt 1/3
+Early stopping at epoch 8970: accuracy stable at 94.41% for 5000 epochs.
+Early stopping at epoch 14011: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 13591: accuracy stable at 99.47% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.47% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.47% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 12493: accuracy stable at 99.73% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.73% for 5000 epochs.
+Early stopping at epoch 9304: accuracy stable at 100.00% for 5000 epochs.
+✗  failed to learn 376 facts. Now searching: 369 - 375
+
+Max learnable facts: 368
+Max facts learned: 368
+
+Running capacity search for: E2_attn_ff___ffres_GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 9700: accuracy stable at 95.31% for 5000 epochs.
+Early stopping at epoch 10437: accuracy stable at 95.12% for 5000 epochs.
+Early stopping at epoch 5535: accuracy stable at 96.09% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 10306: accuracy stable at 99.80% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.80% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.80% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 20244: accuracy stable at 98.83% for 5000 epochs.
+Early stopping at epoch 6320: accuracy stable at 99.22% for 5000 epochs.
+Early stopping at epoch 5687: accuracy stable at 99.41% for 5000 epochs.
+✗  failed to learn 512 facts. Now searching: 1 - 511
+Trying n_facts = 256 ...
+  Attempt 1/3
+Early stopping at epoch 5878: accuracy stable at 99.61% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.61% for 5000 epochs.
+Early stopping at epoch 577: perfect accuracy reached.
+✓  learned all 256 facts. Now searching: 257 - 511
+Trying n_facts = 384 ...
+  Attempt 1/3
+Early stopping at epoch 7159: accuracy stable at 96.88% for 5000 epochs.
+Early stopping at epoch 10070: accuracy stable at 98.44% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.44% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 7987: accuracy stable at 99.74% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.74% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.74% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 15577: accuracy stable at 99.74% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.74% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.74% for 5000 epochs.
+✗  failed to learn 384 facts. Now searching: 257 - 383
+Trying n_facts = 320 ...
+  Attempt 1/3
+Early stopping at epoch 5609: accuracy stable at 99.38% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.38% for 5000 epochs.
+Early stopping at epoch 8974: accuracy stable at 99.69% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 6324: accuracy stable at 99.69% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.69% for 5000 epochs.
+Early stopping at epoch 2439: perfect accuracy reached.
+✓  learned all 320 facts. Now searching: 321 - 383
+Trying n_facts = 352 ...
+  Attempt 1/3
+Early stopping at epoch 7111: accuracy stable at 99.72% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.72% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.72% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 9864: accuracy stable at 95.74% for 5000 epochs.
+Early stopping at epoch 5111: accuracy stable at 95.74% for 5000 epochs.
+Early stopping at epoch 5180: accuracy stable at 96.02% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 7030: accuracy stable at 99.15% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.15% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.15% for 5000 epochs.
+✗  failed to learn 352 facts. Now searching: 321 - 351
+Trying n_facts = 336 ...
+  Attempt 1/3
+Early stopping at epoch 1626: perfect accuracy reached.
+✓  learned all 336 facts. Now searching: 337 - 351
+Trying n_facts = 344 ...
+  Attempt 1/3
+Early stopping at epoch 509: perfect accuracy reached.
+✓  learned all 344 facts. Now searching: 345 - 351
+
+Max learnable facts: 344
+Max facts learned: 344
+
+Running capacity search for: E2_attn_ff___ffres_ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 25114: accuracy stable at 99.80% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.80% for 5000 epochs.
+Early stopping at epoch 74: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 16046: accuracy stable at 82.03% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 26522: accuracy stable at 85.03% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 25546: accuracy stable at 90.23% for 5000 epochs.
+Early stopping at epoch 16134: accuracy stable at 92.45% for 5000 epochs.
+Early stopping at epoch 9621: accuracy stable at 93.10% for 5000 epochs.
+✗  failed to learn 768 facts. Now searching: 513 - 767
+Trying n_facts = 640 ...
+  Attempt 1/3
+Early stopping at epoch 37458: accuracy stable at 97.66% for 5000 epochs.
+Early stopping at epoch 14280: accuracy stable at 99.22% for 5000 epochs.
+Early stopping at epoch 6235: accuracy stable at 99.22% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 13529: accuracy stable at 95.63% for 5000 epochs.
+Early stopping at epoch 8255: accuracy stable at 97.03% for 5000 epochs.
+Early stopping at epoch 7777: accuracy stable at 97.50% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 35330: accuracy stable at 94.22% for 5000 epochs.
+Early stopping at epoch 11161: accuracy stable at 95.78% for 5000 epochs.
+Early stopping at epoch 22727: accuracy stable at 96.72% for 5000 epochs.
+✗  failed to learn 640 facts. Now searching: 513 - 639
+Trying n_facts = 576 ...
+  Attempt 1/3
+Early stopping at epoch 25401: accuracy stable at 90.62% for 5000 epochs.
+Early stopping at epoch 5267: accuracy stable at 98.61% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.61% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 46389: accuracy stable at 99.48% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.48% for 5000 epochs.
+Early stopping at epoch 5714: accuracy stable at 99.48% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 16313: perfect accuracy reached.
+✓  learned all 576 facts. Now searching: 577 - 639
+Trying n_facts = 608 ...
+  Attempt 1/3
+Early stopping at epoch 12635: accuracy stable at 88.82% for 5000 epochs.
+Early stopping at epoch 12778: accuracy stable at 93.42% for 5000 epochs.
+Early stopping at epoch 12143: accuracy stable at 94.08% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 29465: accuracy stable at 91.45% for 5000 epochs.
+Early stopping at epoch 18244: accuracy stable at 94.41% for 5000 epochs.
+Early stopping at epoch 13062: accuracy stable at 96.22% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 15863: accuracy stable at 89.97% for 5000 epochs.
+Early stopping at epoch 14791: accuracy stable at 97.20% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 97.20% for 5000 epochs.
+✗  failed to learn 608 facts. Now searching: 577 - 607
+Trying n_facts = 592 ...
+  Attempt 1/3
+Early stopping at epoch 28798: accuracy stable at 95.61% for 5000 epochs.
+Early stopping at epoch 14408: accuracy stable at 96.45% for 5000 epochs.
+Early stopping at epoch 5041: accuracy stable at 96.62% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 21166: accuracy stable at 90.20% for 5000 epochs.
+Early stopping at epoch 11727: accuracy stable at 93.41% for 5000 epochs.
+Early stopping at epoch 5404: accuracy stable at 93.75% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 15998: accuracy stable at 97.13% for 5000 epochs.
+Early stopping at epoch 6024: accuracy stable at 98.48% for 5000 epochs.
+Early stopping at epoch 5789: accuracy stable at 98.99% for 5000 epochs.
+✗  failed to learn 592 facts. Now searching: 577 - 591
+Trying n_facts = 584 ...
+  Attempt 1/3
+Early stopping at epoch 30289: accuracy stable at 95.89% for 5000 epochs.
+Early stopping at epoch 23471: accuracy stable at 98.29% for 5000 epochs.
+Early stopping at epoch 5104: accuracy stable at 98.29% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 21515: accuracy stable at 90.75% for 5000 epochs.
+Early stopping at epoch 8873: accuracy stable at 95.72% for 5000 epochs.
+Early stopping at epoch 13094: accuracy stable at 97.09% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 15979: perfect accuracy reached.
+✓  learned all 584 facts. Now searching: 585 - 591
+
+Max learnable facts: 584
+Max facts learned: 584
+
+Running capacity search for: E2_attn_ff_norms___GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 1706: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 46241: accuracy stable at 91.41% for 5000 epochs.
+Early stopping at epoch 7637: accuracy stable at 91.80% for 5000 epochs.
+Early stopping at epoch 10995: accuracy stable at 93.10% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 34633: accuracy stable at 99.48% for 5000 epochs.
+Early stopping at epoch 6333: accuracy stable at 99.74% for 5000 epochs.
+Early stopping at epoch 5155: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 17009: accuracy stable at 79.02% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 20054: accuracy stable at 73.66% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 23731: accuracy stable at 75.00% for 5000 epochs.
+✗  failed to learn 896 facts. Now searching: 769 - 895
+Trying n_facts = 832 ...
+  Attempt 1/3
+Early stopping at epoch 24404: accuracy stable at 90.38% for 5000 epochs.
+Early stopping at epoch 47192: accuracy stable at 94.35% for 5000 epochs.
+Early stopping at epoch 7515: accuracy stable at 94.47% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 8397: accuracy stable at 82.21% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 29208: accuracy stable at 85.10% for 5000 epochs.
+Early stopping at epoch 35082: accuracy stable at 90.75% for 5000 epochs.
+Early stopping at epoch 21727: accuracy stable at 92.07% for 5000 epochs.
+✗  failed to learn 832 facts. Now searching: 769 - 831
+Trying n_facts = 800 ...
+  Attempt 1/3
+Early stopping at epoch 10917: accuracy stable at 75.00% for 5000 epochs.
+Early stopping at epoch 26097: accuracy stable at 89.75% for 5000 epochs.
+Early stopping at epoch 40737: accuracy stable at 94.62% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 32231: accuracy stable at 92.37% for 5000 epochs.
+Early stopping at epoch 26724: accuracy stable at 94.62% for 5000 epochs.
+Early stopping at epoch 21132: accuracy stable at 95.25% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 25453: accuracy stable at 91.37% for 5000 epochs.
+Early stopping at epoch 20105: accuracy stable at 93.75% for 5000 epochs.
+Early stopping at epoch 5692: accuracy stable at 93.75% for 5000 epochs.
+✗  failed to learn 800 facts. Now searching: 769 - 799
+Trying n_facts = 784 ...
+  Attempt 1/3
+Early stopping at epoch 7171: accuracy stable at 83.16% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 20203: accuracy stable at 94.77% for 5000 epochs.
+Early stopping at epoch 16420: accuracy stable at 96.43% for 5000 epochs.
+Early stopping at epoch 18208: accuracy stable at 97.96% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 38980: accuracy stable at 98.21% for 5000 epochs.
+Early stopping at epoch 9071: accuracy stable at 98.72% for 5000 epochs.
+Early stopping at epoch 5815: accuracy stable at 98.72% for 5000 epochs.
+✗  failed to learn 784 facts. Now searching: 769 - 783
+Trying n_facts = 776 ...
+  Attempt 1/3
+Early stopping at epoch 10354: accuracy stable at 90.98% for 5000 epochs.
+Early stopping at epoch 14204: accuracy stable at 94.97% for 5000 epochs.
+Early stopping at epoch 17032: accuracy stable at 96.39% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 7915: accuracy stable at 81.57% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 36278: accuracy stable at 97.42% for 5000 epochs.
+Early stopping at epoch 10683: accuracy stable at 97.94% for 5000 epochs.
+Early stopping at epoch 5829: accuracy stable at 98.32% for 5000 epochs.
+✗  failed to learn 776 facts. Now searching: 769 - 775
+
+Max learnable facts: 768
+Max facts learned: 768
+
+Running capacity search for: E2_attn_ff_norms___ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 5307: accuracy stable at 29.30% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 5421: accuracy stable at 30.86% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 5414: accuracy stable at 12.30% for 5000 epochs.
+✗  failed to learn 512 facts. Now searching: 1 - 511
+Trying n_facts = 256 ...
+  Attempt 1/3
+Early stopping at epoch 5355: accuracy stable at 99.22% for 5000 epochs.
+Early stopping at epoch 2868: perfect accuracy reached.
+✓  learned all 256 facts. Now searching: 257 - 511
+Trying n_facts = 384 ...
+  Attempt 1/3
+Early stopping at epoch 5361: accuracy stable at 22.66% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 5760: accuracy stable at 15.89% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 5138: accuracy stable at 38.02% for 5000 epochs.
+✗  failed to learn 384 facts. Now searching: 257 - 383
+Trying n_facts = 320 ...
+  Attempt 1/3
+Early stopping at epoch 5120: perfect accuracy reached.
+✓  learned all 320 facts. Now searching: 321 - 383
+Trying n_facts = 352 ...
+  Attempt 1/3
+Early stopping at epoch 388: perfect accuracy reached.
+✓  learned all 352 facts. Now searching: 353 - 383
+Trying n_facts = 368 ...
+  Attempt 1/3
+Early stopping at epoch 6766: accuracy stable at 16.03% for 5000 epochs.
+Early stopping at epoch 6140: accuracy stable at 16.30% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 5476: accuracy stable at 15.76% for 5000 epochs.
+Early stopping at epoch 5684: accuracy stable at 16.03% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 5175: accuracy stable at 30.43% for 5000 epochs.
+Early stopping at epoch 8194: accuracy stable at 29.89% for 5000 epochs.
+✗  failed to learn 368 facts. Now searching: 353 - 367
+Trying n_facts = 360 ...
+  Attempt 1/3
+Early stopping at epoch 1090: perfect accuracy reached.
+✓  learned all 360 facts. Now searching: 361 - 367
+
+Max learnable facts: 360
+Max facts learned: 360
+
+Running capacity search for: E2_attn_ff_norms__ffres_GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 9529: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 35379: accuracy stable at 98.05% for 5000 epochs.
+Early stopping at epoch 14003: accuracy stable at 99.61% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.61% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 99.74%
+Early stopping at epoch 5406: perfect accuracy reached.
+✓  learned all 768 facts. Now searching: 769 - 1024
+Trying n_facts = 896 ...
+  Attempt 1/3
+Early stopping at epoch 13841: accuracy stable at 78.35% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 11606: accuracy stable at 83.26% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 13713: accuracy stable at 89.17% for 5000 epochs.
+Early stopping at epoch 33272: accuracy stable at 93.75% for 5000 epochs.
+Early stopping at epoch 17175: accuracy stable at 94.64% for 5000 epochs.
+✗  failed to learn 896 facts. Now searching: 769 - 895
+Trying n_facts = 832 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 96.15%
+Early stopping at epoch 14037: accuracy stable at 97.60% for 5000 epochs.
+Early stopping at epoch 5982: accuracy stable at 97.72% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 13416: accuracy stable at 95.91% for 5000 epochs.
+Early stopping at epoch 9770: accuracy stable at 98.56% for 5000 epochs.
+Early stopping at epoch 18849: accuracy stable at 99.28% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 37399: accuracy stable at 99.04% for 5000 epochs.
+Early stopping at epoch 6769: accuracy stable at 99.52% for 5000 epochs.
+Early stopping at epoch 3454: perfect accuracy reached.
+✓  learned all 832 facts. Now searching: 833 - 895
+Trying n_facts = 864 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 90.51%
+Early stopping at epoch 36392: accuracy stable at 95.60% for 5000 epochs.
+Early stopping at epoch 12161: accuracy stable at 96.30% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 32113: accuracy stable at 93.29% for 5000 epochs.
+Early stopping at epoch 9309: accuracy stable at 94.79% for 5000 epochs.
+Early stopping at epoch 12182: accuracy stable at 94.91% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 36184: accuracy stable at 92.13% for 5000 epochs.
+Finished 50000 epochs. Final accuracy: 96.41%
+Early stopping at epoch 13010: accuracy stable at 97.69% for 5000 epochs.
+✗  failed to learn 864 facts. Now searching: 833 - 863
+Trying n_facts = 848 ...
+  Attempt 1/3
+Early stopping at epoch 43146: accuracy stable at 84.43% for 5000 epochs.
+Early stopping at epoch 29810: accuracy stable at 93.87% for 5000 epochs.
+Early stopping at epoch 21195: accuracy stable at 95.05% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 8527: accuracy stable at 88.09% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 36240: accuracy stable at 88.80% for 5000 epochs.
+Early stopping at epoch 17995: accuracy stable at 91.86% for 5000 epochs.
+Early stopping at epoch 19920: accuracy stable at 93.99% for 5000 epochs.
+✗  failed to learn 848 facts. Now searching: 833 - 847
+Trying n_facts = 840 ...
+  Attempt 1/3
+Early stopping at epoch 49648: accuracy stable at 95.48% for 5000 epochs.
+Early stopping at epoch 22696: accuracy stable at 97.38% for 5000 epochs.
+Early stopping at epoch 12318: accuracy stable at 98.69% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 41724: accuracy stable at 94.40% for 5000 epochs.
+Early stopping at epoch 12587: accuracy stable at 96.90% for 5000 epochs.
+Early stopping at epoch 15160: accuracy stable at 98.33% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 20541: accuracy stable at 87.50% for 5000 epochs.
+✗  failed to learn 840 facts. Now searching: 833 - 839
+
+Max learnable facts: 832
+Max facts learned: 832
+
+Running capacity search for: E2_attn_ff_norms__ffres_ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 10978: accuracy stable at 99.80% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.80% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.80% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 6847: accuracy stable at 99.80% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.80% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.80% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 6175: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 9009: accuracy stable at 96.09% for 5000 epochs.
+Early stopping at epoch 10274: accuracy stable at 98.31% for 5000 epochs.
+Early stopping at epoch 6851: accuracy stable at 98.44% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 48438: accuracy stable at 93.10% for 5000 epochs.
+Early stopping at epoch 38912: accuracy stable at 96.88% for 5000 epochs.
+Early stopping at epoch 6239: accuracy stable at 97.01% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 41841: accuracy stable at 95.83% for 5000 epochs.
+Early stopping at epoch 20845: accuracy stable at 97.66% for 5000 epochs.
+Early stopping at epoch 13051: accuracy stable at 97.92% for 5000 epochs.
+✗  failed to learn 768 facts. Now searching: 513 - 767
+Trying n_facts = 640 ...
+  Attempt 1/3
+Early stopping at epoch 12632: accuracy stable at 99.22% for 5000 epochs.
+Early stopping at epoch 5737: accuracy stable at 99.38% for 5000 epochs.
+Early stopping at epoch 5332: accuracy stable at 99.38% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 10614: perfect accuracy reached.
+✓  learned all 640 facts. Now searching: 641 - 767
+Trying n_facts = 704 ...
+  Attempt 1/3
+Early stopping at epoch 27784: accuracy stable at 99.86% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.86% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.86% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 17336: perfect accuracy reached.
+✓  learned all 704 facts. Now searching: 705 - 767
+Trying n_facts = 736 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 99.59%
+Early stopping at epoch 1513: perfect accuracy reached.
+✓  learned all 736 facts. Now searching: 737 - 767
+Trying n_facts = 752 ...
+  Attempt 1/3
+Early stopping at epoch 24240: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 100.00% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 32324: accuracy stable at 92.02% for 5000 epochs.
+Early stopping at epoch 26543: accuracy stable at 94.41% for 5000 epochs.
+Early stopping at epoch 23671: accuracy stable at 96.14% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 28519: accuracy stable at 84.31% for 5000 epochs.
+Early stopping at epoch 15043: accuracy stable at 99.87% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.87% for 5000 epochs.
+✗  failed to learn 752 facts. Now searching: 737 - 751
+Trying n_facts = 744 ...
+  Attempt 1/3
+Early stopping at epoch 41408: accuracy stable at 98.79% for 5000 epochs.
+Early stopping at epoch 10844: accuracy stable at 99.73% for 5000 epochs.
+Early stopping at epoch 8138: accuracy stable at 99.87% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 10512: perfect accuracy reached.
+✓  learned all 744 facts. Now searching: 745 - 751
+
+Max learnable facts: 744
+Max facts learned: 744
+
+Running capacity search for: E2_attn_ff__bias__GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 13420: accuracy stable at 94.73% for 5000 epochs.
+Early stopping at epoch 9272: accuracy stable at 96.68% for 5000 epochs.
+Early stopping at epoch 10142: accuracy stable at 97.85% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 13279: accuracy stable at 83.01% for 5000 epochs.
+Early stopping at epoch 10709: accuracy stable at 86.33% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 7895: accuracy stable at 23.44% for 5000 epochs.
+Early stopping at epoch 5499: accuracy stable at 21.09% for 5000 epochs.
+✗  failed to learn 512 facts. Now searching: 1 - 511
+Trying n_facts = 256 ...
+  Attempt 1/3
+Early stopping at epoch 9790: accuracy stable at 95.31% for 5000 epochs.
+Early stopping at epoch 5106: accuracy stable at 96.09% for 5000 epochs.
+Early stopping at epoch 14551: accuracy stable at 97.66% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 697: perfect accuracy reached.
+✓  learned all 256 facts. Now searching: 257 - 511
+Trying n_facts = 384 ...
+  Attempt 1/3
+Early stopping at epoch 4707: perfect accuracy reached.
+✓  learned all 384 facts. Now searching: 385 - 511
+Trying n_facts = 448 ...
+  Attempt 1/3
+Early stopping at epoch 18852: accuracy stable at 97.32% for 5000 epochs.
+Early stopping at epoch 5765: accuracy stable at 97.10% for 5000 epochs.
+Early stopping at epoch 5954: accuracy stable at 98.21% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 6517: perfect accuracy reached.
+✓  learned all 448 facts. Now searching: 449 - 511
+Trying n_facts = 480 ...
+  Attempt 1/3
+Early stopping at epoch 7270: accuracy stable at 96.88% for 5000 epochs.
+Early stopping at epoch 11634: accuracy stable at 99.38% for 5000 epochs.
+Early stopping at epoch 8103: accuracy stable at 99.79% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 13093: accuracy stable at 91.46% for 5000 epochs.
+Early stopping at epoch 17688: accuracy stable at 96.88% for 5000 epochs.
+Early stopping at epoch 17931: accuracy stable at 97.92% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 20740: accuracy stable at 89.58% for 5000 epochs.
+Early stopping at epoch 21925: accuracy stable at 95.00% for 5000 epochs.
+Early stopping at epoch 14101: accuracy stable at 96.46% for 5000 epochs.
+✗  failed to learn 480 facts. Now searching: 449 - 479
+Trying n_facts = 464 ...
+  Attempt 1/3
+Early stopping at epoch 15620: accuracy stable at 82.54% for 5000 epochs.
+Early stopping at epoch 12421: accuracy stable at 88.58% for 5000 epochs.
+Early stopping at epoch 15555: accuracy stable at 93.10% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 18794: accuracy stable at 83.62% for 5000 epochs.
+Early stopping at epoch 13494: accuracy stable at 84.70% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 4815: perfect accuracy reached.
+✓  learned all 464 facts. Now searching: 465 - 479
+Trying n_facts = 472 ...
+  Attempt 1/3
+Early stopping at epoch 18570: accuracy stable at 96.19% for 5000 epochs.
+Early stopping at epoch 7316: accuracy stable at 96.40% for 5000 epochs.
+Early stopping at epoch 8523: accuracy stable at 97.67% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 10485: accuracy stable at 33.69% for 5000 epochs.
+Early stopping at epoch 11328: accuracy stable at 56.36% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 16353: accuracy stable at 93.22% for 5000 epochs.
+Early stopping at epoch 10830: accuracy stable at 94.28% for 5000 epochs.
+Early stopping at epoch 15147: accuracy stable at 95.97% for 5000 epochs.
+✗  failed to learn 472 facts. Now searching: 465 - 471
+
+Max learnable facts: 464
+Max facts learned: 464
+
+Running capacity search for: E2_attn_ff__bias__ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 20611: accuracy stable at 99.22% for 5000 epochs.
+Early stopping at epoch 5138: accuracy stable at 99.61% for 5000 epochs.
+Early stopping at epoch 5617: accuracy stable at 99.80% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 15509: accuracy stable at 98.24% for 5000 epochs.
+Early stopping at epoch 9465: accuracy stable at 99.22% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.22% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 10806: accuracy stable at 96.48% for 5000 epochs.
+Early stopping at epoch 6933: accuracy stable at 98.44% for 5000 epochs.
+Early stopping at epoch 5504: accuracy stable at 98.83% for 5000 epochs.
+✗  failed to learn 512 facts. Now searching: 1 - 511
+Trying n_facts = 256 ...
+  Attempt 1/3
+Early stopping at epoch 10085: accuracy stable at 99.61% for 5000 epochs.
+Early stopping at epoch 189: perfect accuracy reached.
+✓  learned all 256 facts. Now searching: 257 - 511
+Trying n_facts = 384 ...
+  Attempt 1/3
+Early stopping at epoch 7956: accuracy stable at 96.09% for 5000 epochs.
+Early stopping at epoch 11275: accuracy stable at 98.96% for 5000 epochs.
+Early stopping at epoch 5679: accuracy stable at 99.48% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 12291: accuracy stable at 98.70% for 5000 epochs.
+Early stopping at epoch 6155: accuracy stable at 98.96% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 98.96% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 8112: accuracy stable at 95.31% for 5000 epochs.
+Early stopping at epoch 9234: accuracy stable at 97.40% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 97.40% for 5000 epochs.
+✗  failed to learn 384 facts. Now searching: 257 - 383
+Trying n_facts = 320 ...
+  Attempt 1/3
+Early stopping at epoch 11010: accuracy stable at 99.69% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.69% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.69% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 7249: accuracy stable at 99.69% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.69% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.69% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 5300: accuracy stable at 82.19% for 5000 epochs.
+Early stopping at epoch 15647: accuracy stable at 90.94% for 5000 epochs.
+Early stopping at epoch 5945: accuracy stable at 93.44% for 5000 epochs.
+✗  failed to learn 320 facts. Now searching: 257 - 319
+Trying n_facts = 288 ...
+  Attempt 1/3
+Early stopping at epoch 836: perfect accuracy reached.
+✓  learned all 288 facts. Now searching: 289 - 319
+Trying n_facts = 304 ...
+  Attempt 1/3
+Early stopping at epoch 1297: perfect accuracy reached.
+✓  learned all 304 facts. Now searching: 305 - 319
+Trying n_facts = 312 ...
+  Attempt 1/3
+Early stopping at epoch 3211: perfect accuracy reached.
+✓  learned all 312 facts. Now searching: 313 - 319
+
+Max learnable facts: 312
+Max facts learned: 312
+
+Running capacity search for: E2_attn_ff__bias_ffres_GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 15313: accuracy stable at 94.73% for 5000 epochs.
+Early stopping at epoch 21137: accuracy stable at 99.02% for 5000 epochs.
+Early stopping at epoch 5095: accuracy stable at 99.22% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 20520: accuracy stable at 99.61% for 5000 epochs.
+Early stopping at epoch 2290: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Early stopping at epoch 18624: accuracy stable at 67.19% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 22549: accuracy stable at 96.88% for 5000 epochs.
+Early stopping at epoch 7238: accuracy stable at 97.92% for 5000 epochs.
+Early stopping at epoch 5938: accuracy stable at 98.18% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 42652: accuracy stable at 87.50% for 5000 epochs.
+✗  failed to learn 768 facts. Now searching: 513 - 767
+Trying n_facts = 640 ...
+  Attempt 1/3
+Early stopping at epoch 21848: accuracy stable at 98.12% for 5000 epochs.
+Early stopping at epoch 5014: accuracy stable at 98.12% for 5000 epochs.
+Early stopping at epoch 6588: accuracy stable at 98.28% for 5000 epochs.
+  Attempt 2/3
+Finished 50000 epochs. Final accuracy: 95.63%
+Early stopping at epoch 10728: accuracy stable at 96.25% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 96.25% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 15501: accuracy stable at 99.06% for 5000 epochs.
+Early stopping at epoch 5832: accuracy stable at 98.75% for 5000 epochs.
+Early stopping at epoch 5612: accuracy stable at 99.06% for 5000 epochs.
+✗  failed to learn 640 facts. Now searching: 513 - 639
+Trying n_facts = 576 ...
+  Attempt 1/3
+Early stopping at epoch 20856: accuracy stable at 97.92% for 5000 epochs.
+Early stopping at epoch 11788: accuracy stable at 99.48% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.48% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 2472: perfect accuracy reached.
+✓  learned all 576 facts. Now searching: 577 - 639
+Trying n_facts = 608 ...
+  Attempt 1/3
+Early stopping at epoch 35692: accuracy stable at 98.19% for 5000 epochs.
+Early stopping at epoch 5958: accuracy stable at 98.19% for 5000 epochs.
+Early stopping at epoch 10746: accuracy stable at 98.85% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 44089: accuracy stable at 99.34% for 5000 epochs.
+Early stopping at epoch 5009: accuracy stable at 99.51% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.51% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 18477: accuracy stable at 93.59% for 5000 epochs.
+Early stopping at epoch 7065: accuracy stable at 94.74% for 5000 epochs.
+Early stopping at epoch 5974: accuracy stable at 94.90% for 5000 epochs.
+✗  failed to learn 608 facts. Now searching: 577 - 607
+Trying n_facts = 592 ...
+  Attempt 1/3
+Early stopping at epoch 13825: accuracy stable at 84.29% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 26780: accuracy stable at 97.97% for 5000 epochs.
+Early stopping at epoch 12698: accuracy stable at 99.66% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.66% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 14072: accuracy stable at 93.07% for 5000 epochs.
+Early stopping at epoch 16155: accuracy stable at 98.14% for 5000 epochs.
+Early stopping at epoch 9078: accuracy stable at 98.48% for 5000 epochs.
+✗  failed to learn 592 facts. Now searching: 577 - 591
+Trying n_facts = 584 ...
+  Attempt 1/3
+Early stopping at epoch 7818: accuracy stable at 82.71% for 5000 epochs.
+Early stopping at epoch 13689: accuracy stable at 88.36% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 12831: perfect accuracy reached.
+✓  learned all 584 facts. Now searching: 585 - 591
+
+Max learnable facts: 584
+Max facts learned: 584
+
+Running capacity search for: E2_attn_ff__bias_ffres_ReLU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 15396: accuracy stable at 97.07% for 5000 epochs.
+Early stopping at epoch 8984: accuracy stable at 99.02% for 5000 epochs.
+Early stopping at epoch 8104: accuracy stable at 99.41% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 12520: accuracy stable at 93.16% for 5000 epochs.
+Early stopping at epoch 11937: accuracy stable at 96.68% for 5000 epochs.
+Early stopping at epoch 15805: accuracy stable at 98.24% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 22168: accuracy stable at 99.41% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.41% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.41% for 5000 epochs.
+✗  failed to learn 512 facts. Now searching: 1 - 511
+Trying n_facts = 256 ...
+  Attempt 1/3
+Early stopping at epoch 6689: accuracy stable at 96.88% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 96.88% for 5000 epochs.
+Early stopping at epoch 6806: accuracy stable at 97.27% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 8055: accuracy stable at 98.44% for 5000 epochs.
+Early stopping at epoch 5154: accuracy stable at 98.44% for 5000 epochs.
+Early stopping at epoch 5016: accuracy stable at 98.83% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 6539: accuracy stable at 96.88% for 5000 epochs.
+Early stopping at epoch 5962: accuracy stable at 97.66% for 5000 epochs.
+Early stopping at epoch 8416: accuracy stable at 98.05% for 5000 epochs.
+✗  failed to learn 256 facts. Now searching: 1 - 255
+Trying n_facts = 128 ...
+  Attempt 1/3
+Early stopping at epoch 773: perfect accuracy reached.
+✓  learned all 128 facts. Now searching: 129 - 255
+Trying n_facts = 192 ...
+  Attempt 1/3
+Early stopping at epoch 921: perfect accuracy reached.
+✓  learned all 192 facts. Now searching: 193 - 255
+Trying n_facts = 224 ...
+  Attempt 1/3
+Early stopping at epoch 4124: perfect accuracy reached.
+✓  learned all 224 facts. Now searching: 225 - 255
+Trying n_facts = 240 ...
+  Attempt 1/3
+Early stopping at epoch 6627: accuracy stable at 99.17% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.17% for 5000 epochs.
+Early stopping at epoch 5177: perfect accuracy reached.
+✓  learned all 240 facts. Now searching: 241 - 255
+Trying n_facts = 248 ...
+  Attempt 1/3
+Early stopping at epoch 10662: accuracy stable at 99.19% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.19% for 5000 epochs.
+Early stopping at epoch 5300: accuracy stable at 99.19% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 11693: accuracy stable at 95.56% for 5000 epochs.
+Early stopping at epoch 5615: accuracy stable at 97.58% for 5000 epochs.
+Early stopping at epoch 8038: accuracy stable at 98.39% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 8404: accuracy stable at 97.58% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 97.58% for 5000 epochs.
+Early stopping at epoch 7639: accuracy stable at 97.98% for 5000 epochs.
+✗  failed to learn 248 facts. Now searching: 241 - 247
+
+Max learnable facts: 240
+Max facts learned: 240
+
+Running capacity search for: E2_attn_ff_norms_bias__GELU
+Searching for max learnable facts in [1, 1024]
+
+Trying n_facts = 512 ...
+  Attempt 1/3
+Early stopping at epoch 2478: perfect accuracy reached.
+✓  learned all 512 facts. Now searching: 513 - 1024
+Trying n_facts = 768 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 96.74%
+Early stopping at epoch 8991: accuracy stable at 97.79% for 5000 epochs.
+Early stopping at epoch 8183: accuracy stable at 99.22% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 29745: accuracy stable at 98.05% for 5000 epochs.
+Early stopping at epoch 5020: accuracy stable at 98.05% for 5000 epochs.
+Early stopping at epoch 11325: accuracy stable at 98.83% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 12094: accuracy stable at 92.19% for 5000 epochs.
+Early stopping at epoch 15151: accuracy stable at 94.92% for 5000 epochs.
+Early stopping at epoch 26660: accuracy stable at 96.74% for 5000 epochs.
+✗  failed to learn 768 facts. Now searching: 513 - 767
+Trying n_facts = 640 ...
+  Attempt 1/3
+Early stopping at epoch 18482: perfect accuracy reached.
+✓  learned all 640 facts. Now searching: 641 - 767
+Trying n_facts = 704 ...
+  Attempt 1/3
+Early stopping at epoch 18641: accuracy stable at 97.02% for 5000 epochs.
+Early stopping at epoch 20971: accuracy stable at 99.57% for 5000 epochs.
+Early stopping at epoch 6437: accuracy stable at 99.57% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 31296: accuracy stable at 97.02% for 5000 epochs.
+Early stopping at epoch 6790: accuracy stable at 97.44% for 5000 epochs.
+Early stopping at epoch 8173: accuracy stable at 97.87% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 22548: accuracy stable at 97.16% for 5000 epochs.
+Early stopping at epoch 16448: perfect accuracy reached.
+✓  learned all 704 facts. Now searching: 705 - 767
+Trying n_facts = 736 ...
+  Attempt 1/3
+Early stopping at epoch 16397: accuracy stable at 86.28% for 5000 epochs.
+Early stopping at epoch 13950: accuracy stable at 93.75% for 5000 epochs.
+Early stopping at epoch 13249: accuracy stable at 94.57% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 42853: accuracy stable at 99.73% for 5000 epochs.
+Early stopping at epoch 553: perfect accuracy reached.
+✓  learned all 736 facts. Now searching: 737 - 767
+Trying n_facts = 752 ...
+  Attempt 1/3
+Early stopping at epoch 39304: accuracy stable at 94.55% for 5000 epochs.
+Early stopping at epoch 17025: accuracy stable at 96.94% for 5000 epochs.
+Early stopping at epoch 19158: accuracy stable at 99.47% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 36923: accuracy stable at 81.52% for 5000 epochs.
+Early stopping at epoch 11076: accuracy stable at 97.21% for 5000 epochs.
+Early stopping at epoch 7614: accuracy stable at 97.87% for 5000 epochs.
+  Attempt 3/3
+Early stopping at epoch 30258: accuracy stable at 92.69% for 5000 epochs.
+Early stopping at epoch 24785: accuracy stable at 94.68% for 5000 epochs.
+Early stopping at epoch 10979: accuracy stable at 96.01% for 5000 epochs.
+✗  failed to learn 752 facts. Now searching: 737 - 751
+Trying n_facts = 744 ...
+  Attempt 1/3
+Finished 50000 epochs. Final accuracy: 97.04%
+Early stopping at epoch 26796: accuracy stable at 95.16% for 5000 epochs.
+Early stopping at epoch 8222: accuracy stable at 99.60% for 5000 epochs.
+  Attempt 2/3
+Early stopping at epoch 17233: accuracy stable at 99.73% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.73% for 5000 epochs.
+Early stopping at epoch 5001: accuracy stable at 99.73% for 5000 epochs.
+  Attempt 3/3
+
+
+
+
+
+
+
+
+
+
+

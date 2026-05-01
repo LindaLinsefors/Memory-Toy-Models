@@ -149,7 +149,7 @@ def train_model(model, n_epochs=2000, lr=1e-2,
                 log_to_wandb=True, wandb_log_every=10, wandb_finish=True,
                 wandb_project=WANDB_PROJECT, wandb_group='test', wandb_name=None,
                 early_stopping = False, patience = 100, verbose = True,
-                target_accuracy = 'accuracy') -> bool:
+                target_accuracy = 'accuracy', loss_type='BCE') -> bool:
     """Train a MemoryToyModel on its stored facts.
     
     Args:
@@ -164,12 +164,16 @@ def train_model(model, n_epochs=2000, lr=1e-2,
         early_stopping: Whether to stop training early if accuracy plateaus.
         patience: Number of epochs to wait for accuracy improvement before stopping.
         verbose: Whether to print training progress and early stopping info.
+        loss_type: Either 'BCE' or 'CE' to select binary or multiclass cross entropy.
     Returns:
         True if the model achieved perfect monitored accuracy, False otherwise.
     """
     device = next(model.parameters()).device
     inputs = model.facts["inputs"]
     targets = model.facts["targets"]
+
+    if loss_type not in {'BCE', 'CE'}:
+        raise ValueError("loss_type must be either 'BCE' or 'CE'.")
 
     # Initialise wandb run (reuse existing run if already active)
     if log_to_wandb and wandb.run is None:
@@ -193,10 +197,13 @@ def train_model(model, n_epochs=2000, lr=1e-2,
 
     one_hot_targets = F.one_hot(targets, model.settings.output_vocab_size).float()
 
-    if smoothing is None:
-        loss_targets = one_hot_targets
+    if loss_type == 'BCE':
+        if smoothing is None:
+            loss_targets = one_hot_targets
+        else:
+            loss_targets = torch.ones_like(one_hot_targets) * smoothing + one_hot_targets * (1 - 2*smoothing)
     else:
-        loss_targets = torch.ones_like(one_hot_targets) * smoothing + one_hot_targets * (1 - 2*smoothing)
+        loss_targets = targets
 
     # Early stopping state
     best_accuracy = None
@@ -210,7 +217,10 @@ def train_model(model, n_epochs=2000, lr=1e-2,
         optimizer.zero_grad()
         
         logits = model(inputs)
-        loss = F.binary_cross_entropy_with_logits(logits, loss_targets)
+        if loss_type == 'BCE':
+            loss = F.binary_cross_entropy_with_logits(logits, loss_targets)
+        else:
+            loss = F.cross_entropy(logits, loss_targets, label_smoothing=0.0 if smoothing is None else smoothing)
 
         loss.backward()
         if grad_clip_norm is not None:
@@ -218,7 +228,10 @@ def train_model(model, n_epochs=2000, lr=1e-2,
         optimizer.step()
 
         loss_val = loss.item()
-        accuracy = (one_hot_targets.bool() == (logits > 0)).float().mean().item()
+        if loss_type == 'BCE':
+            accuracy = (one_hot_targets.bool() == (logits > 0)).float().mean().item()
+        else:
+            accuracy = (logits.argmax(dim=-1) == targets).float().mean().item()
         best_guess_accuracy = (logits.argmax(dim=-1) == targets).float().mean().item()
         if target_accuracy == 'accuracy':
             monitored_accuracy = accuracy
@@ -239,7 +252,7 @@ def train_model(model, n_epochs=2000, lr=1e-2,
                 epochs_since_change += 1
                 if epochs_since_change >= patience:
                     if verbose:
-                        print(f"Early stopping at epoch {epoch}: accuracy stable at {monitored_accuracy:.2%} for {patience} epochs.")
+                        print(f"Early stopping at epoch {epoch}: accuracy stable at {best_accuracy:.2%} for {patience} epochs.")
                     early_stopping_triggered = True
                     break
             else:

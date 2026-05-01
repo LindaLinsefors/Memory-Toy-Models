@@ -17,17 +17,23 @@ def name_function_n_facts(settings: ModelSettings) -> str:
     return f"n_facts={settings.n_facts}"
 
 
-def evaluate_model(model, target_accuracy='accuracy') -> bool:
+def evaluate_model(model, target_accuracy='accuracy', loss_type: str = 'BCE') -> bool:
     """Check whether a trained model has learned all its facts perfectly."""
     model.eval()
     inputs = model.facts["inputs"]
     targets = model.facts["targets"]
 
+    if loss_type not in {'BCE', 'CE'}:
+        raise ValueError("loss_type must be either 'BCE' or 'CE'.")
+
     with torch.no_grad():
         logits = model(inputs)
-        one_hot = F.one_hot(targets, model.settings.output_vocab_size)
-        accuracy = (one_hot.bool() == (logits > 0)).float().mean().item()
         best_guess_accuracy = (logits.argmax(dim=-1) == targets).float().mean().item()
+        if loss_type == 'BCE':
+            one_hot = F.one_hot(targets, model.settings.output_vocab_size)
+            accuracy = (one_hot.bool() == (logits > 0)).float().mean().item()
+        else:
+            accuracy = best_guess_accuracy
 
     if target_accuracy == 'accuracy':
         return accuracy == 1.0
@@ -48,7 +54,8 @@ def find_max_facts(settings: ModelSettings,
                    verbose: bool = True,
                    name_function = name_function_n_facts,
                    target_accuracy: str = 'accuracy',
-                   threshold_to_continue: float = 0.99) -> int:
+                   threshold_to_continue: float = 0.99,
+                   loss_type: str = 'BCE') -> int:
     """Binary search for the maximum number of facts a model architecture can learn.
 
     Args:
@@ -66,6 +73,7 @@ def find_max_facts(settings: ModelSettings,
         target_accuracy:     Metric to train for ('accuracy' or 'best_guess_accuracy').
         threshold_to_continue: 
                        Minimum accuracy required to continue searching with a lower learning rate.
+        loss_type:     Either 'BCE' or 'CE' for the training loss used in each trial.
     Returns:
         The maximum n_facts for which the model achieved perfect accuracy
         (within the given precision).
@@ -98,7 +106,8 @@ def find_max_facts(settings: ModelSettings,
                                    verbose=verbose,
                                    name_function=name_function,
                                    target_accuracy=target_accuracy,
-                                   threshold_to_continue=threshold_to_continue)
+                                   threshold_to_continue=threshold_to_continue,
+                                   loss_type=loss_type)
             if success:
                 learned = True
                 break
@@ -132,7 +141,8 @@ def _try_n_facts(base_settings: ModelSettings,
                  verbose: bool,
                  name_function: callable,
                  target_accuracy: str,
-                 threshold_to_continue: float) -> bool:
+                 threshold_to_continue: float,
+                 loss_type: str ) -> bool:
     """Train a model with the given n_facts. Returns True if it achieves perfect accuracy."""
     trial_settings = copy.deepcopy(base_settings)
     trial_settings.n_facts = n_facts
@@ -155,7 +165,7 @@ def _try_n_facts(base_settings: ModelSettings,
                                     log_to_wandb=log_to_wandb, wandb_log_every=wandb_log_every, 
                                     wandb_finish=False, wandb_group=wandb_group,
                                     early_stopping=True, patience=patience, verbose=verbose,
-                                    target_accuracy = target_accuracy)
+                                    target_accuracy=target_accuracy, loss_type=loss_type)
         if success:
             break  # stop if we found a learning rate that works
         if best_accuracy < threshold_to_continue:

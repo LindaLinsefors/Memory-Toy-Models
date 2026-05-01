@@ -146,7 +146,7 @@ class HandCodedModel:
         return accuracy, logits, hidden
 
 
-
+#%%
 
 settings = HandCodedModelSettings()
 settings.n_facts = 32
@@ -195,6 +195,92 @@ for n_facts in [16, 16*2, 16*3, 16*4]:
                 if best_accuracy == 1.0:
                     break
         print(f"Best Accuracy: {best_accuracy}")
+
+#%%
+
+verbose = True
+max_facts_d = {}
+
+# %%
+
+for d_model in [128, 256, 512, 1024]:
+    settings = HandCodedModelSettings(input_vocab_size=2*d_model, 
+                                      output_vocab_size=d_model, 
+                                      d_ff=d_model,
+                                      n_facts=0,
+                                      use_top_no_top_fraction='top_n', top_n=0)
+    
+    max_facts = 0
+    success = True
+    if verbose: print(f"\nEvaluating hand coded model with d_model = {d_model}\n")
+
+    while success:
+        success = False
+        settings.top_n = 0
+        settings.n_facts += d_model
+        keep_trying = 2
+        best_accuracy = 0
+
+        while keep_trying > 0:
+            model = HandCodedModel(settings)
+            accuracy_first_try, _, _ = model.evaluate()
+            if verbose: print(f"  Accuracy {accuracy_first_try:.8f} with {settings.n_facts} facts and top_n = {settings.top_n}.")
+
+            if accuracy_first_try == 1.0:
+                accuracy = accuracy_first_try  
+            else:
+                model = HandCodedModel(settings)
+                accuracy_second_try, _, _ = model.evaluate()
+                if verbose: print(f"  Accuracy {accuracy_second_try:.8f} with {settings.n_facts} facts and top_n = {settings.top_n}.")
+
+                accuracy = max(accuracy_first_try, accuracy_second_try)
+
+            if accuracy == 1.0: #Success, we're done with this number of facts.
+                max_facts = settings.n_facts
+                success = True
+                keep_trying = 0
+                if verbose: print(f"✓ Learned {settings.n_facts} facts with top_n = {settings.top_n}.")
+
+            elif accuracy >= best_accuracy: #Try again with one higher top_n.
+                best_accuracy = accuracy
+                settings.top_n += 1 
+                keep_trying = 2
+            
+            elif accuracy < best_accuracy: #Give up on this number of facts.
+                settings.top_n += 1 
+                keep_trying -= 1
+
+
+    max_facts_d[d_model] = max_facts
+    if verbose: print(f"\nMax facts learned with d_model={d_model}: {max_facts}\n")
+#%%
+
+# Save results from above cell
+max_facts_d = {16: 32, 32: 64, 64: 256, 128: 384, 256: 512, 512: 1536, 1024: 4096}
+#%%
+
+plt.loglog(list(max_facts_d.keys()), list(max_facts_d.values()), marker='o')
+plt.xlabel("d_model")
+plt.ylabel("Max Facts Learned")
+plt.title("Max Facts Learned vs d_model")
+
+
+
+xticks = list(max_facts_d.keys())
+yticks = [2**i for i in range(4, 13)]
+
+ax = plt.gca()
+ax.set_xticks(xticks)
+ax.set_yticks(yticks)
+ax.set_xticklabels([str(d) for d in xticks])
+ax.set_yticklabels([str(d) for d in yticks])
+ax.xaxis.set_minor_locator(plt.NullLocator())
+ax.yaxis.set_minor_locator(plt.NullLocator())
+
+plt.grid()
+
+
+plt.show()
 #%%
 for d in [32*32]:
     settings = generate_settings(d)

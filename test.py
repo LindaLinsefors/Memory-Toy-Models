@@ -243,7 +243,7 @@ def test_train_model_loss_decreases():
         initial_loss = F.binary_cross_entropy_with_logits(logits, targets_oh).item()
     
     # Train briefly
-    train_model(model, n_epochs=200, log_to_wandb=False, early_stopping=False)
+    train_model(model, n_epochs=200, log_to_wandb=False, early_stopping=False, loss_type='BCE')
     
     # Get final loss
     model.eval()
@@ -252,6 +252,34 @@ def test_train_model_loss_decreases():
         final_loss = F.binary_cross_entropy_with_logits(logits, targets_oh).item()
     
     assert final_loss < initial_loss
+
+def test_train_model_ce_loss_decreases():
+    s = ModelSettings(seq_len=2, input_vocab_size=8, output_vocab_size=4,
+                      n_facts=10, d_residual=16, n_heads=1, d_ff=32)
+    torch.manual_seed(0)
+    model = MemoryToyModel(s)
+
+    model.eval()
+    with torch.no_grad():
+        logits = model(model.facts["inputs"])
+        initial_loss = F.cross_entropy(logits, model.facts["targets"]).item()
+
+    train_model(model, n_epochs=200, log_to_wandb=False, early_stopping=False, loss_type='CE')
+
+    model.eval()
+    with torch.no_grad():
+        logits = model(model.facts["inputs"])
+        final_loss = F.cross_entropy(logits, model.facts["targets"]).item()
+
+    assert final_loss < initial_loss
+
+def test_train_model_rejects_unknown_loss_type():
+    s = ModelSettings(seq_len=2, input_vocab_size=8, output_vocab_size=4,
+                      n_facts=10, d_residual=16, n_heads=1, d_ff=32)
+    model = MemoryToyModel(s)
+
+    with pytest.raises(ValueError, match="loss_type"):
+        train_model(model, n_epochs=10, log_to_wandb=False, early_stopping=False, loss_type='MSE')
 
 def test_train_model_early_stopping_perfect():
     """Model should stop early when perfect accuracy is reached."""
@@ -320,6 +348,13 @@ def test_evaluate_model_returns_bool():
     result = evaluate_model(model)
     assert isinstance(result, bool)
 
+def test_evaluate_model_ce_returns_bool():
+    s = ModelSettings(seq_len=1, input_vocab_size=8, output_vocab_size=2,
+                      n_facts=4, d_residual=16, n_heads=1, d_ff=32)
+    model = MemoryToyModel(s)
+    result = evaluate_model(model, loss_type='CE')
+    assert isinstance(result, bool)
+
 
 # %%
 def test_try_n_facts_runs():
@@ -334,6 +369,20 @@ def test_try_n_facts_runs():
                           name_function=name_function_n_facts,
                           target_accuracy='accuracy',
                           threshold_to_continue=0.0)
+    assert isinstance(result, bool)
+
+def test_try_n_facts_runs_with_ce():
+    s = ModelSettings(seq_len=1, input_vocab_size=8, output_vocab_size=2,
+                      n_facts=4, d_residual=16, n_heads=1, d_ff=32)
+    result = _try_n_facts(s, n_facts=4, n_epochs=10, lr=[1e-2],
+                          optimizer_type='Adam', grad_clip_norm=None,
+                          patience=5,
+                          log_to_wandb=False, wandb_group='test',
+                          wandb_log_every=10, verbose=False,
+                          name_function=name_function_n_facts,
+                          target_accuracy='accuracy',
+                          threshold_to_continue=0.0,
+                          loss_type='CE')
     assert isinstance(result, bool)
 
 
@@ -360,6 +409,13 @@ def test_find_max_facts_runs():
                       d_residual=16, n_heads=1, d_ff=32)
     result = find_max_facts(s, precision=3, n_epochs=10, patience=5,
                             log_to_wandb=False, verbose=False)
+    assert isinstance(result, int)
+
+def test_find_max_facts_runs_with_ce():
+    s = ModelSettings(seq_len=1, input_vocab_size=4, output_vocab_size=2,
+                      d_residual=16, n_heads=1, d_ff=32)
+    result = find_max_facts(s, precision=3, n_epochs=10, patience=5,
+                            log_to_wandb=False, verbose=False, loss_type='CE')
     assert isinstance(result, int)
 
 

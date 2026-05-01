@@ -25,6 +25,7 @@ os.makedirs(experiment_dir, exist_ok=True)
 
 testing = False
 model_type = 'reduced' # 'full' or 'reduced'
+duplicate = True
 
 log_to_wandb = True
 lr = [1e-2, 3e-3, 1e-3]
@@ -35,13 +36,17 @@ threshold_to_continue = 0.99
 number_of_attempts = 3
 log_path = os.path.join(experiment_dir, f"{model_type}_model_log")
 
+loss_type = 'BCE' # 'BCE' or 'CE'
+
+if duplicate:
+    log_path += '_duplicate'
+
 
 if testing:
     log_to_wandb = False
     lr = [1e-2]
     patience = 10
     n_epochs = 100
-    precision = 20
     log_path = os.path.join(experiment_dir, "test_log")
 
 
@@ -65,7 +70,7 @@ else:
 
 
 
-def run_sub_experiment(settings: ModelSettings, name: str):
+def run_sub_experiment(settings: ModelSettings, name: str, precision: int):
 
     print(f"Running capacity search for: {name}")
 
@@ -87,6 +92,9 @@ def run_sub_experiment(settings: ModelSettings, name: str):
         "patience": patience,
         "target_accuracy": target_accuracy,
         "threshold_to_continue": threshold_to_continue,
+        "precision": precision,
+        "number_of_attempts": number_of_attempts,
+        "loss_type": loss_type,
     })
 
 
@@ -96,10 +104,14 @@ for d in [16, 32, 64, 128]:
     settings.output_vocab_size = d
     settings.d_residual = d
     settings.d_ff = d
-    precision = d//2
+
+    #precision = d//2  #This was used for the run recored in full_model_log.txt, but this is way to high precision for the larger models.
+    
+    #Increase precision with a factor 4 for each model size, since the max facts increases by about that much.
+    precision = 8 if d == 16   else 8*4 if d == 32    else 8*4*4 if d == 64      else 8*4*4*4    
 
     name = f"{experiment_dir}_{model_type}_d{d}"
-    run_sub_experiment(settings, name)
+    run_sub_experiment(settings, name, precision=precision)
 
 
 

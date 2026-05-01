@@ -257,3 +257,5 @@ Early stopping at epoch 31731: accuracy stable at 99.98% for 5000 epochs.
 Early stopping at epoch 48452: accuracy stable at 99.64% for 5000 epochs.
 Finished 50000 epochs. Final accuracy: 99.76%
 Finished 50000 epochs. Final accuracy: 99.78%
+
+... the rest was lost

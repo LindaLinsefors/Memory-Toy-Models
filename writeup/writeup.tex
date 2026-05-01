@@ -18,6 +18,7 @@
 
 \newcommand{\cmark}{{\color{green!70!black}\ding{51}}}
 \newcommand{\xmark}{{\color{red}\ding{55}}}
+\newcommand{\rothead}[1]{\rotatebox[origin=c]{60}{\smash{\textbf{#1}}}}
 
 \title{Memory in Toy Transformer Models}
 \author{}
@@ -179,6 +180,8 @@ Training supports optional early stopping: it halts when perfect monitored accur
 \texttt{patience}          & int            & 3\,000--5\,000        & Epochs without improvement before stopping \\
 \hdashline[1pt/3pt]
 \texttt{target\_accuracy}  & \parbox[c]{3cm}{\vspace{2pt}\raggedright\texttt{accuracy}, {\footnotesize\texttt{best\_guess\_accuracy}}\vspace{2pt}} & \texttt{accuracy} & Monitored metric for early stopping \\
+\hdashline[1pt/3pt]
+\texttt{loss\_type}          & BCE, CE        & BCE, CE                   & Loss function type (Binary Cross-Entropy or Cross-Entropy) \\
 \midrule
 \multicolumn{4}{@{}l}{\emph{Capacity search parameters}} \\
 \hdashline[1pt/3pt]
@@ -191,7 +194,7 @@ Training supports optional early stopping: it halts when perfect monitored accur
 \texttt{number\_of\_attempts}               & int            & 1, 3         
 & Number of times to try to learn each number of facts, re-starting with a new randomly initialised model each time. \\
 \hdashline[1pt/3pt]
-{\small\texttt{threshold\_to\_continue}}  & float          & 0.99         
+{\small\texttt{threshold\_to\_continue}}  & float          & 0.99, 0.95         
 & If the monitored accuracy is below this threshold, when it's time to move on to the next learning rate, just give up instead. \\
 \bottomrule
 \end{tabular}
@@ -199,6 +202,35 @@ Training supports optional early stopping: it halts when perfect monitored accur
 \label{tab:training-params}
 \end{adjustwidth}
 \end{table}
+
+\begin{table}[ht]
+\begin{adjustwidth}{-2cm}{-2cm}
+\centering
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+\textbf{File} & \rothead{\texttt{patience}} & \rothead{\texttt{target\_accuracy}} & \rothead{\texttt{loss\_type}} & \rothead{\texttt{precision}} & \rothead{\texttt{number\_of\_attempts}} & \rothead{\texttt{threshold\_to\_continue}} \\
+\midrule
+\texttt{E1/experiment\_log.jsonl} & 5000 & ? & BCE & 8 & 1 & 0 \\
+\texttt{E2/experiment\_log.jsonl} & 5000 & ? & BCE & 8 & 1 & 0.99 \\
+\texttt{E2/experiment\_log\_3att.jsonl} & 3000 & ? & BCE & 8 & 3 & 0.99 \\
+\texttt{E2/experiment\_log\_3att\_duplicate.jsonl} & 3000 & ? & BCE & 8 & 3 & 0.99 \\
+\midrule
+\texttt{E2/experiment\_log\_CE\_3att.jsonl} & 3000 & ? & CE & 8 & 3 & 0.95 \\
+\texttt{E2/experiment\_log\_CE\_3att\_duplicate.jsonl} & 3000 & ? & CE & 8 & 3 & 0.95 \\
+\midrule
+\texttt{E3/full\_model\_log.jsonl} & 5000 & ? & BCE & [8, 32, 128, 512] & 3 & 0.99 \\
+\texttt{E3/full\_model\_log\_duplicate.jsonl} & 5000 & ? & BCE & [8, 32, 128, 512] & 3 & 0.99 \\
+\texttt{E3/reduced\_model\_log.jsonl} & 5000 & ? & BCE & [8, 32, 128, 512] & 3 & 0.99 \\
+\texttt{E3/reduced\_model\_log\_duplicate.jsonl} & 5000 & ? & BCE & [8, 32, 128, 512] & 3 & 0.99 \\
+\bottomrule
+\end{tabular}
+\caption{Per-file training and capacity-search settings for the experiment logs in \texttt{E1}, \texttt{E2}, and \texttt{E3}. Entries are left as placeholders for manual completion.}
+\label{tab:file-training-params}
+\end{adjustwidth}
+\end{table}
+
+
 
 
 \section{Experiment: Which architectural components matter for fact memorisation?}
@@ -295,6 +327,65 @@ Next we'll go over the other settings one by one, in order of least expected imp
 \end{tabular}
 \caption{Maximum facts memorised per architectural configuration ($d_{\text{residual}}=16$, $d_{\text{ff}}=16$). Columns Dup, 3att, and Orig correspond to \texttt{experiment\_log\_3att\_duplicate}, \texttt{experiment\_log\_3att}, and \texttt{experiment\_log}, respectively. E1 corresponds to \texttt{E1/experiment\_log} (attention-only configurations). The highest value in each row is shown in \textbf{bold}, outliers are highlighted with a \fbox{box}, and the $\star$ symbol indicates that this architectural configuration was chosen for scaling experiment in Section~\ref{sec:scaling}.}
 \label{tab:e2-3att}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}cccccc ccc@{}}
+\toprule
+ & & & & & & \multicolumn{3}{c}{\textbf{Max Facts}} \\
+\cmidrule(l){7-9}
+\textbf{Attention} & \textbf{FF} & \textbf{Norms} & \textbf{Residual} & \textbf{Bias} & \textbf{Activation} & \textbf{CE\_Dup} & \textbf{CE\_3att} & \textbf{CE\_Orig} \\
+\midrule
+\cmark & \cmark & \cmark & \cmark & \cmark & GELU & 800 & 744 & \textbf{832} \\
+\cmark & \cmark & \cmark & \cmark & \cmark & ReLU & \textbf{768} & \textbf{768} & 728 \\
+\cmark & \cmark & \cmark & \cmark & \xmark & GELU & \textbf{832} & 648 & 600 \\
+\cmark & \cmark & \cmark & \cmark & \xmark & ReLU & \textbf{736} & \textbf{736} & 520 \\
+\hdashline[1pt/3pt]
+\cmark & \cmark & \cmark & \xmark & \cmark & GELU & \textbf{816} & 800 & 600 \\
+\cmark & \cmark & \cmark & \xmark & \cmark & ReLU & \textbf{720} & 712 & 448 \\
+\cmark & \cmark & \cmark & \xmark & \xmark & GELU & \textbf{696} & 632 & 576 \\
+\cmark & \cmark & \cmark & \xmark & \xmark & ReLU & 304 & \textbf{408} & 320 \\
+\hdashline[1pt/3pt]
+\cmark & \cmark & \xmark & \cmark & \cmark & GELU & \textbf{544} & 432 & \fbox{264} \\
+\cmark & \cmark & \xmark & \cmark & \cmark & ReLU & 416 & \textbf{432} & \fbox{120} \\
+\cmark & \cmark & \xmark & \cmark & \xmark & GELU & \textbf{592} & 544 & \fbox{248} \\
+\cmark & \cmark & \xmark & \cmark & \xmark & ReLU & \fbox{\textbf{472}} & \fbox{232} & \fbox{224} \\
+\hdashline[1pt/3pt]
+\cmark & \cmark & \xmark & \xmark & \cmark & GELU & 408 & 336 & \textbf{512} \\
+\cmark & \cmark & \xmark & \xmark & \cmark & ReLU & \fbox{248} & \fbox{\textbf{424}} & 320 \\
+\cmark & \cmark & \xmark & \xmark & \xmark & GELU & 312 & \textbf{392} & \fbox{176} \\
+\cmark & \cmark & \xmark & \xmark & \xmark & ReLU & \textbf{432} & 392 & 368 \\
+\midrule
+\cmark & \xmark & \cmark & N/A & N/A & N/A & 144 & 152 & \textbf{168} \\
+\cmark & \xmark & \xmark & N/A & N/A & N/A & 112 & \textbf{144} & 112 \\
+\midrule
+\xmark & \cmark & \cmark & \cmark & \cmark & GELU & \textbf{1016} & \textbf{1016} & \textbf{1016} \\
+\xmark & \cmark & \cmark & \cmark & \cmark & ReLU & \textbf{1016} & \textbf{1016} & \textbf{1016} \\
+\xmark & \cmark & \cmark & \cmark & \xmark & GELU & \textbf{1016} & \textbf{1016} & 1000 \\
+\xmark & \cmark & \cmark & \cmark & \xmark & ReLU & \textbf{1016} & \textbf{1016} & 960 \\
+\hdashline[1pt/3pt]
+\xmark & \cmark & \cmark & \xmark & \cmark & GELU & \textbf{1016} & \textbf{1016} & \textbf{1016} \\
+\xmark & \cmark & \cmark & \xmark & \cmark & ReLU & \textbf{1000} & \textbf{1000} & \fbox{504} \\
+\xmark & \cmark & \cmark & \xmark & \xmark & GELU & \textbf{864} & 840 & \textbf{864} \\
+\xmark & \cmark & \cmark & \xmark & \xmark & ReLU & 464 & \textbf{544} & \fbox{272} \\
+\hdashline[1pt/3pt]
+\xmark & \cmark & \xmark & \cmark & \cmark & GELU & \textbf{1000} & 960 & 960 \\
+\xmark & \cmark & \xmark & \cmark & \cmark & ReLU & \textbf{960} & 936 & \textbf{960} \\
+\xmark & \cmark & \xmark & \cmark & \xmark & GELU & 960 & 960 & \textbf{992} \\
+\xmark & \cmark & \xmark & \cmark & \xmark & ReLU & 936 & \textbf{944} & \textbf{944} \\
+\hdashline[1pt/3pt]
+\xmark & \cmark & \xmark & \xmark & \cmark & GELU & 800 & 808 & \textbf{832} \\
+\xmark & \cmark & \xmark & \xmark & \cmark & ReLU & 744 & \textbf{808} & 624 \\
+\xmark & \cmark & \xmark & \xmark & \xmark & GELU & \textbf{744} & 688 & 680 \\
+\xmark & \cmark & \xmark & \xmark & \xmark & ReLU & 600 & \textbf{648} & 400 \\
+\midrule
+\xmark & \xmark & \cmark & N/A & N/A & N/A & \textbf{552} & 520 & 544 \\
+\xmark & \xmark & \xmark & N/A & N/A & N/A & \textbf{216} & \textbf{216} & \textbf{216} \\
+\bottomrule
+\end{tabular}
+\caption{Maximum facts memorised per architectural configuration using Cross-Entropy loss ($d_{\text{residual}}=16$, $d_{\text{ff}}=16$). Columns CE\_Dup, CE\_3att, and CE\_Orig correspond to \texttt{experiment\_log\_CE\_3att\_duplicate}, \texttt{experiment\_log\_CE\_3att}, and \texttt{experiment\_log\_CE}, respectively. The highest value in each row is shown in \textbf{bold} and outliers are highlighted with a \fbox{box}.}
+\label{tab:e2-ce}
 \end{table}
 
 \subsection{Does GELU vs RELU matter? - Probably not much}
