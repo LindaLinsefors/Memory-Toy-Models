@@ -331,60 +331,60 @@ Next we'll go over the other settings one by one, in order of least expected imp
 
 \begin{table}[h]
 \centering
-\begin{tabular}{@{}cccccc ccc@{}}
+\begin{tabular}{@{}cccccc cccc@{}}
 \toprule
- & & & & & & \multicolumn{3}{c}{\textbf{Max Facts}} \\
-\cmidrule(l){7-9}
-\textbf{Attention} & \textbf{FF} & \textbf{Norms} & \textbf{Residual} & \textbf{Bias} & \textbf{Activation} & \textbf{CE\_Dup} & \textbf{CE\_3att} & \textbf{CE\_Orig} \\
+ & & & & & & \multicolumn{4}{c}{\textbf{Max Facts}} \\
+\cmidrule(l){7-10}
+\textbf{Attention} & \textbf{FF} & \textbf{Norms} & \textbf{Residual} & \textbf{Bias} & \textbf{Activation} & \textbf{3att\_L} & \textbf{Dup} & \textbf{3att} & \textbf{Orig} \\
 \midrule
-\cmark & \cmark & \cmark & \cmark & \cmark & GELU & 800 & 744 & \textbf{832} \\
-\cmark & \cmark & \cmark & \cmark & \cmark & ReLU & \textbf{768} & \textbf{768} & 728 \\
-\cmark & \cmark & \cmark & \cmark & \xmark & GELU & \textbf{832} & 648 & 600 \\
-\cmark & \cmark & \cmark & \cmark & \xmark & ReLU & \textbf{736} & \textbf{736} & 520 \\
+\cmark & \cmark & \cmark & \cmark & \cmark & GELU &  & 800 & 744 & \textbf{832} \\
+\cmark & \cmark & \cmark & \cmark & \cmark & ReLU &  & \textbf{768} & \textbf{768} & 728 \\
+\cmark & \cmark & \cmark & \cmark & \xmark & GELU & \textbf{832} & \textbf{832} & 648 & 600 \\
+\cmark & \cmark & \cmark & \cmark & \xmark & ReLU & \textbf{744} & 736 & 736 & 520 \\
 \hdashline[1pt/3pt]
-\cmark & \cmark & \cmark & \xmark & \cmark & GELU & \textbf{816} & 800 & 600 \\
-\cmark & \cmark & \cmark & \xmark & \cmark & ReLU & \textbf{720} & 712 & 448 \\
-\cmark & \cmark & \cmark & \xmark & \xmark & GELU & \textbf{696} & 632 & 576 \\
-\cmark & \cmark & \cmark & \xmark & \xmark & ReLU & 304 & \textbf{408} & 320 \\
+\cmark & \cmark & \cmark & \xmark & \cmark & GELU &  & \textbf{816} & 800 & 600 \\
+\cmark & \cmark & \cmark & \xmark & \cmark & ReLU &  & \textbf{720} & 712 & 448 \\
+\cmark & \cmark & \cmark & \xmark & \xmark & GELU & \textbf{768} & 696 & 632 & 576 \\
+\cmark & \cmark & \cmark & \xmark & \xmark & ReLU & 360 & 304 & \textbf{408} & 320 \\
 \hdashline[1pt/3pt]
-\cmark & \cmark & \xmark & \cmark & \cmark & GELU & \textbf{544} & 432 & \fbox{264} \\
-\cmark & \cmark & \xmark & \cmark & \cmark & ReLU & 416 & \textbf{432} & \fbox{120} \\
-\cmark & \cmark & \xmark & \cmark & \xmark & GELU & \textbf{592} & 544 & \fbox{248} \\
-\cmark & \cmark & \xmark & \cmark & \xmark & ReLU & \fbox{\textbf{472}} & \fbox{232} & \fbox{224} \\
+\cmark & \cmark & \xmark & \cmark & \cmark & GELU & \textbf{584} & 544 & 432 & \fbox{264} \\
+\cmark & \cmark & \xmark & \cmark & \cmark & ReLU & \fbox{240} & 416 & \textbf{432} & \fbox{120} \\
+\cmark & \cmark & \xmark & \cmark & \xmark & GELU & \fbox{344} & \textbf{592} & 544 & \fbox{248} \\
+\cmark & \cmark & \xmark & \cmark & \xmark & ReLU & \textbf{584} & 472 & \fbox{232} & \fbox{224} \\
 \hdashline[1pt/3pt]
-\cmark & \cmark & \xmark & \xmark & \cmark & GELU & 408 & 336 & \textbf{512} \\
-\cmark & \cmark & \xmark & \xmark & \cmark & ReLU & \fbox{248} & \fbox{\textbf{424}} & 320 \\
-\cmark & \cmark & \xmark & \xmark & \xmark & GELU & 312 & \textbf{392} & \fbox{176} \\
-\cmark & \cmark & \xmark & \xmark & \xmark & ReLU & \textbf{432} & 392 & 368 \\
+\cmark & \cmark & \xmark & \xmark & \cmark & GELU & 464 & 408 & 336 & \textbf{512} \\
+\cmark & \cmark & \xmark & \xmark & \cmark & ReLU & 312 & \fbox{248} & \fbox{\textbf{424}} & 320 \\
+\cmark & \cmark & \xmark & \xmark & \xmark & GELU & \textbf{472} & 312 & 392 & \fbox{176} \\
+\cmark & \cmark & \xmark & \xmark & \xmark & ReLU & 368 & \textbf{432} & 392 & 368 \\
 \midrule
-\cmark & \xmark & \cmark & N/A & N/A & N/A & 144 & 152 & \textbf{168} \\
-\cmark & \xmark & \xmark & N/A & N/A & N/A & 112 & \textbf{144} & 112 \\
+\cmark & \xmark & \cmark & N/A & N/A & N/A &  & 144 & 152 & \textbf{168} \\
+\cmark & \xmark & \xmark & N/A & N/A & N/A &  & 112 & \textbf{144} & 112 \\
 \midrule
-\xmark & \cmark & \cmark & \cmark & \cmark & GELU & \textbf{1016} & \textbf{1016} & \textbf{1016} \\
-\xmark & \cmark & \cmark & \cmark & \cmark & ReLU & \textbf{1016} & \textbf{1016} & \textbf{1016} \\
-\xmark & \cmark & \cmark & \cmark & \xmark & GELU & \textbf{1016} & \textbf{1016} & 1000 \\
-\xmark & \cmark & \cmark & \cmark & \xmark & ReLU & \textbf{1016} & \textbf{1016} & 960 \\
+\xmark & \cmark & \cmark & \cmark & \cmark & GELU & \textbf{1016} & \textbf{1016} & \textbf{1016} & \textbf{1016} \\
+\xmark & \cmark & \cmark & \cmark & \cmark & ReLU & \textbf{1016} & \textbf{1016} & \textbf{1016} & \textbf{1016} \\
+\xmark & \cmark & \cmark & \cmark & \xmark & GELU & \textbf{1016} & \textbf{1016} & \textbf{1016} & 1000 \\
+\xmark & \cmark & \cmark & \cmark & \xmark & ReLU & \textbf{1016} & \textbf{1016} & \textbf{1016} & 960 \\
 \hdashline[1pt/3pt]
-\xmark & \cmark & \cmark & \xmark & \cmark & GELU & \textbf{1016} & \textbf{1016} & \textbf{1016} \\
-\xmark & \cmark & \cmark & \xmark & \cmark & ReLU & \textbf{1000} & \textbf{1000} & \fbox{504} \\
-\xmark & \cmark & \cmark & \xmark & \xmark & GELU & \textbf{864} & 840 & \textbf{864} \\
-\xmark & \cmark & \cmark & \xmark & \xmark & ReLU & 464 & \textbf{544} & \fbox{272} \\
+\xmark & \cmark & \cmark & \xmark & \cmark & GELU & \textbf{1016} & \textbf{1016} & \textbf{1016} & \textbf{1016} \\
+\xmark & \cmark & \cmark & \xmark & \cmark & ReLU & \textbf{1008} & 1000 & 1000 & \fbox{504} \\
+\xmark & \cmark & \cmark & \xmark & \xmark & GELU & \textbf{896} & 864 & 840 & 864 \\
+\xmark & \cmark & \cmark & \xmark & \xmark & ReLU & 408 & 464 & \textbf{544} & \fbox{272} \\
 \hdashline[1pt/3pt]
-\xmark & \cmark & \xmark & \cmark & \cmark & GELU & \textbf{1000} & 960 & 960 \\
-\xmark & \cmark & \xmark & \cmark & \cmark & ReLU & \textbf{960} & 936 & \textbf{960} \\
-\xmark & \cmark & \xmark & \cmark & \xmark & GELU & 960 & 960 & \textbf{992} \\
-\xmark & \cmark & \xmark & \cmark & \xmark & ReLU & 936 & \textbf{944} & \textbf{944} \\
+\xmark & \cmark & \xmark & \cmark & \cmark & GELU & 960 & \textbf{1000} & 960 & 960 \\
+\xmark & \cmark & \xmark & \cmark & \cmark & ReLU & \textbf{960} & \textbf{960} & 936 & \textbf{960} \\
+\xmark & \cmark & \xmark & \cmark & \xmark & GELU & \textbf{1016} & 960 & 960 & 992 \\
+\xmark & \cmark & \xmark & \cmark & \xmark & ReLU & \textbf{960} & 936 & 944 & 944 \\
 \hdashline[1pt/3pt]
-\xmark & \cmark & \xmark & \xmark & \cmark & GELU & 800 & 808 & \textbf{832} \\
-\xmark & \cmark & \xmark & \xmark & \cmark & ReLU & 744 & \textbf{808} & 624 \\
-\xmark & \cmark & \xmark & \xmark & \xmark & GELU & \textbf{744} & 688 & 680 \\
-\xmark & \cmark & \xmark & \xmark & \xmark & ReLU & 600 & \textbf{648} & 400 \\
+\xmark & \cmark & \xmark & \xmark & \cmark & GELU & \textbf{864} & 800 & 808 & 832 \\
+\xmark & \cmark & \xmark & \xmark & \cmark & ReLU & 800 & 744 & \textbf{808} & 624 \\
+\xmark & \cmark & \xmark & \xmark & \xmark & GELU & \textbf{744} & \textbf{744} & 688 & 680 \\
+\xmark & \cmark & \xmark & \xmark & \xmark & ReLU & \textbf{648} & 600 & \textbf{648} & 400 \\
 \midrule
-\xmark & \xmark & \cmark & N/A & N/A & N/A & \textbf{552} & 520 & 544 \\
-\xmark & \xmark & \xmark & N/A & N/A & N/A & \textbf{216} & \textbf{216} & \textbf{216} \\
+\xmark & \xmark & \cmark & N/A & N/A & N/A &  & \textbf{552} & 520 & 544 \\
+\xmark & \xmark & \xmark & N/A & N/A & N/A &  & \textbf{216} & \textbf{216} & \textbf{216} \\
 \bottomrule
 \end{tabular}
-\caption{Maximum facts memorised per architectural configuration using Cross-Entropy loss ($d_{\text{residual}}=16$, $d_{\text{ff}}=16$). Columns CE\_Dup, CE\_3att, and CE\_Orig correspond to \texttt{experiment\_log\_CE\_3att\_duplicate}, \texttt{experiment\_log\_CE\_3att}, and \texttt{experiment\_log\_CE}, respectively. The highest value in each row is shown in \textbf{bold} and outliers are highlighted with a \fbox{box}.}
+\caption{Maximum facts memorised per architectural configuration using Cross-Entropy loss ($d_{\text{residual}}=16$, $d_{\text{ff}}=16$). Columns CE\_Long, CE\_Dup, CE\_3att, and CE\_Orig correspond to \texttt{experiment\_log\_CE\_3att\_long\_duplicate}, \texttt{experiment\_log\_CE\_3att\_duplicate}, \texttt{experiment\_log\_CE\_3att}, and \texttt{experiment\_log\_CE}, respectively. Empty cells indicate configurations not covered by that run. The highest value in each row is shown in \textbf{bold} and outliers are highlighted with a \fbox{box}.}
 \label{tab:e2-ce}
 \end{table}
 
