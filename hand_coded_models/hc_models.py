@@ -28,12 +28,124 @@ class HandCodedModelSettings:
         self.use_top_no_top_fraction = use_top_no_top_fraction  # 'top_n' or 'top_fraction'
         self.top_n = top_n
         self.top_fraction = top_fraction
+        self.adjustments = True
 
 def generate_settings(d):
     return HandCodedModelSettings(input_vocab_size = 2*d, 
                                   output_vocab_size = d, 
                                   n_facts = d,
                                   d_ff = d)
+
+
+def search_best_top_n(d, n_facts, retries=2, metric='accuracy', adjustments=True):
+    """Search over values of top_n to find the one giving the best accuracy.
+
+    Builds a model with input_vocab_size=2*d, output_vocab_size=d, d_ff=d and
+    the given n_facts, then increases top_n from 0 upward. For each top_n the
+    model is built a few times (since construction is stochastic) and the best
+    accuracy is kept. The search stops once raising top_n has decreased the
+    accuracy twice in a row.
+
+    metric selects which score to track: 'accuracy' or 'best_guess_accuracy'.
+    adjustments toggles the model's post-hoc bias/intervention adjustments.
+
+    Returns (best_top_n, best_accuracy).
+    """
+    if metric not in ('accuracy', 'best_guess_accuracy'):
+        raise ValueError("metric must be 'accuracy' or 'best_guess_accuracy'")
+
+    settings = generate_settings(d)
+    settings.n_facts = n_facts
+    settings.use_top_no_top_fraction = 'top_n'
+    settings.adjustments = adjustments
+
+    best_top_n = 0
+    best_accuracy = 0.0
+    prev_accuracy = -1.0
+    decreases_in_a_row = 0
+
+    top_n = 0
+    while True:
+        settings.top_n = top_n
+
+        accuracy_for_top_n = 0.0
+        for _ in range(retries):
+            model = HandCodedModel(settings)
+            accuracy, best_guess_accuracy, _, _ = model.evaluate()
+            score = accuracy if metric == 'accuracy' else best_guess_accuracy
+            accuracy_for_top_n = max(accuracy_for_top_n, score)
+            if accuracy_for_top_n == 1.0:
+                break
+
+        if accuracy_for_top_n > best_accuracy:
+            best_accuracy = accuracy_for_top_n
+            best_top_n = top_n
+
+        if best_accuracy == 1.0:
+            break
+
+        if accuracy_for_top_n < prev_accuracy:
+            decreases_in_a_row += 1
+            if decreases_in_a_row >= 2:
+                break
+        else:
+            decreases_in_a_row = 0
+
+        prev_accuracy = accuracy_for_top_n
+        top_n += 1
+
+    return best_top_n, best_accuracy
+
+
+def search_max_facts(d, accuracy_threshold, retries=2, metric='accuracy', adjustments=True):
+    """Find the largest n_facts whose best accuracy still meets a threshold.
+
+    For a model of dimension d, uses search_best_top_n to score a given number
+    of facts. n_facts is always a multiple of d (k * d), since generate_facts
+    only distributes labels evenly in that case. First grows k exponentially to
+    bracket the failure point, then binary searches between the last passing and
+    first failing multipliers.
+
+    adjustments toggles the model's post-hoc bias/intervention adjustments.
+
+    Returns (max_facts, best_top_n, best_accuracy) for the largest passing
+    n_facts found, or (0, None, None) if even n_facts=d fails.
+    """
+    def passes(k):
+        n_facts = k * d
+        top_n, accuracy = search_best_top_n(d, n_facts, retries=retries,
+                                            metric=metric, adjustments=adjustments)
+        return accuracy >= accuracy_threshold, top_n, accuracy
+
+    # Exponentially grow the multiplier k to bracket: lo passes, hi fails.
+    lo = 0  # k=0 (n_facts=0) trivially passes (nothing to learn)
+    lo_result = (None, None)
+    hi = 1
+
+    while True:
+        ok, top_n, accuracy = passes(hi)
+        if not ok:
+            break
+        lo = hi
+        lo_result = (top_n, accuracy)
+        hi *= 2
+
+    # If even the smallest count (k=1, n_facts=d) fails, nothing passes.
+    if lo == 0:
+        return 0, None, None
+
+    # Binary search for the boundary in (lo, hi): lo passes, hi fails.
+    while hi - lo > 1:
+        mid = (lo + hi) // 2
+        ok, top_n, accuracy = passes(mid)
+        if ok:
+            lo = mid
+            lo_result = (top_n, accuracy)
+        else:
+            hi = mid
+
+    best_top_n, best_accuracy = lo_result
+    return lo * d, best_top_n, best_accuracy
 
 class HandCodedModel:
     def __init__(self, settings: HandCodedModelSettings):
@@ -113,22 +225,24 @@ class HandCodedModel:
         self.down_matrix = - 2.0 * my_assignments
         self.down_bias = torch.ones(n_labels)  # Bias to push towards 1, since we are using negative weights
 
-        logits, hidden = self.forward(inputs)
+        if settings.adjustments == True:
 
-        self.logg_intervention_neurons = torch.zeros(n_labels, hidden_dim)
-        for label in range(n_labels):
-            problems = (logits[:, label] > 0) & (labels != label)
-            if problems.any():
-                intervention_neurons = ((hidden[problems]) == 0).any(dim=0) & (hidden[labels == label] > 0).any(dim=0)
-                self.logg_intervention_neurons[label, intervention_neurons] = 1
-        self.down_matrix += self.logg_intervention_neurons
+            logits, hidden = self.forward(inputs)
 
-        logits, hidden = self.forward(inputs)
+            self.logg_intervention_neurons = torch.zeros(n_labels, hidden_dim)
+            for label in range(n_labels):
+                problems = (logits[:, label] > 0) & (labels != label)
+                if problems.any():
+                    intervention_neurons = ((hidden[problems]) == 0).any(dim=0) & (hidden[labels == label] > 0).any(dim=0)
+                    self.logg_intervention_neurons[label, intervention_neurons] = 1
+            self.down_matrix += self.logg_intervention_neurons
 
-        for label in range(n_labels):
-            min_true_logit = logits[labels == label, label].min()
-            max_false_logit = logits[labels != label, label].max()
-            self.down_bias[label] -= (max_false_logit + min_true_logit) / 2
+            logits, hidden = self.forward(inputs)
+
+            for label in range(n_labels):
+                min_true_logit = logits[labels == label, label].min()
+                max_false_logit = logits[labels != label, label].max()
+                self.down_bias[label] -= (max_false_logit + min_true_logit) / 2
 
 
     def forward(self, x):
@@ -143,7 +257,8 @@ class HandCodedModel:
         logits, hidden = self.forward(self.facts['inputs'])
         one_hot_targets = F.one_hot(self.facts['targets'], self.settings.output_vocab_size)
         accuracy = (one_hot_targets.bool() == (logits > 0)).float().mean().item()
-        return accuracy, logits, hidden
+        best_guess_accuracy = self.facts['targets'].eq(logits.argmax(dim=1)).float().mean().item()
+        return accuracy, best_guess_accuracy, logits, hidden
 
 
 #%%
@@ -151,7 +266,7 @@ class HandCodedModel:
 settings = HandCodedModelSettings()
 settings.n_facts = 32
 model = HandCodedModel(settings)
-accuracy, logits, hidden = model.evaluate()
+accuracy, best_guess_accuracy, logits, hidden = model.evaluate()
 
 plt.imshow(hidden.cpu(), aspect='auto', cmap='viridis')
 plt.colorbar()
@@ -189,7 +304,7 @@ for n_facts in [16, 16*2, 16*3, 16*4]:
         best_accuracy = 0
         for _ in range(10):
             model = HandCodedModel(settings)
-            accuracy, logits, hidden = model.evaluate()
+            accuracy, best_guess_accuracy, logits, hidden = model.evaluate()
             if accuracy > best_accuracy:
                 best_accuracy = accuracy
                 if best_accuracy == 1.0:
@@ -223,7 +338,7 @@ for d_model in [128, 256, 512, 1024]:
 
         while keep_trying > 0:
             model = HandCodedModel(settings)
-            accuracy_first_try, _, _ = model.evaluate()
+            accuracy_first_try,_ , _, _ = model.evaluate()
             if verbose: print(f"  Accuracy {accuracy_first_try:.8f} with {settings.n_facts} facts and top_n = {settings.top_n}.")
 
             if accuracy_first_try == 1.0:
@@ -291,8 +406,8 @@ for d in [32*32]:
 
         settings.top_n = top_n
         model = HandCodedModel(settings)
-        accuracy, logits, hidden = model.evaluate()
-        print(f"Accuracy: {accuracy}")
+        accuracy, best_guess_accuracy, logits, hidden = model.evaluate()
+        print(f"Accuracy: {accuracy}, Best Guess Accuracy: {best_guess_accuracy}")
 
 # %%
 settings = HandCodedModelSettings()
@@ -336,4 +451,87 @@ plt.ylabel("Output Neurons")
 plt.title("Down Matrix Heatmap")
 plt.show()
 
+# %%
+
+
+for d in [32]:
+    for n_facts in [64, 128, 256, 512, 1024]:
+        top_n, acc = search_best_top_n(d, n_facts, metric='best_guess_accuracy')
+        print(f"d={d}, n_facts={n_facts}, best guess accuracy={acc:.4f}, best top_n={top_n}")
+    
+
+
+# %%
+adjustments = False
+results=[]
+
+for acc in [1, 0.9, 0.5]:  
+
+    for d in [16, 32, 64, 128]:
+        max_facts, top_n, best_acc = search_max_facts(d, acc, metric='best_guess_accuracy', adjustments=adjustments)
+        print(f"d={d}, accuracy_threshold={acc}, max_facts={max_facts}, best_top_n={top_n}, best_accuracy={best_acc:.4f}")
+
+        results.append({'d': d, 'accuracy_threshold': acc, 'max_facts': max_facts, 'best_top_n': top_n, 'best_accuracy': best_acc})
+
+print(results)
+
+# %%
+
+
+# with adjustments = True
+results_at = [{'d': 16, 'accuracy_threshold': 1, 'max_facts': 48, 'best_top_n': 0, 'best_accuracy': 1.0}, 
+           {'d': 32, 'accuracy_threshold': 1, 'max_facts': 64, 'best_top_n': 0, 'best_accuracy': 1.0}, 
+           {'d': 64, 'accuracy_threshold': 1, 'max_facts': 256, 'best_top_n': 0, 'best_accuracy': 1.0}, 
+           {'d': 128, 'accuracy_threshold': 1, 'max_facts': 512, 'best_top_n': 0, 'best_accuracy': 1.0}, 
+           {'d': 16, 'accuracy_threshold': 0.9, 'max_facts': 48, 'best_top_n': 0, 'best_accuracy': 1.0}, 
+           {'d': 32, 'accuracy_threshold': 0.9, 'max_facts': 128, 'best_top_n': 0, 'best_accuracy': 0.9609375}, 
+           {'d': 64, 'accuracy_threshold': 0.9, 'max_facts': 384, 'best_top_n': 0, 'best_accuracy': 0.90625}, 
+           {'d': 128, 'accuracy_threshold': 0.9, 'max_facts': 896, 'best_top_n': 0, 'best_accuracy': 0.9375000596046448}, 
+           {'d': 16, 'accuracy_threshold': 0.5, 'max_facts': 160, 'best_top_n': 4, 'best_accuracy': 0.5375000238418579}, 
+           {'d': 32, 'accuracy_threshold': 0.5, 'max_facts': 480, 'best_top_n': 1, 'best_accuracy': 0.5145833492279053}, 
+           {'d': 64, 'accuracy_threshold': 0.5, 'max_facts': 640, 'best_top_n': 1, 'best_accuracy': 0.5062500238418579}, 
+           {'d': 128, 'accuracy_threshold': 0.5, 'max_facts': 1280, 'best_top_n': 0, 'best_accuracy': 0.539843738079071}]
+
+# with adjustments = False
+results_af = [{'d': 16, 'accuracy_threshold': 1, 'max_facts': 16, 'best_top_n': 0, 'best_accuracy': 1.0}, 
+           {'d': 32, 'accuracy_threshold': 1, 'max_facts': 64, 'best_top_n': 0, 'best_accuracy': 1.0}, 
+           {'d': 64, 'accuracy_threshold': 1, 'max_facts': 192, 'best_top_n': 0, 'best_accuracy': 1.0}, 
+           {'d': 128, 'accuracy_threshold': 1, 'max_facts': 384, 'best_top_n': 0, 'best_accuracy': 1.0}, 
+           {'d': 16, 'accuracy_threshold': 0.9, 'max_facts': 48, 'best_top_n': 0, 'best_accuracy': 0.9583333730697632}, 
+           {'d': 32, 'accuracy_threshold': 0.9, 'max_facts': 160, 'best_top_n': 0, 'best_accuracy': 0.9312500357627869}, 
+           {'d': 64, 'accuracy_threshold': 0.9, 'max_facts': 512, 'best_top_n': 1, 'best_accuracy': 0.91015625}, 
+           {'d': 128, 'accuracy_threshold': 0.9, 'max_facts': 1408, 'best_top_n': 1, 'best_accuracy': 0.909801185131073}, 
+           {'d': 16, 'accuracy_threshold': 0.5, 'max_facts': 176, 'best_top_n': 2, 'best_accuracy': 0.5056818127632141}, 
+           {'d': 32, 'accuracy_threshold': 0.5, 'max_facts': 480, 'best_top_n': 3, 'best_accuracy': 0.5208333730697632}, 
+           {'d': 64, 'accuracy_threshold': 0.5, 'max_facts': 1408, 'best_top_n': 2, 'best_accuracy': 0.5007102489471436}, 
+           {'d': 128, 'accuracy_threshold': 0.5, 'max_facts': 3840, 'best_top_n': 4, 'best_accuracy': 0.5171875357627869}]
+
+for adjustments in [True, False]:
+
+    if adjustments == True:
+        results = results_at
+    else:
+        results = results_af
+
+    for acc in [1, 0.9, 0.5]:  
+        max_facts = [r['max_facts'] for r in results if r['accuracy_threshold'] == acc]
+        d_values = [r['d'] for r in results if r['accuracy_threshold'] == acc]
+        style = '--x' if adjustments else '-o'
+        plt.loglog(d_values, max_facts, style, label=f'Accuracy Threshold = {acc}, adjustments = {adjustments}')
+    
+plt.xlabel("d_model")
+plt.ylabel("Max Facts Learned")
+plt.title("Max Facts Learned vs d_model")
+plt.legend()
+
+ax = plt.gca()
+ax.set_xticks([16, 32, 64, 128])
+ax.set_xticks([], minor=True)
+ax.set_xticklabels([16, 32, 64, 128])
+ax.set_yticks([16, 32, 64, 128, 256, 512, 1024, 2048, 4096])
+ax.set_yticks([], minor=True)
+ax.set_yticklabels([16, 32, 64, 128, 256, 512, 1024, 2048, 4096])
+plt.grid(True, which="both", ls="--", linewidth=0.5)
+
+plt.show()
 # %%

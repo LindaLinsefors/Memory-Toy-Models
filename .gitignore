@@ -25,6 +25,10 @@ writeup/*.lot
 # Test logs
 *test_log*
 
+# Per-process stdout from launcher.py (transient; results live in .jsonl + W&B)
+**/logs/
+_smoketest/
+
 # Side quests
 side_quests/
 

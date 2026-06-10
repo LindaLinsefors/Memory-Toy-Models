@@ -1,0 +1,14 @@
+# Minimal dependencies for the capacity-search experiments (E4 path:
+# models.py, capacity_search.py, log.py, run_one.py, launcher.py + plotting).
+#
+# torch is intentionally NOT pinned here. On a RunPod PyTorch pod it is already
+# installed in the image — reinstalling risks a CUDA mismatch. On a bare/CPU box,
+# install it first, separately:
+#   GPU (CUDA 12.8):  pip install torch --index-url https://download.pytorch.org/whl/cu128
+#   CPU only:         pip install torch --index-url https://download.pytorch.org/whl/cpu
+#
+# Then:  pip install -r requirements.txt
+
+wandb>=0.18
+numpy>=1.26
+matplotlib>=3.8

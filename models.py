@@ -1,7 +1,9 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-torch.set_default_device("cuda")
+
+from device import setup_default_device
+setup_default_device()  # cuda if available, else cpu; override with MTM_DEVICE
 
 import math
 import copy
