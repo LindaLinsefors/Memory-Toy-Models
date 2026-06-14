@@ -47,7 +47,7 @@ log_path += f"_{loss_type}_{any_all_most}"
 
 #Make sure the log path is unique to avoid mixing with previous runs
 i = 1
-while os.path.exists(f"{log_path}_({i})"):
+while os.path.exists(f"{log_path}_({i}).jsonl"):
     i += 1
 log_path = f"{log_path}_({i})"
 

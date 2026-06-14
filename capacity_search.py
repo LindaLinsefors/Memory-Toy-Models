@@ -98,6 +98,19 @@ def find_max_facts(settings: ModelSettings,
     lo, hi = 1, max_possible
     best = 0  # highest n_facts confirmed learnable
 
+    kwargs = dict(
+        n_epochs=n_epochs, lr=lr, 
+        optimizer_type=optimizer_type, grad_clip_norm=grad_clip_norm, 
+        patience=patience,
+        log_to_wandb=log_to_wandb,
+        wandb_group=wandb_group,
+        wandb_log_every=wandb_log_every,
+        name_function=name_function,
+        target_accuracy=target_accuracy,
+        threshold_to_continue=threshold_to_continue,
+        loss_type=loss_type
+    )
+
     if verbose:
         print(f"Searching for max learnable facts in [{lo}, {hi}]")
         print()
@@ -108,60 +121,18 @@ def find_max_facts(settings: ModelSettings,
         if verbose:
             print(f"Trying n_facts = {mid} ...")
 
-        if not use_modal:
-            learned = False
-            for attempt in range(1, number_of_attempts + 1):
-                if verbose and number_of_attempts > 1:
-                    print(f"  Attempt {attempt}/{number_of_attempts}")
-                success = _try_n_facts(settings, mid,
-                                    n_epochs=n_epochs, lr=lr, 
-                                    optimizer_type=optimizer_type, grad_clip_norm=grad_clip_norm, 
-                                    patience=patience,
-                                    log_to_wandb=log_to_wandb,
-                                    wandb_group=wandb_group,
-                                    wandb_log_every=wandb_log_every,
-                                    verbose=verbose,
-                                    name_function=name_function,
-                                    target_accuracy=target_accuracy,
-                                    threshold_to_continue=threshold_to_continue,
-                                    loss_type=loss_type)
-                if success:
-                    learned = True
-                    break
 
-        else:
-            # Run all `number_of_attempts` attempts in PARALLEL on Modal.
-            # .map() wants one positional iterator per positional arg of the
-            # function. The only positional arg of _try_n_facts is base_settings,
-            # so we repeat it `number_of_attempts` times (that sets the count).
-            # Everything else is identical across attempts -> pass via kwargs,
-            # which .map() broadcasts to every call.
-            successes = list(_try_n_facts_modal.map(
-                [settings] * number_of_attempts,   # -> base_settings, N copies
-                kwargs=dict(
-                    n_facts=mid,
-                    n_epochs=n_epochs,
-                    lr=lr,
-                    optimizer_type=optimizer_type,
-                    grad_clip_norm=grad_clip_norm,
-                    patience=patience,
-                    log_to_wandb=log_to_wandb,
-                    wandb_group=wandb_group,
-                    wandb_log_every=wandb_log_every,
-                    verbose=verbose,
-                    name_function=name_function,
-                    target_accuracy=target_accuracy,
-                    threshold_to_continue=threshold_to_continue,
-                    loss_type=loss_type,
-                ),
-            ))
-            if any_all_most == 'any':
-                learned = any(successes)   # "any attempt wins"
-            elif any_all_most == 'all':
-                learned = all(successes)   # "all attempts must succeed"
-            elif any_all_most == 'most':
-                learned = sum(successes) > len(successes) // 2   # "majority wins"
+        learned = _try_n_facts_several_attempts(
+            settings, 
+            mid, 
+            number_of_attempts, 
+            verbose, 
+            use_modal, 
+            any_all_most,
+            **kwargs
+           )
 
+       
         if learned:
             best = mid
             lo = mid + 1
@@ -172,6 +143,22 @@ def find_max_facts(settings: ModelSettings,
             if verbose:
                 print(f"✗  failed to learn {mid} facts. Now searching: {lo} - {hi}")
             
+    if hi == max_possible: #Then we should also check if we can learn max_possible facts
+        if verbose:
+            print(f"Trying n_facts = {max_possible} ...")
+        learned = _try_n_facts_several_attempts(
+            settings, 
+            max_possible, 
+            number_of_attempts, 
+            verbose, 
+            use_modal, 
+            any_all_most,
+            **kwargs
+           )
+        
+        if learned:
+            best = max_possible
+        
     if verbose:
         print(f"\nMax learnable facts: {best}")
 
@@ -187,7 +174,40 @@ def find_max_facts_modal(config: dict) -> int:
     """
     return find_max_facts(use_modal=True, **config)
 
+def _try_n_facts_several_attempts(settings: ModelSettings, 
+                                  num_facts: int,
+                                  number_of_attempts: int, 
+                                  verbose: bool,
+                                  use_modal: bool,
+                                  any_all_most: str,
+                                  **kwargs) -> bool:
+    if not use_modal:
+        learned = False
+        for attempt in range(1, number_of_attempts + 1):
+            if verbose and number_of_attempts > 1:
+                print(f"  Attempt {attempt}/{number_of_attempts}")
+            success = _try_n_facts(settings, num_facts,
+                                   verbose=verbose, **kwargs)
+            if success:
+                learned = True
+                break
 
+        return learned
+    
+    else:
+        successes = list(_try_n_facts_modal.map(
+            [settings] * number_of_attempts,   # -> base_settings, N copies
+            kwargs=dict(n_facts=num_facts, verbose=verbose, **kwargs),
+        ))
+
+        if any_all_most == 'any':
+            learned = any(successes)   # "any attempt wins"
+        elif any_all_most == 'all':
+            learned = all(successes)   # "all attempts must succeed"
+        elif any_all_most == 'most':
+            learned = sum(successes) > len(successes) // 2   # "majority wins"
+
+        return learned
 
 def _try_n_facts(base_settings: ModelSettings,
                  n_facts: int,
@@ -240,7 +260,9 @@ def _try_n_facts(base_settings: ModelSettings,
 
     return success
 
-@app.function(image=image, gpu="T4", timeout=10800)  # 1h cap: one full 50k-epoch attempt
+
+
+@app.function(image=image, gpu="T4", timeout=10800)  # 3h cap: one full 50k-epoch attempt
 def _try_n_facts_modal(*args, **kwargs) -> bool:
     """Variant of _try_n_facts that runs on Modal, on a GPU.
 
