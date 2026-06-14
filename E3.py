@@ -1,6 +1,7 @@
 
 #%%
-# Test how maximum number of learnable facts scales with model size, for linear models
+# Test how maximum number of learnable facts scales with model size,
+# for few different architecture variants.
 
 import torch
 torch.set_default_device("cuda")
@@ -22,7 +23,7 @@ from log import *
 experiment_dir = "E3"
 os.makedirs(experiment_dir, exist_ok=True)
 
-testing = False
+testing = True
 model_type = 'reduced' # 'full' or 'reduced'
 duplicate = True
 
@@ -35,11 +36,11 @@ threshold_to_continue = 0.99
 number_of_attempts = 3
 log_path = os.path.join(experiment_dir, f"{model_type}_model_log")
 
-loss_type = 'BCE' # 'BCE' or 'CE'
+loss_type = 'CE' # 'BCE' or 'CE'
 
 if loss_type == 'CE':
     target_accuracy = 'best_guess_accuracy'
-    treshold_to_continue = 0.95
+    threshold_to_continue = 0.95
     log_path += '_CE'
 
 if duplicate:
@@ -86,7 +87,7 @@ def run_sub_experiment(settings: ModelSettings, name: str, precision: int):
                                 patience=patience, n_epochs=n_epochs, lr=lr, precision=precision,
                                 verbose = True, name_function=name_function, target_accuracy=target_accuracy,
                                 number_of_attempts=number_of_attempts, 
-                                threshold_to_continue=threshold_to_continue)
+                                threshold_to_continue=threshold_to_continue, loss_type=loss_type)
     
     print(f"Max facts learned: {max_facts}\n")
     

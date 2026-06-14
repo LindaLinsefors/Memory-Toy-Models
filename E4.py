@@ -1,7 +1,7 @@
 
 #%%
-# Test how maximum number of learnable facts scales with model size,
-# for few different architecture variants.
+# Test how maximum number of learnable facts scales with model size, for linear models
+
 
 import os
 import importlib

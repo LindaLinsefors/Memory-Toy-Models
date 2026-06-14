@@ -8,8 +8,17 @@ import wandb
 
 from models import ModelSettings, MemoryToyModel, train_model
 
+import modal
+app = modal.App("capacity-search")
 
-
+# The image the Modal containers run in. The default image has none of our deps,
+# so we install torch + wandb and ship our local modules so `from models import ...`
+# works inside the container. (CPU torch here; for GPU add a CUDA build + gpu=... .)
+image = (
+    modal.Image.debian_slim(python_version="3.11")
+    .pip_install("torch", "wandb", "numpy")
+    .add_local_python_source("models", "device", "log")
+)
 
 
 def name_function_n_facts(settings: ModelSettings) -> str:
@@ -55,7 +64,9 @@ def find_max_facts(settings: ModelSettings,
                    name_function = name_function_n_facts,
                    target_accuracy: str = 'accuracy',
                    threshold_to_continue: float = 0.99,
-                   loss_type: str = 'BCE') -> int:
+                   loss_type: str = 'BCE',
+                   use_modal: bool = False,
+                   any_all_most: str = 'any') -> int:
     """Binary search for the maximum number of facts a model architecture can learn.
 
     Args:
@@ -74,6 +85,11 @@ def find_max_facts(settings: ModelSettings,
         threshold_to_continue: 
                        Minimum accuracy required to continue searching with a lower learning rate.
         loss_type:     Either 'BCE' or 'CE' for the training loss used in each trial.
+        use_modal:     If True, run the per-candidate attempts in parallel on Modal
+                       (via _try_n_facts_modal.map). If False, run them locally in a loop.
+        any_all_most:  Only used if use_modal is True. 
+                       If 'any', a single successful attempt counts as success. If 'all',
+                       all attempts must succeed. If 'most', a majority of attempts must succeed.
     Returns:
         The maximum n_facts for which the model achieved perfect accuracy
         (within the given precision).
@@ -92,25 +108,59 @@ def find_max_facts(settings: ModelSettings,
         if verbose:
             print(f"Trying n_facts = {mid} ...")
 
-        learned = False
-        for attempt in range(1, number_of_attempts + 1):
-            if verbose and number_of_attempts > 1:
-                print(f"  Attempt {attempt}/{number_of_attempts}")
-            success = _try_n_facts(settings, mid,
-                                   n_epochs=n_epochs, lr=lr, 
-                                   optimizer_type=optimizer_type, grad_clip_norm=grad_clip_norm, 
-                                   patience=patience,
-                                   log_to_wandb=log_to_wandb,
-                                   wandb_group=wandb_group,
-                                   wandb_log_every=wandb_log_every,
-                                   verbose=verbose,
-                                   name_function=name_function,
-                                   target_accuracy=target_accuracy,
-                                   threshold_to_continue=threshold_to_continue,
-                                   loss_type=loss_type)
-            if success:
-                learned = True
-                break
+        if not use_modal:
+            learned = False
+            for attempt in range(1, number_of_attempts + 1):
+                if verbose and number_of_attempts > 1:
+                    print(f"  Attempt {attempt}/{number_of_attempts}")
+                success = _try_n_facts(settings, mid,
+                                    n_epochs=n_epochs, lr=lr, 
+                                    optimizer_type=optimizer_type, grad_clip_norm=grad_clip_norm, 
+                                    patience=patience,
+                                    log_to_wandb=log_to_wandb,
+                                    wandb_group=wandb_group,
+                                    wandb_log_every=wandb_log_every,
+                                    verbose=verbose,
+                                    name_function=name_function,
+                                    target_accuracy=target_accuracy,
+                                    threshold_to_continue=threshold_to_continue,
+                                    loss_type=loss_type)
+                if success:
+                    learned = True
+                    break
+
+        else:
+            # Run all `number_of_attempts` attempts in PARALLEL on Modal.
+            # .map() wants one positional iterator per positional arg of the
+            # function. The only positional arg of _try_n_facts is base_settings,
+            # so we repeat it `number_of_attempts` times (that sets the count).
+            # Everything else is identical across attempts -> pass via kwargs,
+            # which .map() broadcasts to every call.
+            successes = list(_try_n_facts_modal.map(
+                [settings] * number_of_attempts,   # -> base_settings, N copies
+                kwargs=dict(
+                    n_facts=mid,
+                    n_epochs=n_epochs,
+                    lr=lr,
+                    optimizer_type=optimizer_type,
+                    grad_clip_norm=grad_clip_norm,
+                    patience=patience,
+                    log_to_wandb=log_to_wandb,
+                    wandb_group=wandb_group,
+                    wandb_log_every=wandb_log_every,
+                    verbose=verbose,
+                    name_function=name_function,
+                    target_accuracy=target_accuracy,
+                    threshold_to_continue=threshold_to_continue,
+                    loss_type=loss_type,
+                ),
+            ))
+            if any_all_most == 'any':
+                learned = any(successes)   # "any attempt wins"
+            elif any_all_most == 'all':
+                learned = all(successes)   # "all attempts must succeed"
+            elif any_all_most == 'most':
+                learned = sum(successes) > len(successes) // 2   # "majority wins"
 
         if learned:
             best = mid
@@ -126,6 +176,17 @@ def find_max_facts(settings: ModelSettings,
         print(f"\nMax learnable facts: {best}")
 
     return best
+
+@app.function(image=image, timeout=86400)  # 24h cap: outer waits on the whole per-d search
+def find_max_facts_modal(config: dict) -> int:
+    """Run one capacity search on Modal.
+
+    `config` is exactly the keyword arguments for find_max_facts (settings,
+    precision, lr, wandb_group, name_function, ...). We only add use_modal=True,
+    which makes each search nest its attempts onto GPU containers.
+    """
+    return find_max_facts(use_modal=True, **config)
+
 
 
 def _try_n_facts(base_settings: ModelSettings,
@@ -178,6 +239,17 @@ def _try_n_facts(base_settings: ModelSettings,
         wandb.finish()
 
     return success
+
+@app.function(image=image, gpu="T4", timeout=10800)  # 1h cap: one full 50k-epoch attempt
+def _try_n_facts_modal(*args, **kwargs) -> bool:
+    """Variant of _try_n_facts that runs on Modal, on a GPU.
+
+    This is where the actual training happens, so it gets the GPU. models.py
+    sets the default device to cuda-if-available, so on this container the model
+    trains on the GPU automatically. Change gpu="T4" to e.g. "A10G"/"A100" if you
+    want a bigger card (overkill for these tiny models, but easy to switch).
+    """
+    return _try_n_facts(*args, **kwargs)
 
 
 

@@ -16,7 +16,8 @@ WANDB_PROJECT = "Memory Toy Models"
 class ModelSettings:
     def __init__(self, seq_len=2, input_vocab_size=32, output_vocab_size=16, n_facts=64, seed=42,
                  d_residual=16, n_heads=1, d_ff=16,
-                 attention=True, ff=True, bias=True, norms=True, ff_residual=True, ff_activation_type='GELU'):
+                 attention=True, qk_is_one=False,
+                 ff=True, bias=True, norms=True, ff_residual=True, ff_activation_type='GELU'):
         
         # Data dimensions
         self.seq_len = seq_len
@@ -32,6 +33,7 @@ class ModelSettings:
 
         # Model architectural choices
         self.attention = attention
+        self.qk_is_one = qk_is_one # If True, use a fixed attention matrix of all ones 
         self.ff = ff
         self.bias = bias
         self.norms = norms
@@ -87,7 +89,7 @@ class MemoryToyModel(nn.Module):
             self.pos_emb = nn.Embedding(settings.seq_len, settings.d_residual)
 
             # Single transformer layer
-            self.attn = CausalSelfAttention(settings.d_residual, settings.n_heads)
+            self.attn = CausalSelfAttention(settings.d_residual, settings.n_heads, settings.qk_is_one)
             self.ln1 = nn.RMSNorm(settings.d_residual) if settings.norms else nn.Identity()
 
         else:
@@ -106,6 +108,7 @@ class MemoryToyModel(nn.Module):
         self.ln_f = nn.RMSNorm(settings.d_residual) if settings.norms else nn.Identity()
         self.head = nn.Linear(settings.d_residual, settings.output_vocab_size, bias=settings.bias)
 
+        # Generate and store the facts as buffers so they are part of the model's state_dict
         facts = generate_facts(settings.n_facts, settings.seq_len, 
                                     settings.input_vocab_size, settings.output_vocab_size, 
                                     settings.seed)
@@ -279,11 +282,12 @@ def train_model(model, n_epochs=2000, lr=1e-2,
 class CausalSelfAttention(nn.Module):
     """Multi-head causal (masked) self-attention."""
 
-    def __init__(self, d_model, n_heads):
+    def __init__(self, d_model, n_heads, qk_is_one=False):
         super().__init__()
         assert d_model % n_heads == 0
         self.n_heads = n_heads
         self.head_dim = d_model // n_heads
+        self.qk_is_one = qk_is_one
 
         self.qkv = nn.Linear(d_model, 3 * d_model, bias=False)
         self.proj = nn.Linear(d_model, d_model, bias=False)
@@ -297,12 +301,16 @@ class CausalSelfAttention(nn.Module):
         k = k.view(B, T, self.n_heads, self.head_dim).transpose(1, 2)
         v = v.view(B, T, self.n_heads, self.head_dim).transpose(1, 2)
 
-        # Scaled dot-product attention with causal mask
-        scale = 1.0 / math.sqrt(self.head_dim)
-        attn = (q @ k.transpose(-2, -1)) * scale
-        causal_mask = torch.triu(torch.ones(T, T, device=x.device, dtype=torch.bool), diagonal=1)
-        attn = attn.masked_fill(causal_mask, float('-inf'))
-        attn = F.softmax(attn, dim=-1)
+        if self.qk_is_one:
+            attn = torch.ones(T, T, device=x.device, dtype=v.dtype) / T
+
+        else:
+            # Scaled dot-product attention with causal mask
+            scale = 1.0 / math.sqrt(self.head_dim)
+            attn = (q @ k.transpose(-2, -1)) * scale
+            causal_mask = torch.triu(torch.ones(T, T, device=x.device, dtype=torch.bool), diagonal=1)
+            attn = attn.masked_fill(causal_mask, float('-inf'))
+            attn = F.softmax(attn, dim=-1)
 
         out = (attn @ v).transpose(1, 2).contiguous().view(B, T, C)
         return self.proj(out)
