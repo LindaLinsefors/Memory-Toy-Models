@@ -63,6 +63,7 @@ if testing:
     n_epochs = 100
     precision = 20
     log_path = os.path.join(experiment_dir, "test_log")
+    number_of_attempts = 1
 
  
 

@@ -1,0 +1,7 @@
+cpu -- Attempts: 3 -- Elapsed: 35.3722 seconds
+gpu -- Attempts: 3 -- Elapsed: 73.3123 seconds
+
+cpu -- Attempts: 9 -- Elapsed: 44.1893 seconds
+
+cpu -- Attempts: 11 -- Elapsed: 47.0588 seconds
+gpu -- Attempts: 11 -- Elapsed: 139.3670 seconds

@@ -1,0 +1,76 @@
+\begin{tabular}{@{}cccccc|cccc|cccc|cccc@{}}
+\toprule
+ &  &  &  &  &  & \multicolumn{4}{|c}{\textbf{Any of 11}} & \multicolumn{4}{|c}{\textbf{Majority of 11}} & \multicolumn{4}{|c}{\textbf{All of 11}} \\
+\cmidrule(lr){7-10}\cmidrule(lr){11-14}\cmidrule(lr){15-18}
+\textbf{Attn} & \textbf{FF} & \textbf{Norm} & \textbf{Res} & \textbf{Bias} & \textbf{Act} & (1) & (2) & (3) & (4) & (1) & (2) & (3) & (4) & (1) & (2) & (3) & (4) \\
+\midrule
+None & \cmark & \xmark & \xmark & \xmark & GELU & 776 & 760 & 784 & \textbf{896} & 688 & 672 & \textbf{704} & \textbf{704} & \textbf{640} & 560 & 600 & 560 \\
+None & \cmark & \xmark & \xmark & \xmark & ReLU & 664 & 688 & 736 & \textbf{816} & 568 & 568 & 504 & \textbf{576} & 416 & \fbox{184} & \fbox{\textbf{448}} & 288 \\
+None & \cmark & \xmark & \xmark & \cmark & GELU & 864 & 848 & 896 & \textbf{904} & 776 & \textbf{800} & 784 & 792 & 680 & 680 & 680 & \textbf{720} \\
+None & \cmark & \xmark & \xmark & \cmark & ReLU & \textbf{960} & 824 & 872 & 872 & 680 & \textbf{720} & 688 & 712 & 488 & 472 & \textbf{528} & 496 \\
+\hdashline[1pt/3pt]
+None & \cmark & \xmark & \cmark & \xmark & GELU & 992 & 984 & 984 & \textbf{1008} & 952 & \textbf{960} & 952 & \textbf{960} & 920 & \textbf{928} & 912 & \textbf{928} \\
+None & \cmark & \xmark & \cmark & \xmark & ReLU & \textbf{976} & 960 & 968 & \textbf{976} & 928 & 920 & 920 & \textbf{936} & \textbf{912} & 888 & \textbf{912} & 896 \\
+None & \cmark & \xmark & \cmark & \cmark & GELU & 1000 & \textbf{1008} & 992 & \textbf{1008} & 952 & \textbf{968} & 960 & 960 & \textbf{920} & \textbf{920} & \textbf{920} & \textbf{920} \\
+None & \cmark & \xmark & \cmark & \cmark & ReLU & 984 & 976 & \textbf{1000} & 976 & 936 & 928 & \textbf{944} & 920 & 904 & 904 & \textbf{928} & 912 \\
+\hdashline[1pt/3pt]
+None & \cmark & \cmark & \xmark & \xmark & GELU & 888 & 888 & 920 & \textbf{960} & 824 & \textbf{856} & 832 & 824 & 792 & 792 & 776 & \textbf{800} \\
+None & \cmark & \cmark & \xmark & \xmark & ReLU & 472 & 560 & 552 & \textbf{576} & 328 & 328 & \fbox{248} & \textbf{344} & \fbox{\textbf{256}} & 168 & \fbox{88} & 168 \\
+None & \cmark & \cmark & \xmark & \cmark & GELU & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & 984 & 952 & \textbf{1000} & 984 \\
+None & \cmark & \cmark & \xmark & \cmark & ReLU & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & 880 & 888 & \textbf{976} & 920 & 528 & 480 & \textbf{536} & \textbf{536} \\
+\hdashline[1pt/3pt]
+None & \cmark & \cmark & \cmark & \xmark & GELU & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & 1000 & 1016 & \textbf{1024} & \textbf{1024} & 984 & \textbf{992} & 984 & 952 \\
+None & \cmark & \cmark & \cmark & \xmark & ReLU & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & 1016 & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1008} & 984 & 992 & 992 \\
+None & \cmark & \cmark & \cmark & \cmark & GELU & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & 1000 & \textbf{1024} \\
+None & \cmark & \cmark & \cmark & \cmark & ReLU & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & \textbf{1024} & 1008 & \textbf{1024} & \textbf{1024} & 1008 \\
+\hdashline[1pt/3pt]
+None & \xmark & \xmark & N/A & N/A & N/A & \textbf{208} & \textbf{208} & \textbf{208} & \textbf{208} & \textbf{208} & \textbf{208} & \textbf{208} & \textbf{208} & \textbf{208} & \textbf{208} & \textbf{208} & \textbf{208} \\
+None & \xmark & \cmark & N/A & N/A & N/A & \textbf{576} & \textbf{576} & \textbf{576} & 552 & 536 & \textbf{544} & 528 & \textbf{544} & 496 & 480 & 472 & \textbf{504} \\
+\midrule
+Unif & \cmark & \xmark & \xmark & \xmark & GELU & \textbf{696} & 680 & 680 & 688 & \textbf{576} & 536 & 552 & 552 & 440 & 424 & \textbf{480} & 464 \\
+Unif & \cmark & \xmark & \xmark & \xmark & ReLU & 640 & 640 & 616 & \textbf{672} & 472 & \textbf{512} & 480 & \textbf{512} & 336 & 376 & 368 & \textbf{392} \\
+Unif & \cmark & \xmark & \xmark & \cmark & GELU & 712 & 696 & \textbf{720} & \textbf{720} & 664 & 640 & 632 & \textbf{672} & \textbf{528} & 520 & 488 & 520 \\
+Unif & \cmark & \xmark & \xmark & \cmark & ReLU & 712 & 712 & 704 & \textbf{720} & \textbf{640} & \textbf{640} & 584 & \textbf{640} & 448 & 440 & \textbf{480} & 432 \\
+\hdashline[1pt/3pt]
+Unif & \cmark & \xmark & \cmark & \xmark & GELU & \textbf{832} & 824 & 824 & 816 & 792 & 792 & \textbf{800} & 792 & \textbf{768} & 720 & 744 & 760 \\
+Unif & \cmark & \xmark & \cmark & \xmark & ReLU & \textbf{816} & 808 & \textbf{816} & 800 & 760 & 776 & \textbf{784} & \textbf{784} & 736 & \textbf{744} & 728 & \fbox{504} \\
+Unif & \cmark & \xmark & \cmark & \cmark & GELU & 824 & 832 & \textbf{840} & \textbf{840} & 800 & \textbf{808} & 800 & \textbf{808} & 728 & 760 & \textbf{776} & 752 \\
+Unif & \cmark & \xmark & \cmark & \cmark & ReLU & \textbf{824} & 792 & 816 & 800 & \textbf{784} & 776 & \textbf{784} & \textbf{784} & 760 & \textbf{768} & \textbf{768} & 760 \\
+\hdashline[1pt/3pt]
+Unif & \cmark & \cmark & \xmark & \xmark & GELU & \textbf{800} & \textbf{800} & 776 & 784 & \textbf{744} & 736 & \textbf{744} & 736 & 696 & 696 & 696 & \textbf{704} \\
+Unif & \cmark & \cmark & \xmark & \xmark & ReLU & 496 & 504 & \textbf{528} & 440 & 280 & 296 & \textbf{312} & 248 & 104 & 144 & 104 & \fbox{\textbf{160}} \\
+Unif & \cmark & \cmark & \xmark & \cmark & GELU & 880 & \textbf{904} & 888 & 888 & \textbf{848} & \textbf{848} & \textbf{848} & 840 & \textbf{776} & 760 & \textbf{776} & 768 \\
+Unif & \cmark & \cmark & \xmark & \cmark & ReLU & \textbf{920} & 888 & 896 & 880 & \textbf{768} & 728 & \textbf{768} & \textbf{768} & 240 & 248 & 248 & \fbox{\textbf{448}} \\
+\hdashline[1pt/3pt]
+Unif & \cmark & \cmark & \cmark & \xmark & GELU & 880 & 896 & 912 & \textbf{920} & 856 & \textbf{864} & 848 & 856 & \textbf{832} & 816 & 800 & 792 \\
+Unif & \cmark & \cmark & \cmark & \xmark & ReLU & 872 & 880 & \textbf{904} & 872 & \textbf{856} & 840 & 848 & \textbf{856} & 800 & 792 & 800 & \textbf{808} \\
+Unif & \cmark & \cmark & \cmark & \cmark & GELU & 944 & 936 & \textbf{960} & \textbf{960} & \textbf{912} & 904 & 904 & 896 & 856 & 864 & \textbf{880} & 856 \\
+Unif & \cmark & \cmark & \cmark & \cmark & ReLU & 912 & 944 & 936 & \textbf{960} & \textbf{896} & 888 & 888 & 872 & 816 & \textbf{832} & \textbf{832} & \textbf{832} \\
+\hdashline[1pt/3pt]
+Unif & \xmark & \xmark & N/A & N/A & N/A & \textbf{208} & \textbf{208} & \textbf{208} & \textbf{208} & 200 & 192 & \textbf{208} & 192 & \textbf{192} & \textbf{192} & \textbf{192} & \textbf{192} \\
+Unif & \xmark & \cmark & N/A & N/A & N/A & \textbf{416} & 408 & 408 & 408 & \textbf{376} & \textbf{376} & \textbf{376} & \textbf{376} & 312 & 304 & 328 & \textbf{336} \\
+\midrule
+Full & \cmark & \xmark & \xmark & \xmark & GELU & 536 & 584 & 504 & \textbf{600} & \fbox{304} & \textbf{392} & 384 & 384 & \fbox{\textbf{136}} & 120 & \fbox{80} & 88 \\
+Full & \cmark & \xmark & \xmark & \xmark & ReLU & 456 & 576 & 488 & \textbf{584} & 312 & \textbf{352} & 272 & 312 & \fbox{112} & \fbox{64} & \fbox{\textbf{128}} & \fbox{48} \\
+Full & \cmark & \xmark & \xmark & \cmark & GELU & 600 & 632 & \textbf{696} & 616 & 336 & \textbf{384} & 312 & 352 & \fbox{144} & \fbox{\textbf{152}} & \fbox{24} & \fbox{48} \\
+Full & \cmark & \xmark & \xmark & \cmark & ReLU & 544 & \textbf{656} & 536 & 640 & 280 & 272 & \textbf{368} & 360 & \fbox{\textbf{144}} & \fbox{16} & 72 & 56 \\
+\hdashline[1pt/3pt]
+Full & \cmark & \xmark & \cmark & \xmark & GELU & \textbf{688} & 664 & 656 & 640 & 344 & 328 & \textbf{384} & \fbox{248} & \fbox{56} & \fbox{128} & \fbox{\textbf{136}} & \fbox{40} \\
+Full & \cmark & \xmark & \cmark & \xmark & ReLU & \fbox{488} & 672 & \textbf{704} & 688 & \textbf{336} & 320 & 248 & 248 & 88 & \fbox{\textbf{112}} & 64 & 72 \\
+Full & \cmark & \xmark & \cmark & \cmark & GELU & 624 & 664 & \textbf{712} & 608 & 264 & 296 & 248 & \textbf{328} & \fbox{16} & \fbox{\textbf{128}} & \fbox{96} & \fbox{56} \\
+Full & \cmark & \xmark & \cmark & \cmark & ReLU & \textbf{648} & 600 & 504 & 592 & 272 & 248 & \fbox{176} & \fbox{\textbf{512}} & 96 & \fbox{64} & 80 & \fbox{\textbf{112}} \\
+\hdashline[1pt/3pt]
+Full & \cmark & \cmark & \xmark & \xmark & GELU & \textbf{784} & 768 & 768 & 696 & 648 & \textbf{656} & 600 & 616 & 264 & \fbox{\textbf{368}} & 232 & 232 \\
+Full & \cmark & \cmark & \xmark & \xmark & ReLU & 440 & \textbf{512} & 496 & 472 & 312 & 296 & 320 & \textbf{328} & 128 & \fbox{\textbf{192}} & 152 & 136 \\
+Full & \cmark & \cmark & \xmark & \cmark & GELU & 800 & \textbf{896} & 800 & 760 & 600 & 672 & \fbox{504} & \textbf{704} & 336 & \fbox{184} & \textbf{376} & 296 \\
+Full & \cmark & \cmark & \xmark & \cmark & ReLU & 800 & 776 & 728 & \textbf{832} & 440 & 520 & \textbf{576} & 536 & \fbox{152} & 232 & 264 & \textbf{288} \\
+\hdashline[1pt/3pt]
+Full & \cmark & \cmark & \cmark & \xmark & GELU & \textbf{864} & 776 & 832 & 808 & 632 & 704 & \textbf{736} & 704 & 232 & 216 & \fbox{\textbf{320}} & 184 \\
+Full & \cmark & \cmark & \cmark & \xmark & ReLU & 776 & \textbf{832} & \textbf{832} & \textbf{832} & 680 & 688 & \textbf{728} & 688 & 280 & 240 & 280 & \textbf{296} \\
+Full & \cmark & \cmark & \cmark & \cmark & GELU & 848 & 816 & \textbf{872} & 808 & \textbf{720} & 696 & 632 & 704 & 320 & \fbox{248} & 384 & \fbox{\textbf{448}} \\
+Full & \cmark & \cmark & \cmark & \cmark & ReLU & 832 & \textbf{840} & \textbf{840} & 792 & \textbf{768} & 704 & 640 & 632 & \textbf{336} & \fbox{208} & 320 & 240 \\
+\hdashline[1pt/3pt]
+Full & \xmark & \xmark & N/A & N/A & N/A & 208 & 168 & \textbf{224} & 208 & 112 & \textbf{120} & 88 & 96 & 16 & 16 & 16 & \fbox{\textbf{48}} \\
+Full & \xmark & \cmark & N/A & N/A & N/A & 384 & \fbox{272} & \textbf{416} & 384 & 168 & 176 & \fbox{136} & \textbf{192} & \textbf{64} & 48 & 56 & 56 \\
+\bottomrule
+\end{tabular}

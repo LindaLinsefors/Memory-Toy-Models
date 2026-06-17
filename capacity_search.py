@@ -20,6 +20,8 @@ image = (
     .add_local_python_source("models", "device", "log")
 )
 
+MODAL_GPU = "T4"  # GPU type used when device == "gpu"
+
 
 def name_function_n_facts(settings: ModelSettings) -> str:
     """Generate a descriptive name for a run based on the number of facts."""
@@ -66,7 +68,8 @@ def find_max_facts(settings: ModelSettings,
                    threshold_to_continue: float = 0.99,
                    loss_type: str = 'BCE',
                    use_modal: bool = False,
-                   any_all_most: str = 'any') -> int:
+                   any_all_most: str = 'any',
+                   device: str = 'gpu') -> int:
     """Binary search for the maximum number of facts a model architecture can learn.
 
     Args:
@@ -90,6 +93,8 @@ def find_max_facts(settings: ModelSettings,
         any_all_most:  Only used if use_modal is True. 
                        If 'any', a single successful attempt counts as success. If 'all',
                        all attempts must succeed. If 'most', a majority of attempts must succeed.
+        device:        Only used on the Modal path: 'gpu' runs each training attempt on a
+                       GPU container, 'cpu' on a CPU container.
     Returns:
         The maximum n_facts for which the model achieved perfect accuracy
         (within the given precision).
@@ -123,12 +128,13 @@ def find_max_facts(settings: ModelSettings,
 
 
         learned = _try_n_facts_several_attempts(
-            settings, 
-            mid, 
-            number_of_attempts, 
-            verbose, 
-            use_modal, 
+            settings,
+            mid,
+            number_of_attempts,
+            verbose,
+            use_modal,
             any_all_most,
+            device,
             **kwargs
            )
 
@@ -147,12 +153,13 @@ def find_max_facts(settings: ModelSettings,
         if verbose:
             print(f"Trying n_facts = {max_possible} ...")
         learned = _try_n_facts_several_attempts(
-            settings, 
-            max_possible, 
-            number_of_attempts, 
-            verbose, 
-            use_modal, 
+            settings,
+            max_possible,
+            number_of_attempts,
+            verbose,
+            use_modal,
             any_all_most,
+            device,
             **kwargs
            )
         
@@ -164,7 +171,8 @@ def find_max_facts(settings: ModelSettings,
 
     return best
 
-@app.function(image=image, timeout=86400)  # 24h cap: outer waits on the whole per-d search
+@app.function(image=image, timeout=86400, nonpreemptible=True)  # 24h cap; non-preemptible so a
+# whole per-variant search never restarts (the inner attempts stay preemptible - cheap to redo)
 def find_max_facts_modal(config: dict) -> int:
     """Run one capacity search on Modal.
 
@@ -180,6 +188,7 @@ def _try_n_facts_several_attempts(settings: ModelSettings,
                                   verbose: bool,
                                   use_modal: bool,
                                   any_all_most: str,
+                                  device: str,
                                   **kwargs) -> bool:
     if not use_modal:
         learned = False
@@ -195,8 +204,22 @@ def _try_n_facts_several_attempts(settings: ModelSettings,
         return learned
     
     else:
-        successes = list(_try_n_facts_modal.map(
-            [settings] * number_of_attempts,   # -> base_settings, N copies
+        if device == 'gpu':
+            fn = _try_n_facts_modal.with_options(gpu=MODAL_GPU)
+        elif device == 'cpu':
+            fn = _try_n_facts_modal
+        else:
+            raise ValueError("device must be 'cpu' or 'gpu'")
+
+        # Only the first attempt logs to W&B; the rest are forced off, to avoid N
+        # near-identical W&B runs per candidate. log_to_wandb has to be a per-call
+        # positional arg here, because .map can vary positional args but not kwargs.
+        log_to_wandb = kwargs.pop('log_to_wandb', False)
+        log_flags = [log_to_wandb] + [False] * (number_of_attempts - 1)
+
+        successes = list(fn.map(
+            [settings] * number_of_attempts,   # -> settings      (positional 1)
+            log_flags,                          # -> log_to_wandb  (positional 2)
             kwargs=dict(n_facts=num_facts, verbose=verbose, **kwargs),
         ))
 
@@ -262,16 +285,22 @@ def _try_n_facts(base_settings: ModelSettings,
 
 
 
-@app.function(image=image, gpu="T4", timeout=10800)  # 3h cap: one full 50k-epoch attempt
-def _try_n_facts_modal(*args, **kwargs) -> bool:
-    """Variant of _try_n_facts that runs on Modal, on a GPU.
+@app.function(image=image, timeout=10800,  # 3h cap: one full 50k-epoch attempt
+              secrets=[modal.Secret.from_name("wandb")])  # injects WANDB_API_KEY for wandb.init
+def _try_n_facts_modal(settings, log_to_wandb, **kwargs) -> bool:
+    """Variant of _try_n_facts that runs on Modal.
 
-    This is where the actual training happens, so it gets the GPU. models.py
-    sets the default device to cuda-if-available, so on this container the model
-    trains on the GPU automatically. Change gpu="T4" to e.g. "A10G"/"A100" if you
-    want a bigger card (overkill for these tiny models, but easy to switch).
+    `settings` and `log_to_wandb` are explicit positional args so that .map can
+    vary log_to_wandb per attempt (only one attempt of a candidate logs to W&B);
+    everything else is forwarded via kwargs.
+
+    The base function is CPU-only. The caller adds a GPU at runtime via
+    .with_options(gpu=MODAL_GPU) when device == 'gpu' (see
+    _try_n_facts_several_attempts). A GPU can be *added* this way but not *unset*,
+    which is why the base has no gpu=. models.py sets the default device to
+    cuda-if-available, so the model uses whichever device the container has.
     """
-    return _try_n_facts(*args, **kwargs)
+    return _try_n_facts(settings, log_to_wandb=log_to_wandb, **kwargs)
 
 
 

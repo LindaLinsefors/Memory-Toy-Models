@@ -27,18 +27,19 @@ from log import log_result
 
 # ── Experiment configuration ─────────────────────────────────────────────────
 experiment_dir = "E3"
-testing = False                  # small/cheap run to validate the pipeline first
+testing = True                  # small/cheap run to validate the pipeline first
 model_type = "reduced"          # 'full' or 'reduced'
-duplicate = False
+duplicate = True
 
-log_to_wandb = False            # must stay False on Modal without a Secret (see bottom)
+log_to_wandb = True
 lr = [1e-2, 3e-3, 1e-3]
 patience = 5000
 n_epochs = 50000
 target_accuracy = "accuracy"
 threshold_to_continue = 0.99
-number_of_attempts = 3
+number_of_attempts = 11
 loss_type = "CE"                # 'BCE' or 'CE'
+device = "gpu"                  # "gpu" or "cpu" (where the training containers run)
 
 d_values = [16, 32, 64, 128]
 
@@ -73,7 +74,11 @@ def build_log_path() -> str:
         path += "_CE"
     if duplicate:
         path += "_duplicate"
-    return path
+    # Make the log path unique to avoid mixing with previous runs.
+    i = 1
+    while os.path.exists(f"{path}_({i}).jsonl"):
+        i += 1
+    return f"{path}_({i})"
 
 
 def build_configs():
@@ -112,6 +117,7 @@ def build_configs():
             number_of_attempts=number_of_attempts,
             threshold_to_continue=threshold_to_continue,
             loss_type=loss_type,
+            device=device,
         ))
     return configs
 
@@ -120,8 +126,14 @@ def build_configs():
 @app.local_entrypoint()
 def main():
     os.makedirs(experiment_dir, exist_ok=True)
-    log_path = build_log_path()
     configs = build_configs()
+
+    log_path = build_log_path()
+    # reserve the log file name; create it only if it doesn't already exist (never truncate)
+    if not os.path.exists(f"{log_path}.jsonl"):
+        with open(f"{log_path}.jsonl", "x"):
+            pass
+    print(f"Log path: {log_path}.jsonl")
 
     print(f"Launching {len(configs)} capacity searches on Modal "
           f"(one per d={d_values}); attempts run in parallel on GPU inside each.\n")

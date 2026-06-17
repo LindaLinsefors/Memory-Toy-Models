@@ -1,0 +1,311 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{parskip}
+\usepackage{xcolor}
+\usepackage{pifont}
+\usepackage[margin=0.5cm]{caption}
+\usepackage{changepage}
+\usepackage{array}
+\usepackage{arydshln}
+\usepackage{rotating}
+
+\newcommand{\cmark}{{\color{green!70!black}\ding{51}}}
+\newcommand{\xmark}{{\color{red}\ding{55}}}
+\newcommand{\rothead}[1]{\rotatebox[origin=c]{60}{\smash{\textbf{#1}}}}
+
+\title{Memory in Toy Transformer Models}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\noindent\emph{This is a work-in-progress draft. Some sections are drafted with the help of Claude and not all claims have been independently verified. Treat numbers as preliminary.}
+
+\section{Introduction}
+
+The goal of this project is to understand how memorised facts are stored in the weights of transformer models. To isolate the mechanisms involved, we study a minimal \emph{toy model}: a single-layer transformer that receives two input tokens and must produce one output token. A \emph{fact} is a specific pair of input tokens mapped to a specific output token. The mapping is random, so the model cannot exploit any systematic structure and must genuinely memorise each fact.
+
+We proceed in two stages. First, by selectively enabling or disabling components of the architecture --- attention, feed-forward layer, biases, normalisation, residual connections --- we measure which parts of the model matter for fact memorisation. We do this by measuring the maximum number of facts each configuration can learn at a fixed (small) model size. Second, we take a small number of configurations and scale them up, to see how the maximum number of memorised facts grows with model size.
+
+In addition, we attempt to match the trained model's performance with a hand-coded weight-setting algorithm (i.e.\ not learned via gradient descent). Why attempt this? Because a good measure of whether you understand something is whether you can replicate it: if we understand how the model stores facts in its weights, we should be able to hand-code a model that does the same thing. Our attempt does not fully succeed, but we think it represents some non-zero progress.
+
+
+\section{Model Architecture}
+\label{sec:architecture}
+
+The model, \textsc{MemoryToyModel}, is a single-layer transformer whose components can be toggled on or off via a set of architectural flags. All configurable options are collected in a \textsc{ModelSettings} object; the full list is summarised in Table~\ref{tab:settings} and described below.
+
+\subsection{Overview}
+
+The forward pass proceeds through up to six stages:
+\begin{enumerate}[nosep]
+    \item \textbf{Embedding}: The input tokens are mapped into a $d_\text{residual}$-dimensional residual stream. The precise mechanism depends on whether attention is enabled. (See Section~\ref{sec:embedding}.)
+    \item \textbf{Layer Norm 1} (optional): An RMSNorm that normalises the input to the attention layer; the residual stream itself is left unchanged, and the attention output is added back to it. Present if and only if both attention and norms are enabled.
+    \item \textbf{Attention} (optional): If enabled, the embedded sequence is processed by a single self-attention layer; afterwards only the last sequence position is retained. The attention pattern is either learned or fixed to a uniform average. (See Section~\ref{sec:attention}.)
+    \item \textbf{Layer Norm 2} (optional): An RMSNorm that normalises the input to the feed-forward block, again leaving the residual stream unchanged. Present if and only if both feed-forward and norms are enabled.
+    \item \textbf{Feed-Forward block} (optional): If enabled, the activations pass through a GELU or ReLU MLP, with an optional residual connection around it. (See Section~\ref{sec:ff}.)
+    \item \textbf{Output Head}: A final RMSNorm (if enabled) followed by a linear projection maps the residual stream to logits over the output vocabulary.
+\end{enumerate}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}lr>{\raggedright\arraybackslash}p{7.2cm}@{}}
+\toprule
+\textbf{Parameter} & \textbf{Values} & \textbf{Description} \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Data dimensions}} \\
+\texttt{seq\_len}            & 2     & Number of input tokens per fact \\
+\texttt{input\_vocab\_size}  & 32, 64, 128, 256    & Size of the input token vocabulary \\
+\texttt{output\_vocab\_size} & 16, 32, 64, 128     & Size of the output token vocabulary \\
+\texttt{n\_facts}            & int      & Number of facts to memorise \\
+\texttt{seed}                & 42    & Random seed for fact generation \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Internal dimensions}} \\
+\texttt{d\_residual}         & 16, 32, 64, 128       & Residual-stream (embedding) dimension \\
+\texttt{n\_heads}            & 1     & Number of attention heads \\
+\texttt{d\_ff}               & 16, 32, 64, 128      & Hidden dimension of the feed-forward block \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Architectural toggles}} \\
+\texttt{attention}           & True/False  & Enable self-attention \\
+\texttt{qk\_is\_one}         & True/False  & If attention is on, replace the learned $QK$ pattern with a fixed uniform average \\
+\texttt{ff}                  & True/False  & Enable feed-forward block \\
+\texttt{bias}                & True/False  & Include bias terms in linear layers \\
+\texttt{norms}               & True/False  & Use RMSNorm (otherwise identity) \\
+\texttt{ff\_residual}        & True/False  & Residual connection around FF block \\
+\texttt{ff\_activation\_type}& GELU/ReLU  & Activation function in the FF block \\
+\bottomrule
+\end{tabular}
+\caption{Every configurable setting of \textsc{MemoryToyModel}, with the value (or values) each one takes across the experiments in this document shown in the \textbf{Values} column. The code also accepts other values for the \emph{Data dimensions} and \emph{Internal dimensions} (including \texttt{seq\_len}, \texttt{n\_heads} and \texttt{seed}); only those listed are actually used.}
+\label{tab:settings}
+\end{table}
+
+\subsection{Embedding}
+\label{sec:embedding}
+
+Two modes are available, controlled by the \texttt{attention} flag.
+
+\paragraph{With attention (\texttt{attention = True}).}
+Each input token is embedded via a learned token embedding $W_E \in \mathbb{R}^{V_\text{in} \times d_\text{residual}}$ and summed with a learned positional embedding $W_P \in \mathbb{R}^{T \times d_\text{residual}}$, where $T$ is the sequence length and $V_\text{in}$ the input vocabulary size. The embedded sequence is normalised with RMSNorm (if \texttt{norms = True}, otherwise the identity) and passed through a single self-attention layer (Section~\ref{sec:attention}). Only the representation at the \emph{last} sequence position is retained, combined with the embedding at the same position by a residual connection that is always active:
+\[
+    x = e_T + \text{Attn}\!\left(\text{Norm}(e)\right)_T,
+\]
+where $e \in \mathbb{R}^{T \times d_\text{residual}}$ is the embedded sequence and subscript $T$ denotes the last position.
+
+\paragraph{Without attention (\texttt{attention = False}).}
+A separate embedding matrix $W_{E_i} \in \mathbb{R}^{V_\text{in}\times d_\text{residual}}$ is learned for each input position $i \in \{1,\dots,T\}$, and the residual-stream vector is their element-wise sum:
+\[
+    x = \sum_{i=1}^{T} W_{E_i}[\text{token}_i].
+\]
+This removes the attention mechanism entirely, replacing it with a simple additive composition of per-position embeddings. As we will see, this replacement is actually \emph{more} powerful for fact memorisation than attention is.
+
+\subsection{Attention}
+\label{sec:attention}
+
+When attention is enabled, a single linear projection produces queries, keys, and values ($Q$, $K$, $V$), split across $n_\text{heads}$ heads of dimension $d_\text{head} = d_\text{residual} / n_\text{heads}$. The new flag \texttt{qk\_is\_one} selects between two regimes for the attention pattern:
+
+\paragraph{Full attention (\texttt{qk\_is\_one = False}).}
+The usual scaled dot-product causal attention,
+\[
+    \text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_\text{head}}} + M\right) V,
+\]
+where $M$ is a causal mask. The attention weights depend on the input through $Q$ and $K$.
+
+\paragraph{Uniform attention (\texttt{qk\_is\_one = True}).}
+The attention matrix is replaced by a fixed uniform pattern $\tfrac{1}{T}\mathbf{1}\mathbf{1}^\top$, so each position receives the average of all value vectors regardless of content. The $Q$ and $K$ projections are then unused; only the value and output projections are learned. This isolates ``a learned linear mixing of the tokens'' from ``a learned, content-dependent routing of the tokens''.
+
+In both cases the head outputs are concatenated and projected back to $d_\text{residual}$ dimensions by a learned linear map, with no biases in the attention projections.
+
+\subsection{Feed-Forward Block}
+\label{sec:ff}
+
+When enabled (\texttt{ff = True}), the feed-forward block is a standard two-layer MLP:
+\[
+    \text{FF}(x) = W_2\, \sigma\!\left(W_1 x + b_1\right) + b_2,
+\]
+where $W_1 \in \mathbb{R}^{d_\text{ff} \times d_\text{residual}}$, $W_2 \in \mathbb{R}^{d_\text{residual} \times d_\text{ff}}$, and $\sigma$ is GELU or ReLU. Biases $b_1, b_2$ are included only when \texttt{bias = True}. The input to the MLP is optionally normalised with RMSNorm (controlled by \texttt{norms}). A residual connection around the block is controlled by \texttt{ff\_residual}:
+\[
+    x \leftarrow
+    \begin{cases}
+        x + \text{FF}(\text{Norm}(x)) & \text{if } \texttt{ff\_residual = True},\\
+        \text{FF}(\text{Norm}(x)) & \text{otherwise}.
+    \end{cases}
+\]
+
+\subsection{Output Head}
+
+The residual-stream vector is passed through a final RMSNorm (if \texttt{norms = True}) and then a linear projection $W_H \in \mathbb{R}^{V_\text{out} \times d_\text{residual}}$ (with bias when \texttt{bias = True}) to produce logits over the output vocabulary of size $V_\text{out}$.
+
+\section{Fact Generation}
+
+Facts are generated deterministically from the random seed. Each fact consists of \texttt{seq\_len} input tokens and a target token. For \texttt{seq\_len = 2}, the input pairs are drawn without replacement from all $V_\text{in}^2$ ordered pairs, and the target is assigned cyclically from the output vocabulary ($\text{target}_i = i \bmod V_\text{out}$). This gives a near-uniform distribution over output classes while keeping the input--output mapping arbitrary, so the model cannot learn any simple rule. Note that for $V_\text{in} = 32$, $\texttt{seq\_len} = 2$ there are only $32^2 = 1024$ possible distinct facts, which is the absolute ceiling on \texttt{n\_facts}.
+
+\section{Training}
+
+The model is trained full-batch with the Adam optimiser, using \emph{cross-entropy} (CE) loss over the output vocabulary. We track \textbf{best-guess accuracy}: the fraction of facts for which $\arg\max$ of the logits equals the correct target. Training uses early stopping: it halts when best-guess accuracy reaches $1.0$, or when it has not improved for \texttt{patience} epochs.
+
+\paragraph{Capacity search.}
+To find the maximum number of facts a configuration can memorise, we binary-search over \texttt{n\_facts}. For each candidate count we train several models from fresh random initialisations, optionally cycling through a list of learning rates when progress stalls. A candidate count counts as ``learnable'' according to one of three criteria over the \texttt{number\_of\_attempts} repeats:
+\begin{itemize}[nosep]
+    \item \textbf{any}: at least one attempt reaches perfect accuracy;
+    \item \textbf{most}: a majority of attempts reach perfect accuracy;
+    \item \textbf{all}: every attempt reaches perfect accuracy.
+\end{itemize}
+The binary search narrows until the remaining interval is below \texttt{precision}. The two criteria used in the experiments below, \emph{any} and \emph{most}, bracket the capacity: \emph{any} reports the most optimistic ``best case with a lucky seed'', while \emph{most} reports a more robust ``typically achievable'' capacity. By construction the \emph{any} number is always at least the \emph{most} number.
+
+\section{Experiment: Which architectural components matter for fact memorisation?}
+\label{sec:e5}
+
+In this experiment we fix a small model size (Table~\ref{tab:e5-fixed}) and sweep over the architectural toggles, measuring the maximum number of facts each configuration can memorise. The results are in Table~\ref{tab:e5}.
+
+Each architecture is measured under three criteria for counting a fact count as ``learnable'': \emph{any} (at least one of $11$ attempts reaches perfect accuracy), \emph{majority} (more than half do), and \emph{all} (every attempt does). Each criterion is repeated four times with independently sampled attempts, giving twelve runs that serve as a consistency check. Every measurement uses $11$ attempts per candidate fact count, $\texttt{n\_epochs} = 50\,000$ with early stopping, and the learning-rate schedule \texttt{lr}$=[10^{-2}, 3\times10^{-3}, 10^{-3}]$. The full per-run settings are listed in Table~\ref{tab:e5-runparams}.
+
+The three criteria are not just noise reduction --- they probe different things. \emph{Any} measures the best capacity reachable with a lucky initialisation; \emph{all} measures the capacity the model reaches \emph{reliably}, on every seed. The gap between them is a measure of how fragile a configuration is to train, and below it turns out to be at least as informative as the capacities themselves.
+
+Two features of Table~\ref{tab:e5} therefore read as \emph{stability}. When the \emph{any}, \emph{majority}, and \emph{all} values of a row are close, training is stable: the architecture reliably learns that many facts, because nearly every seed reaches the same capacity. When instead the value falls steeply from \emph{any} to \emph{majority} to \emph{all}, and the row carries many \fbox{boxed} outliers (repeats more than $20\%$ from their group's median), training is unstable: the architecture only occasionally reaches a high capacity and usually lands well short of it, so it does not reliably get to, or even near, its best capacity. These two signals do coincide: across the $54$ architectures the number of outliers in a row correlates strongly with its drop from \emph{any} to \emph{all} (Pearson $0.77$, Spearman $0.81$),\footnote{Both are correlation coefficients in $[-1,+1]$ measuring how strongly two quantities move together ($+1$ perfectly together, $0$ unrelated, $-1$ opposite). For paired samples $(x_i,y_i)$ with means $\bar x,\bar y$, the \emph{Pearson} coefficient measures a linear relationship, $r=\frac{\sum_i (x_i-\bar x)(y_i-\bar y)}{\sqrt{\sum_i (x_i-\bar x)^2}\,\sqrt{\sum_i (y_i-\bar y)^2}}$. The \emph{Spearman} coefficient applies the same formula to the \emph{ranks} of the values, capturing any monotonic (not just linear) trend and remaining robust to outliers; with no tied ranks it reduces to $1-\frac{6\sum_i d_i^2}{n(n^2-1)}$, where $d_i$ is the difference between the ranks of $x_i$ and $y_i$. See Wikipedia: \href{https://en.wikipedia.org/wiki/Pearson_correlation_coefficient}{Pearson correlation coefficient} and \href{https://en.wikipedia.org/wiki/Spearman\%27s_rank_correlation_coefficient}{Spearman's rank correlation coefficient}.} the mean drop rising monotonically from about $17\%$ for rows with no outliers to over $85\%$ for the most outlier-heavy rows.
+
+\paragraph{Reliability.}
+Individual training runs occasionally fail, producing spuriously low capacity estimates. Running $11$ attempts and reporting the three criteria largely suppresses these: within each criterion the four repeats agree closely for the \emph{None} and \emph{Uniform} rows (usually within a few percent). The \emph{Full}-attention rows remain noisier between repeats, which is itself consistent with full attention being the hardest variant to train.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Data and model dimension parameters} & \textbf{Value} \\
+\midrule
+\texttt{input\_vocab\_size}  & 32 \\
+\texttt{output\_vocab\_size} & 16 \\
+\texttt{d\_residual}         & 16 \\
+\texttt{d\_ff}               & 16 \\
+\bottomrule
+\end{tabular}
+\caption{Fixed model and data dimensions for the experiment in Section~\ref{sec:e5}. The architectural toggles are varied across rows of Table~\ref{tab:e5}. With these dimensions the maximum possible number of facts is $32^2 = 1024$.}
+\label{tab:e5-fixed}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+\texttt{loss\_type}            & CE \\
+\texttt{n\_epochs}             & 50\,000 (with early stopping) \\
+\texttt{lr}                    & $[10^{-2},\ 3\times10^{-3},\ 10^{-3}]$ \\
+\texttt{patience}              & 5\,000 \\
+\texttt{target\_accuracy}      & \texttt{best\_guess\_accuracy} \\
+\texttt{threshold\_to\_continue} & 0.95 \\
+\texttt{precision}             & 8 \\
+\texttt{number\_of\_attempts}  & 11 \\
+\texttt{any\_all\_most}        & \emph{any}, \emph{majority}, \emph{all} \\
+\bottomrule
+\end{tabular}
+\caption{Training and capacity-search settings shared by all runs in Table~\ref{tab:e5}. The \texttt{Max Facts} columns of Table~\ref{tab:e5} are the twelve runs: four independent repeats of each of the \emph{any}, \emph{majority}, and \emph{all} criteria.}
+\label{tab:e5-runparams}
+\end{table}
+
+\begin{table}[p]
+\footnotesize
+\setlength{\tabcolsep}{4.5pt}
+\renewcommand{\arraystretch}{0.82}
+\setlength{\fboxsep}{1.5pt}  % tighter outlier boxes (\fbox) so they don't widen the table
+% Table is wider than the text block; bleed into the margins (more on the left).
+\begin{adjustwidth}{-2cm}{-1.2cm}
+\centering
+\input{table_E5.tex}
+\end{adjustwidth}
+\caption{Maximum facts memorised per architectural configuration ($d_\text{residual}=16$, $d_\text{ff}=16$, CE loss). \textbf{Attn} is the token-mixing mechanism: \emph{None} (additive per-position embeddings), \emph{Unif} (uniform/averaging attention, \texttt{qk\_is\_one = True}), or \emph{Full} (learned attention). The \emph{Any} / \emph{Majority} / \emph{All} column groups apply the corresponding criterion (a fact count counts as learned if at least one / more than half / all of the $11$ attempts reach perfect accuracy); the four numbered columns within each group are independent repeats. Within each group the row-wise maximum is shown in \textbf{bold} and values more than $20\%$ from the group's median are \fbox{boxed} as outliers. For \texttt{ff = False} rows the residual, bias and activation flags do not apply (N/A). Note that $1024$ is the dataset ceiling, so configurations reaching it have saturated the data rather than the model.}
+\label{tab:e5}
+\end{table}
+
+Two patterns recur across almost every comparison below. First, each component we vary has a fairly consistent ``better'' setting that wins on the large majority of architectures. Second, and more telling, each component matters far more for \emph{reliability} than for \emph{peak} capacity: the average gap between the better and worse setting grows steadily from \emph{any} to \emph{majority} to \emph{all}. A toggle that moves peak capacity by a few percent can move the \emph{reliably}-memorised count by tens or hundreds of percent. We take the components in roughly increasing order of importance, ending with the two that dominate --- the feed-forward block and the attention mechanism.
+
+\subsection{Activation function: a small edge for GELU, mostly about reliability}
+
+The activation function has the smallest effect on peak capacity of any toggle. Under \emph{any}, GELU beats ReLU on $19$ of the $24$ \texttt{ff = True} architectures, but by a mean of only $+11\%$, and several pairs tie (Table~\ref{tab:activation}). The gap then widens sharply with the criterion --- $+25\%$ under \emph{majority}, $+72\%$ under \emph{all}. This is the cleanest illustration of the reliability pattern: GELU and ReLU reach similar \emph{best-case} capacities, but ReLU much more often fails to memorise the same facts on \emph{every} seed. The few exceptions (a handful of \emph{Full}-attention rows where ReLU edges ahead, down to $-13\%$) are small and look like training noise. We therefore treat activation as the least important choice for capacity --- it matters mainly for training stability.
+
+\begin{table}[ht]
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{adjustwidth}{-1.5cm}{-1.5cm}
+\centering
+\input{table_activation.tex}
+\end{adjustwidth}
+\caption{GELU vs.\ ReLU, one row per \texttt{ff = True} architecture (the $24$ configurations that differ only in activation function). For each criterion, \textbf{G$>$R}, \textbf{$=$}, and \textbf{R$>$G} count the repeats (out of $4$) in which GELU exceeds, equals, or trails ReLU, paired by repeat index; a count of $4$ (all repeats agree) is shown in \textbf{bold}. \textbf{Mean \%$\Delta$} is the mean of $(\text{GELU}-\text{ReLU})/\text{ReLU}$ over the repeats, coloured \textcolor{green!55!black}{green} when positive (GELU ahead) and \textcolor{red}{red} when negative.}
+\label{tab:activation}
+\end{table}
+
+\subsection{Bias terms: a small but consistent gain}
+
+Including bias terms in the linear layers is a modest, consistent help: bias wins on $19$--$20$ of the $24$ architectures under every criterion, by a mean of $+15\%$ (\emph{any}), $+24\%$ (\emph{majority}) and $+28\%$ (\emph{all}); these numbers are read off the main sweep (Table~\ref{tab:e5}), as bias gets no separate table. Bias is the one exception to the reliability pattern --- its advantage barely grows as the criterion tightens, and its $+28\%$ under \emph{all} is the \emph{smallest} strict-criterion effect of any component. So bias supplies a small uniform lift rather than a reliability multiplier. This even flips its ranking against the activation function: under \emph{any}, bias matters slightly more than GELU-vs-ReLU ($+15\%$ vs $+11\%$), but under \emph{all} it matters far less ($+28\%$ vs $+72\%$). A few architectures do marginally better without bias, and we expect the whole effect to shrink as the model is scaled up.
+
+\subsection{Normalisation: a large gain, and essential without the feed-forward block}
+\label{sec:e5-norms}
+
+RMSNorm is clearly beneficial, and uniquely so in one regime. With the feed-forward block present, norm-on wins on $21$--$22$ of the $24$ architectures, by a mean of $+14\%$ (\emph{any}), $+40\%$ (\emph{majority}) and $+120\%$ (\emph{all}) --- the now-familiar small-peak, large-reliability shape (Table~\ref{tab:norm}). When the feed-forward block is \emph{absent} (the bottom rows of the table), normalisation becomes essential rather than merely helpful: it roughly doubles capacity on every criterion ($+80\%$ to $+190\%$), and, unusually, the benefit is already large under \emph{any} rather than only under \emph{all}. The main genuine break from the pattern is a handful of architectures that prefer no norm, including one strict-criterion row at $-65\%$.
+
+\begin{table}[ht]
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{adjustwidth}{-1.5cm}{-1.5cm}
+\centering
+\input{table_norm.tex}
+\end{adjustwidth}
+\caption{Norm on vs.\ off, one row per \texttt{ff = True} architecture (the $24$ configurations that differ only in the RMSNorm layers). For each criterion, \textbf{On} and \textbf{Off} count the repeats (out of $4$) in which norm-on / norm-off has more facts and \textbf{$=$} counts ties, all paired by repeat index; a count of $4$ (all repeats agree) is shown in \textbf{bold}. \textbf{Mean \%$\Delta$} is the mean of $(\text{on}-\text{off})/\text{off}$ over the repeats, coloured \textcolor{green!55!black}{green} when positive (norm helps) and \textcolor{red}{red} when negative.}
+\label{tab:norm}
+\end{table}
+
+\subsection{The residual connection: a large, reliable gain}
+
+A residual connection around the feed-forward block is one of the strongest beneficial toggles. Residual-on wins on $19$--$22$ of the $24$ architectures, by a mean of $+21\%$ (\emph{any}), $+40\%$ (\emph{majority}) and $+100\%$ (\emph{all}), with the largest single-architecture gap reaching $+574\%$ under \emph{all} (Table~\ref{tab:residual}). The reliability pattern is again pronounced: the residual connection roughly doubles the number of \emph{reliably} memorised facts. Only one or two architectures prefer no residual, and only marginally.
+
+\begin{table}[ht]
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{adjustwidth}{-1.5cm}{-1.5cm}
+\centering
+\input{table_residual.tex}
+\end{adjustwidth}
+\caption{Residual on vs.\ off, one row per \texttt{ff = True} architecture (the $24$ configurations that differ only in the residual connection around the FF block). For each criterion, \textbf{On} and \textbf{Off} count the repeats (out of $4$) in which residual-on / residual-off has more facts and \textbf{$=$} counts ties, all paired by repeat index; a count of $4$ (all repeats agree) is shown in \textbf{bold}. \textbf{Mean \%$\Delta$} is the mean of $(\text{on}-\text{off})/\text{off}$ over the repeats, coloured \textcolor{green!55!black}{green} when positive (residual helps) and \textcolor{red}{red} when negative.}
+\label{tab:residual}
+\end{table}
+
+\subsection{The feed-forward block: where the facts are stored}
+
+The feed-forward block is the single largest effect in the sweep. We can switch it off for only six architectures (the \texttt{ff = False} runs vary attention and normalisation, holding the residual and bias on and the activation at ReLU), and there adding the block multiplies capacity by a mean of $+200\%$ to $+270\%$, helping in every case (Table~\ref{tab:ff}); without it the model tops out at a few hundred facts, with it at $700$--$1024$ (Table~\ref{tab:e5}). This is expected --- the MLP is the model's associative memory, where the facts are actually written --- so it sets the overall scale that every other component merely modulates. Its value is largest exactly where the rest of the model is weakest: the gain is biggest with no normalisation (e.g.\ $+373\%$ for \emph{None} without a norm) and shrinks, while staying large, once a norm is present. It is also the one setting under which normalisation flips from helpful to indispensable (Section~\ref{sec:e5-norms}).
+
+\begin{table}[ht]
+\centering
+\input{table_ff.tex}
+\caption{Feed-forward block on vs.\ off, for the six \texttt{(attention, norm)} architectures where the block can be removed (the residual and bias are held on and the activation at ReLU, the settings present on the \texttt{ff = False} runs). For each criterion, \textbf{On} and \textbf{Off} count the repeats (out of $4$) in which FF-on / FF-off has more facts and \textbf{$=$} counts ties; a count of $4$ is shown in \textbf{bold}. \textbf{Mean \%$\Delta$} is the mean of $(\text{on}-\text{off})/\text{off}$ over the repeats, coloured \textcolor{green!55!black}{green} when positive.}
+\label{tab:ff}
+\end{table}
+
+\subsection{Attention: the more machinery, the fewer facts (None \texorpdfstring{$>$}{>} Unif \texorpdfstring{$>$}{>} Full)}
+
+The attention mechanism gives the most striking --- and most counterintuitive --- result. Across all $16$ \texttt{ff = True} architectures (and the no-FF rows), capacity is ordered \emph{None} $>$ \emph{Uniform} $>$ \emph{Full} with almost no exceptions (Table~\ref{tab:attention}): the more attention machinery we add, the \emph{fewer} facts the model memorises. As everywhere, the gaps widen under stricter criteria --- but here very unevenly, and the unevenness is the interesting part. The \emph{None}$\to$\emph{Uniform} step is a small, stable cost (None beats Uniform by $\sim$$16$--$26\%$ across all three criteria). The expensive step is \emph{Uniform}$\to$\emph{Full}: replacing the fixed average with a learned softmax barely dents peak capacity ($+18\%$ for Uniform over Full under \emph{any}) but is ruinous for reliability ($+504\%$ under \emph{all}). The penalty is concentrated almost entirely in the \emph{learned} $QK$ routing, not in having attention at all.
+
+\begin{sidewaystable}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\centering
+\input{table_attention.tex}
+\caption{Pairwise comparison of the attention variants \textbf{N}one / \textbf{U}nif / \textbf{F}ull, one row per architecture (the $16$ \texttt{ff = True} rows plus the $2$ \texttt{ff = False} rows, where only normalisation varies). For each criterion and each pair, the \textbf{X$>$Y} column counts the repeats (out of $4$) in which variant X beats variant Y (paired by repeat index; a count of $4$ is \textbf{bold}, zeros blank), and the \textbf{$\Delta$} column is the mean of $(\text{X}-\text{Y})/\text{Y}$ over the repeats, coloured \textcolor{green!55!black}{green} when positive and \textcolor{red}{red} when negative.}
+\label{tab:attention}
+\end{sidewaystable}
+
+Why would more machinery hurt? It makes sense once you look at what each variant has to learn. The ``no attention'' path learns a separate embedding table per input position and simply adds them; for two input tokens this is an unconstrained learned function of each token, a very flexible way to write facts into the residual stream. Uniform attention is more restricted (a single shared value projection, averaged over positions), and full learned attention is more restricted still, because the content-dependent softmax routing has to be \emph{learned} and consumes capacity rather than adding it. For pure memorisation the simplest mixing wins; a content-dependent softmax adds little capacity and a great deal of training difficulty --- which is exactly the reliability cost we see appear in the \emph{Uniform}$\to$\emph{Full} step.
+
+\section{Experiment: How does Max Facts scale with model size?}
+
+\emph{(Data not yet available --- to be written once the scaling runs are complete.)}
+
+\end{document}
