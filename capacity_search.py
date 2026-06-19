@@ -285,7 +285,7 @@ def _try_n_facts(base_settings: ModelSettings,
 
 
 
-@app.function(image=image, timeout=10800,  # 3h cap: one full 50k-epoch attempt
+@app.function(image=image, timeout=60*60*10,  # 10h cap: one full 50k-epoch attempt
               secrets=[modal.Secret.from_name("wandb")])  # injects WANDB_API_KEY for wandb.init
 def _try_n_facts_modal(settings, log_to_wandb, **kwargs) -> bool:
     """Variant of _try_n_facts that runs on Modal.

@@ -1,0 +1,319 @@
+{
+  "settings": {
+    "d": 32,
+    "n_facts": 256,
+    "n_attempts": 11,
+    "top_fraction_sweep": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9
+    ],
+    "S_sweep": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "input_vocab_size": 64,
+    "output_vocab_size": 32,
+    "d_ff": 32,
+    "seed": 42,
+    "metric": "best_guess_accuracy"
+  },
+  "timestamp": "2026-06-18T12:16:39",
+  "results": [
+    {
+      "S": 1,
+      "top_fraction": 0.0,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.62890625
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.1,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.57421875
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.2,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.578125
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.3,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.453125
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.4,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.3828125
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.5,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.2578125
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.6,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.2734375
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.7,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.21875
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.8,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.17578125
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.9,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.16015625
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.0,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.6328125
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.1,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.6015625
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.2,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.61328125
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.3,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.44140625
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.4,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.359375
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.5,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.27734375
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.6,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.23828125
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.7,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.25
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.8,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.18359375
+    },
+    {
+      "S": 1,
+      "top_fraction": 0.9,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.15234375
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.0,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.77734375
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.1,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.76953125
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.2,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.65234375
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.3,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.57421875
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.4,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.4609375
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.5,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.33984375
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.6,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.296875
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.7,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.21875
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.8,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.20703125
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.9,
+      "attempt": 0,
+      "conn_seed": 43,
+      "best_guess_accuracy": 0.15625
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.0,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.80078125
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.1,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.80859375
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.2,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.734375
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.3,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.5546875
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.4,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.48828125
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.5,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.41796875
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.6,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.33984375
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.7,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.265625
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.8,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.21875
+    },
+    {
+      "S": 2,
+      "top_fraction": 0.9,
+      "attempt": 1,
+      "conn_seed": 44,
+      "best_guess_accuracy": 0.17578125
+    }
+  ]
+}
