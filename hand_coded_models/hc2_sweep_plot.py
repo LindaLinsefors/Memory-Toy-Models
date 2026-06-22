@@ -9,6 +9,7 @@ function of top_fraction and n_neurons_per_label (S).
 import os
 import json
 import glob
+from collections import defaultdict
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -321,7 +322,72 @@ def write_sorted_capacity_results(path=None, out_path=None):
             f.write(json.dumps(r) + "\n")
 
     print(f"Wrote {len(runs_sorted)} sorted rows to {out_path}")
-    return runs_sorted
+    return None
+
+
+def plot_capacity_vs_d(path=None):
+    """Log-log plot of max_facts vs d, one line per (accuracy_threshold, any_all_most).
+
+    Color encodes any_all_most; line style encodes accuracy_threshold. Reads the
+    capacity-search log (JSONL) via load_capacity_results. Points with max_facts<=0
+    (e.g. a search that bottomed out) are dropped, since they can't appear on a log
+    axis.
+    """
+    if path is None:
+        path = os.path.join(RESULTS_DIR, "capacity_search_results.json")
+    runs = load_capacity_results(path)
+    if not runs:
+        raise FileNotFoundError(f"No capacity results found in {path}")
+
+    # color = any_all_most, style = accuracy_threshold.
+    aam_color = {"any": "tab:blue", "all": "tab:red", "most": "tab:green"}
+    styles = ["-", "--", ":", "-."]
+    thresholds = sorted({r.get("accuracy_threshold") for r in runs})
+    thr_style = {t: styles[i % len(styles)] for i, t in enumerate(thresholds)}
+
+    # Group rows by (accuracy_threshold, any_all_most) -> {d: max_facts}.
+    groups = defaultdict(dict)
+    for r in runs:
+        groups[(r["accuracy_threshold"], r["any_all_most"])][r["d"]] = r["max_facts"]
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    all_ys = []
+    for (thr, aam) in sorted(groups, key=lambda k: (k[1], k[0])):
+        ds_mf = sorted(groups[(thr, aam)].items())
+        xs = [d for d, mf in ds_mf if mf and mf > 0]
+        ys = [mf for d, mf in ds_mf if mf and mf > 0]
+        if not xs:
+            continue
+        all_ys.extend(ys)
+        ax.loglog(xs, ys, marker="o", markersize=5,
+                  color=aam_color.get(aam, "tab:gray"),
+                  linestyle=thr_style[thr],
+                  label=f"{aam}, acc>={thr}")
+
+    ax.set_xlabel("d (model size)")
+    ax.set_ylabel("max_facts")
+    ax.set_title("Capacity vs d  (color = any/all/most, style = accuracy_threshold)")
+
+    # x ticks: the model sizes we sweep, as plain integers (no minor 10^x ticks).
+    xticks = [16, 32, 64, 128, 256]
+    ax.set_xticks(xticks)
+    ax.set_xticks([], minor=True)
+    ax.set_xticklabels([str(x) for x in xticks])
+
+    # y ticks: powers of two spanning the plotted max_facts range.
+    if all_ys:
+        lo = int(np.floor(np.log2(min(all_ys))))
+        hi = int(np.ceil(np.log2(max(all_ys))))
+        yticks = [2 ** n for n in range(lo, hi + 1)]
+        ax.set_yticks(yticks)
+        ax.set_yticks([], minor=True)
+        ax.set_yticklabels([str(y) for y in yticks])
+
+    ax.grid(True, which="both", ls="--", linewidth=0.5)
+    ax.legend(fontsize=8, ncol=2)
+    fig.tight_layout()
+    plt.show()
+    return fig
 
 
 '''
@@ -339,7 +405,11 @@ d = 32
 for n_facts in [32, 64, 128, 256, 512, 1024]:
     show_grid(d, n_facts)
 # %%
-d = 128
-for n_facts in [128, 256, 512, 1024, 2048, 4096, 8192]:
+d = 256
+for n_facts in [512, 1024, 2048, 4096, 8192]:
     show_grid(d, n_facts)
+# %%
+plot_capacity_vs_d()
+# %%
+write_sorted_capacity_results()
 # %%

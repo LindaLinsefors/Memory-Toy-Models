@@ -1,14 +1,30 @@
-"""Capacity search for HandCodedModel2.
+"""Capacity search for HandCodedModel2 (searches over integer top_n), on Modal.
 
 Binary-search the largest n_facts that HandCodedModel2 can store, where "can
-store" is decided by sweeping (top_fraction, S) and asking whether ANY cell of
-that grid reaches `accuracy_threshold` (under the any/all/most rule).
+store" means: sweeping (S, top_n), some cell of that grid reaches
+`accuracy_threshold` under the any/all/most rule.
 
-The expensive grid evaluation reuses the Modal fan-out from hc2_sweep.py: each
-(S, top_fraction, attempt) point becomes one container that builds its own fresh
-connection matrix. Grids are cached to hand_coded_models/hc2_sweep_results/ (the
-same files hc2_sweep.py / hc2_sweep_plot.py use), so a value of n_facts already
-swept on disk is loaded instead of recomputed.
+Why top_n (not top_fraction): top_n is the number of top tokens (per input
+position) a neuron suppresses — the actual knob. An experiment showed the optimal
+top_n is small but scales with S (roughly top_n* <= ~2*S); a fixed top_fraction
+grid maps to wildly different (and too-coarse) top_n across model sizes, so it
+missed optima. We therefore search top_n as integers over a per-S range
+0..round(2.2*S).
+
+Efficiency: the connection matrix depends only on (D=d, T=d, S) — NOT on n_facts,
+top_n, or attempt — so there is exactly ONE matrix per (d, S). We build them once
+per d (in parallel on Modal), cache them to hand_coded_models/conn_cache/ on disk,
+and reuse them across every n_facts probe, every top_n, every attempt, and every
+config. Attempts share the base matrix and the facts; to add variety back, each
+attempt permutes the matrix's label columns (mixing which labels share neurons,
+structure preserved) and re-seeds the constructor's random tie-breaking.
+
+Automation: set CONFIGS (a list of d x accuracy_threshold x any_all_most) at the
+top; main() runs find_max_facts for each and appends one line per run to
+hc2_sweep_results/capacity_search_results_topn.json (a SEPARATE log from the old
+top_fraction runs; nothing old is overwritten). Grid files are written under new
+names hc2_sweep_topn_d{d}_nfacts{nf}.json, leaving the old hc2_sweep_d*_nfacts*
+files (and hc2_sweep_plot.py) untouched.
 
 Run it with:
     python -m modal run hand_coded_models/hc2_capacity_search.py
@@ -27,35 +43,70 @@ import modal
 # Fixed seed for generate_facts (the facts never change), and this file's dir.
 seed = 42
 _HERE = os.path.dirname(os.path.abspath(__file__))
+RESULTS_DIR = os.path.join(_HERE, "hc2_sweep_results")
+CONN_CACHE_DIR = os.path.join(_HERE, "conn_cache")
 
 
-# Settings used when running this file.
-d = 32
-accuracy_threshold = 0.9
-any_all_most = "all"
-
-
+# ── Settings ──────────────────────────────────────────────────────────────────
 n_attempts = 11
-precision = 8 if d == 16 else 8 * 4 if d == 32 else 8 * 4 * 4 if d == 64 else 8 * 4 * 4 * 4
 
-if d == 16:
-    S_sweep = [1,2,3,4,5,6,7,8,9,10]
-elif d == 32:
-    S_sweep = [1,2,3,4,5,6,7,8,9,10,11,13]
-elif d == 64:
-    S_sweep = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
-elif d == 128:
-    S_sweep = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+# Each n_facts grid is fanned out across ~this many Modal containers (the cap on
+# simultaneous containers). Cells are sized so the (S x attempt x top_n) work
+# splits into roughly this many balanced units.
+TARGET_TASKS = 1000
 
-top_fraction_sweep = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+# Each capacity search runs one (d, accuracy_threshold, any_all_most) config.
+# This list reproduces the 24-cell sweep you were doing by hand, now automated.
+CONFIGS = [
+    dict(d=d, accuracy_threshold=thr, any_all_most=aam)
+    for d in [16, 32, 64, 128, 256]
+    for thr in [0.9, 1.0]
+    for aam in ["any", "all", "most"]
+]
+
+testing = False  # small/cheap end-to-end validation run
 
 
+def S_sweep_for(d):
+    """Which n_neurons_per_label values to sweep for a given model size d."""
+    if d <= 16:
+        return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    elif d <= 32:
+        return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13]
+    elif d <= 64:
+        return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    elif d <= 128:
+        return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+    else:
+        return list(range(1, 25))
+
+
+def precision_for(d):
+    """Binary-search stopping precision (stop when hi - lo < precision)."""
+    return 8 if d == 16 else 8 * 4 if d == 32 else 8 * 4 * 4 if d == 64 else 8 * 4 * 4 * 4
+
+
+def top_n_sweep_for(S):
+    """Integer top_n grid for a given S: 0 .. round(2.2*S) (covers observed optima)."""
+    return list(range(0, round(2.2 * S) + 1))
+
+
+# All connection matrices use this fixed seed, so a given (d, S) maps to ONE matrix.
+MATRIX_SEED = seed
+
+
+def _tie_seed(S, attempt):
+    """Per-(S, attempt) seed for the constructor's random tie-breaking — the only
+    source of variation between attempts now that the matrix is shared per (d, S)."""
+    return 10_000 * S + attempt
+
+
+# ── Modal app + image ─────────────────────────────────────────────────────────
 app = modal.App("hc2-capacity-search")
 
-# Self-contained container image (mirrors hc2_sweep.py): ships hc2.py plus the
-# repo-root modules it imports, so `import hc2` works inside the container. We do
-# NOT import anything from hc2_sweep at module level — Modal re-imports THIS file
-# inside every container, and `hand_coded_models` is not on the container path.
+# Self-contained image: ships hc2.py + the repo-root modules it imports. No
+# top-level import of `hand_coded_models` (Modal re-imports THIS file inside every
+# container and that package is not on the container path).
 image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install("torch", "numpy", "wandb")
@@ -64,74 +115,116 @@ image = (
 )
 
 
-@app.function(image=image, timeout=86400)
-def _run_one(args: dict) -> dict:
-    """Evaluate ONE model: a single (n_facts, S, top_fraction, attempt) point.
-
-    Self-contained copy of hc2_sweep._run_one so this file is an independent Modal
-    app. Builds a fresh connection matrix from a unique conn_seed; the facts are
-    fixed by `seed`, so only the matrix (and tie-breaking) varies across attempts.
-    """
+@app.function(image=image, timeout=86400, max_containers=TARGET_TASKS)
+def _build_conn(arg):
+    """Build the ONE connection matrix for a (D, S). arg = (D, S). Returns (arg, matrix)."""
     import sys
     import warnings
     if "/root" not in sys.path:
         sys.path.insert(0, "/root")
+    from hc2 import make_connection_matrix
 
-    import torch
-    from hc2 import (
-        HandCodedModel2,
-        HandCodedModel2Settings,
-        make_connection_matrix,
-    )
-
-    S = args["S"]
-    conn_seed = args["conn_seed"]
-    torch.manual_seed(conn_seed)
-
+    D, S = arg
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        conn = make_connection_matrix(D=args["d_ff"], T=args["output_vocab_size"],
-                                      S=S, seed=conn_seed)
-
-    settings = HandCodedModel2Settings(
-        input_vocab_size=args["input_vocab_size"],
-        output_vocab_size=args["output_vocab_size"],
-        n_facts=args["n_facts"],
-        seed=args["seed"],
-        d_ff=args["d_ff"],
-        n_neurons_per_label=S,
-        use_top_no_top_fraction="top_fraction",
-        top_fraction=args["top_fraction"],
-    )
-    model = HandCodedModel2(settings, precomputed_conn=conn)
-    _, best_guess_accuracy, _, _ = model.evaluate()
-    return {
-        "n_facts": args["n_facts"],
-        "S": S,
-        "top_fraction": args["top_fraction"],
-        "attempt": args["attempt"],
-        "conn_seed": conn_seed,
-        "best_guess_accuracy": best_guess_accuracy,
-    }
+        m = make_connection_matrix(D=D, T=D, S=S, seed=MATRIX_SEED)
+    return (arg, m)
 
 
-RESULTS_DIR = os.path.join(_HERE, "hc2_sweep_results")
+@app.function(image=image, timeout=86400, max_containers=TARGET_TASKS)
+def _run_one(cell):
+    """Evaluate one (S, attempt, n_facts) over its whole top_n grid, reusing the
+    precomputed connection matrix carried in the cell. Returns a list of records.
+
+    Per-attempt variety comes from permuting the matrix's label columns (and from
+    re-seeding the constructor's tie-breaking) — no matrix is rebuilt."""
+    import sys
+    if "/root" not in sys.path:
+        sys.path.insert(0, "/root")
+    import torch
+    from hc2 import HandCodedModel2, HandCodedModel2Settings
+
+    conn = cell["conn"]                 # np.ndarray (d_ff, n_labels), shared base matrix for this S
+    S = cell["S"]
+    attempt = cell["attempt"]
+    n_facts = cell["n_facts"]
+    tie_seed = cell["tie_seed"]
+
+    # Per-attempt randomness without rebuilding: permute the label COLUMNS (axis 1
+    # = output labels) of the shared matrix, so which labels share neurons differs
+    # across attempts. A column permutation preserves all structural properties
+    # (S ones per column, row sums, pairwise overlaps) — it only relabels.
+    perm = np.random.default_rng(tie_seed).permutation(conn.shape[1])
+    conn = conn[:, perm]
+
+    records = []
+    for top_n in cell["top_n_list"]:
+        # Reproducible random tie-breaking inside the constructor (varies per attempt).
+        torch.manual_seed(tie_seed + top_n)
+        settings = HandCodedModel2Settings(
+            input_vocab_size=cell["input_vocab_size"],
+            output_vocab_size=cell["output_vocab_size"],
+            n_facts=n_facts,
+            seed=cell["seed"],
+            d_ff=cell["d_ff"],
+            n_neurons_per_label=S,
+            use_top_no_top_fraction="top_n",
+            top_n=top_n,
+        )
+        model = HandCodedModel2(settings, precomputed_conn=conn)
+        _, best_guess_accuracy, _, _ = model.evaluate()
+        records.append({
+            "n_facts": n_facts,
+            "S": S,
+            "top_n": top_n,
+            "attempt": attempt,
+            "tie_seed": tie_seed,
+            "best_guess_accuracy": best_guess_accuracy,
+        })
+    return records
 
 
-# ── Result caching ────────────────────────────────────────────────────────────
+# ── Connection-matrix cache (driver-side disk + Modal build) ──────────────────
+
+def _conn_path(D, S):
+    return os.path.join(CONN_CACHE_DIR, f"d{D}_s{S}.npy")
+
+
+def _ensure_conn(d, S_sweep, verbose=True):
+    """Return {S: matrix} for all S (one matrix per (d, S)), building the missing
+    ones once on Modal and caching every matrix to disk under conn_cache/."""
+    os.makedirs(CONN_CACHE_DIR, exist_ok=True)
+    out = {}
+    to_build = []          # list of (d, S)
+    for S in S_sweep:
+        p = _conn_path(d, S)
+        if os.path.exists(p):
+            out[S] = np.load(p)
+        else:
+            to_build.append((d, S))
+
+    if to_build:
+        if verbose:
+            print(f"  Building {len(to_build)} connection matrices on Modal "
+                  f"(d={d}, one per S); reused across all n_facts/top_n/attempts/configs ...")
+        for (D, S), m in _build_conn.map(to_build):
+            np.save(_conn_path(D, S), m)
+            out[S] = m
+    elif verbose:
+        print(f"  All {len(out)} connection matrices for d={d} loaded from cache.")
+    return out
+
+
+# ── Result caching (grid files: hc2_sweep_topn_d{d}_nfacts{nf}.json) ───────────
+
+def _grid_glob():
+    return os.path.join(RESULTS_DIR, "hc2_sweep_topn_d*_nfacts*.json")
+
 
 def _load_cached_records(d, n_facts):
-    """Pool every record for (d, n_facts) from the result files on disk.
-
-    Mirrors hc2_sweep_plot._load_records: scans RESULTS_DIR, keeps files whose
-    settings match (d, n_facts), and concatenates their `results` lists. Skips
-    test_*.json. Returns a (possibly empty) list of record dicts.
-    """
+    """Pool every top_n grid record for (d, n_facts) from disk."""
     records = []
-    # Match only grid files by their naming pattern (hc2_sweep_d{d}_nfacts{nf}.json
-    # and its _({i}) variants). This ignores any other .json in the folder — e.g.
-    # the JSONL capacity-search log or test_* runs — so co-location is harmless.
-    for path in sorted(glob.glob(os.path.join(RESULTS_DIR, "hc2_sweep_d*_nfacts*.json"))):
+    for path in sorted(glob.glob(_grid_glob())):
         with open(path, "r", encoding="utf-8") as f:
             payload = json.load(f)
         s = payload.get("settings", {})
@@ -140,64 +233,70 @@ def _load_cached_records(d, n_facts):
     return records
 
 
-def _covers(records, S_sweep, top_fraction_sweep, n_attempts):
-    """True if `records` already hold >= n_attempts runs for every (S, tf) wanted."""
+def _covers(records, S_sweep, n_attempts):
+    """True if `records` already hold >= n_attempts runs for every (S, top_n) wanted."""
     counts = defaultdict(int)
     for r in records:
-        counts[(r["S"], r["top_fraction"])] += 1
+        counts[(r["S"], r["top_n"])] += 1
     for S in S_sweep:
-        for tf in top_fraction_sweep:
-            if counts[(S, tf)] < n_attempts:
+        for tn in top_n_sweep_for(S):
+            if counts[(S, tn)] < n_attempts:
                 return False
     return True
 
 
-def _build_cells_for_n_facts(d, n_facts, n_attempts, top_fraction_sweep, S_sweep,
-                             seed_offset=0):
-    """Build the per-evaluation work units for one n_facts (see hc2_sweep._build_cells).
+def _build_cells_for_n_facts(d, n_facts, n_attempts, S_sweep, conn_by_S):
+    """Fan a grid out into ~TARGET_TASKS balanced units for Modal.
 
-    One cell per (S, top_fraction, attempt); each gets a unique conn_seed so its
-    connection matrix is generated independently.
-    """
+    A unit is one (S, attempt) plus a CHUNK of that S's top_n grid. Splitting the
+    top_n grid into chunks (rather than one big cell per (S, attempt)) keeps unit
+    durations uniform — high-S cells no longer run 15x longer than low-S ones — so
+    Modal can keep many more containers busy at once. All chunks of an (S, attempt)
+    use the same per-attempt column permutation (it is derived from tie_seed)."""
+    # Total (S, attempt, top_n) evaluations -> chunk size that hits ~TARGET_TASKS units.
+    total = sum(n_attempts * len(top_n_sweep_for(S)) for S in S_sweep)
+    chunk = max(1, round(total / TARGET_TASKS))
+
     cells = []
-    idx = seed_offset
     for S in S_sweep:
-        for top_fraction in top_fraction_sweep:
-            for attempt in range(n_attempts):
+        tns = top_n_sweep_for(S)
+        conn = conn_by_S[S]
+        for a in range(n_attempts):
+            for i in range(0, len(tns), chunk):
                 cells.append({
-                    "n_facts": n_facts,
+                    "conn": conn,
                     "S": S,
-                    "top_fraction": top_fraction,
-                    "attempt": attempt,
-                    "conn_seed": seed + 1 + idx,
-                    "d_ff": d,
-                    "seed": seed,
+                    "attempt": a,
+                    "n_facts": n_facts,
+                    "tie_seed": _tie_seed(S, a),
+                    "top_n_list": tns[i:i + chunk],
                     "input_vocab_size": 2 * d,
                     "output_vocab_size": d,
+                    "d_ff": d,
+                    "seed": seed,
                 })
-                idx += 1
     return cells
 
 
-def _save_records(d, n_facts, records, n_attempts, top_fraction_sweep, S_sweep):
-    """Write a grid result file in the schema hc2_sweep.py uses (one per n_facts)."""
+def _save_records(d, n_facts, records, n_attempts, S_sweep):
+    """Write a top_n grid result file (one per n_facts)."""
     os.makedirs(RESULTS_DIR, exist_ok=True)
     payload = {
         "settings": {
             "d": d,
             "n_facts": n_facts,
             "n_attempts": n_attempts,
-            "top_fraction_sweep": top_fraction_sweep,
             "S_sweep": S_sweep,
             "input_vocab_size": 2 * d,
             "output_vocab_size": d,
             "d_ff": d,
             "seed": seed,
             "metric": "best_guess_accuracy",
+            "search_mode": "top_n",
         },
         "results": records,
     }
-    out_path = os.path.join(RESULTS_DIR, f"hc2_sweep_d{d}_nfacts{n_facts}.json")
+    out_path = os.path.join(RESULTS_DIR, f"hc2_sweep_topn_d{d}_nfacts{n_facts}.json")
     base, ext = os.path.splitext(out_path)
     i = 1
     while os.path.exists(out_path):
@@ -210,128 +309,71 @@ def _save_records(d, n_facts, records, n_attempts, top_fraction_sweep, S_sweep):
 
 # ── Grid evaluation ───────────────────────────────────────────────────────────
 
-def _evaluate_n_facts(
-        d,
-        n_attempts,
-        n_facts,
-        top_fraction_sweep,
-        S_sweep,
-        accuracy_threshold = 1.0,
-        any_all_most = "any",
-        verbose = True,
-):
-    '''
-    Evaluate the model's performance for a given number of facts.
+def _evaluate_n_facts(d, n_attempts, n_facts, S_sweep, conn_by_S,
+                      accuracy_threshold=1.0, any_all_most="any", verbose=True):
+    """Decide whether n_facts is storable, by sweeping (S, top_n).
 
-    Args:
-        d (int): The dimensionality of the model.
-        n_attempts (int): The number of attempts to evaluate.
-        n_facts (int): The number of facts to evaluate.
-        top_fraction_sweep (list): List of top fraction values to sweep.
-        S_sweep (list): List of S values to sweep.
-        accuracy_threshold (float, optional): Accuracy threshold for evaluation. Defaults to 1.0.
-        any_all_most (str, optional): Evaluation mode ('any', 'all', 'most'). Defaults to "any".
-
-    Returns:
-        success (bool): Whether the evaluation was successful based on the accuracy threshold.
-        best_combination (tuple): The (top_fraction, S) combination that had the best accuracy.
-
-    Method:
-    1) Check if there is a file in hc2_sweep_results with the results
-    for this (d, n_attempts, n_facts, top_fraction_sweep, S_sweep)
-    combination. If so, load it, if not generate it, using functions from
-    hc2_sweep.py. Use modal.
-    2) Find if there any (top_fraction, S) combinations that have
-    accuracy >= accuracy_threshold.
-    2a) For any_all_most = "all", success=True if all runs for any
-    (top_fraction, S) combination have accuracy >= accuracy_threshold.
-    2b) For any_all_most = "any", success=True if any run for any
-    (top_fraction, S) combination has accuracy >= accuracy_threshold.
-    2c) For any_all_most = "most", success=True if most runs for any
-    (top_fraction, S) combination has accuracy >= accuracy_threshold.
-    3) Return success, and the (top_fraction, S) combination that had
-    the best accuracy.
-    '''
+    Returns (success, best_combination) where best_combination is the (top_n, S)
+    whose any/all/most score is highest. Uses the disk cache if a covering grid
+    already exists; otherwise runs the grid on Modal and saves it.
+    """
     if any_all_most not in ("any", "all", "most"):
         raise ValueError("any_all_most must be 'any', 'all', or 'most'")
 
-    # 1) Use cached results if the grid is already on disk; otherwise run it on Modal.
     records = _load_cached_records(d, n_facts)
-    if _covers(records, S_sweep, top_fraction_sweep, n_attempts):
+    if _covers(records, S_sweep, n_attempts):
         if verbose:
-            print(f"    n_facts={n_facts}: loaded grid from cache "
-                  f"({len(records)} records)")
+            print(f"    n_facts={n_facts}: loaded grid from cache ({len(records)} records)")
     else:
-        cells = _build_cells_for_n_facts(
-            d, n_facts, n_attempts, top_fraction_sweep, S_sweep)
+        cells = _build_cells_for_n_facts(d, n_facts, n_attempts, S_sweep, conn_by_S)
         if verbose:
-            print(f"    n_facts={n_facts}: running {len(cells)} evaluations on Modal ...")
-        records = list(_run_one.map(cells))
-        path = _save_records(d, n_facts, records, n_attempts,
-                             top_fraction_sweep, S_sweep)
+            print(f"    n_facts={n_facts}: running {len(cells)} cells on Modal ...")
+        nested = list(_run_one.map(cells))
+        records = [r for cell_records in nested for r in cell_records]
+        path = _save_records(d, n_facts, records, n_attempts, S_sweep)
         if verbose:
             print(f"    n_facts={n_facts}: wrote {len(records)} records to {path}")
 
-    # 2) Collect each (S, top_fraction) cell's runs, restricted to the wanted sweep.
-    wanted_S = set(S_sweep)
-    wanted_tf = set(top_fraction_sweep)
+    # Collect each (S, top_n) cell's runs, restricted to the wanted grid.
+    wanted = {(S, tn) for S in S_sweep for tn in top_n_sweep_for(S)}
     cells = defaultdict(list)
     for r in records:
-        if r["S"] in wanted_S and r["top_fraction"] in wanted_tf:
-            cells[(r["S"], r["top_fraction"])].append(r["best_guess_accuracy"])
+        key = (r["S"], r["top_n"])
+        if key in wanted:
+            cells[key].append(r["best_guess_accuracy"])
 
-    # Reduce each cell to one "score" matching the any/all/most rule, so that
-    #   success  <=>  best cell score >= accuracy_threshold.
-    #   any  -> a single run is enough        -> max  over runs
-    #   all  -> every run must pass           -> min  over runs
-    #   most -> a majority must pass          -> median over runs
-    if any_all_most == "any":
-        reduce_fn = np.max
-    elif any_all_most == "all":
-        reduce_fn = np.min
-    else:
-        reduce_fn = np.median
+    # Reduce each cell to one score matching the rule, so success <=> best >= threshold.
+    #   any -> max over runs ; all -> min over runs ; most -> median over runs
+    reduce_fn = {"any": np.max, "all": np.min, "most": np.median}[any_all_most]
 
     best_score = -1.0
     best_combination = None
-    for (S, tf), accs in cells.items():
+    for (S, tn), accs in cells.items():
         score = float(reduce_fn(accs))
         if score > best_score:
             best_score = score
-            best_combination = (tf, S)
+            best_combination = (tn, S)
 
-    # 3) Success iff the best cell's score clears the threshold.
     success = best_score >= accuracy_threshold
-    if verbose:
-        tf, S = best_combination
-        print(f"    n_facts={n_facts}: best {any_all_most} cell "
-              f"(top_fraction={tf}, S={S}) score={best_score:.4f} "
-              f"{'>=' if success else '<'} {accuracy_threshold}  "
+    if verbose and best_combination is not None:
+        tn, S = best_combination
+        print(f"    n_facts={n_facts}: best {any_all_most} cell (top_n={tn}, S={S}) "
+              f"score={best_score:.4f} {'>=' if success else '<'} {accuracy_threshold} "
               f"-> {'PASS' if success else 'fail'}")
-
     return success, best_combination
 
 
 # ── Binary search over n_facts ────────────────────────────────────────────────
 
-def find_max_facts(
-        d,
-        n_attempts,
-        top_fraction_sweep,
-        S_sweep,
-        precision=1,
-        accuracy_threshold=1.0,
-        any_all_most="any",
-        verbose=True,
-):
-    """Binary-search the maximum n_facts whose (top_fraction, S) grid passes.
+def find_max_facts(d, n_attempts, S_sweep, precision=1,
+                   accuracy_threshold=1.0, any_all_most="any", verbose=True):
+    """Binary-search the maximum storable n_facts. max_possible = (2*d)^2 = 4*d**2.
 
-    Inspired by find_max_facts in capacity_search.py. max_possible is the number
-    of distinct two-token inputs available: (2*d)^2 = 4*d**2.
-
-    Returns (best_n_facts, best_combination) where best_combination is the
-    (top_fraction, S) that scored best at best_n_facts (or None if nothing passed).
+    Returns (best_n_facts, best_combination) with best_combination = (top_n, S).
     """
+    # Build/cache the connection matrices for this d ONCE (one per S); reused everywhere.
+    conn_by_S = _ensure_conn(d, S_sweep, verbose=verbose)
+
     max_possible = 4 * d ** 2
     lo, hi = 1, max_possible
     best = 0
@@ -345,7 +387,7 @@ def find_max_facts(
         if verbose:
             print(f"Trying n_facts = {mid} ...")
         success, combo = _evaluate_n_facts(
-            d, n_attempts, mid, top_fraction_sweep, S_sweep,
+            d, n_attempts, mid, S_sweep, conn_by_S,
             accuracy_threshold=accuracy_threshold,
             any_all_most=any_all_most, verbose=verbose,
         )
@@ -353,18 +395,17 @@ def find_max_facts(
             best, best_combo = mid, combo
             lo = mid + 1
             if verbose:
-                print(f"✓  stored {mid} facts. Now searching: {lo} - {hi}\n")
+                print(f"OK  stored {mid} facts. Now searching: {lo} - {hi}\n")
         else:
             hi = mid - 1
             if verbose:
-                print(f"✗  failed at {mid} facts. Now searching: {lo} - {hi}\n")
+                print(f"X   failed at {mid} facts. Now searching: {lo} - {hi}\n")
 
-    # The loop never tests hi when it equals max_possible; check it explicitly.
-    if hi == max_possible:
+    if hi == max_possible:  # loop never tests the top end
         if verbose:
             print(f"Trying n_facts = {max_possible} (max possible) ...")
         success, combo = _evaluate_n_facts(
-            d, n_attempts, max_possible, top_fraction_sweep, S_sweep,
+            d, n_attempts, max_possible, S_sweep, conn_by_S,
             accuracy_threshold=accuracy_threshold,
             any_all_most=any_all_most, verbose=verbose,
         )
@@ -372,29 +413,33 @@ def find_max_facts(
             best, best_combo = max_possible, combo
 
     if verbose:
-        print(f"\nMax storable facts: {best}  (best top_fraction, S = {best_combo})")
+        print(f"\nMax storable facts: {best}  (best top_n, S = {best_combo})")
     return best, best_combo
 
 
-CAPACITY_RESULTS_PATH = os.path.join(RESULTS_DIR, "capacity_search_results.json")
+# ── Result logging + driver ───────────────────────────────────────────────────
+# Separate log from the old top_fraction runs (capacity_search_results.json) so
+# the two approaches' results never mix and nothing old is overwritten.
+CAPACITY_RESULTS_PATH = os.path.join(RESULTS_DIR, "capacity_search_results_topn.json")
 
 
-def _append_capacity_result(max_facts, best_combo):
-    """Append one JSON line summarising this run; never touches previous lines."""
+def _append_capacity_result(d, max_facts, best_combo, accuracy_threshold,
+                            any_all_most, n_attempts, precision, S_sweep):
+    """Append one JSON line summarising a run; never touches previous lines."""
     os.makedirs(RESULTS_DIR, exist_ok=True)
-    best_tf, best_S = (best_combo if best_combo is not None else (None, None))
+    best_top_n, best_S = (best_combo if best_combo is not None else (None, None))
     record = {
         "timestamp": datetime.now().isoformat(timespec="seconds"),
         "d": d,
         "max_facts": max_facts,
-        "best_top_fraction": best_tf,
+        "best_top_n": best_top_n,
         "best_S": best_S,
         "accuracy_threshold": accuracy_threshold,
         "any_all_most": any_all_most,
         "n_attempts": n_attempts,
         "precision": precision,
         "S_sweep": S_sweep,
-        "top_fraction_sweep": top_fraction_sweep,
+        "search_mode": "top_n",
     }
     with open(CAPACITY_RESULTS_PATH, "a", encoding="utf-8") as f:
         f.write(json.dumps(record) + "\n")
@@ -403,16 +448,27 @@ def _append_capacity_result(max_facts, best_combo):
 
 @app.local_entrypoint()
 def main():
-    best, best_combo = find_max_facts(
-        d=d,
-        n_attempts=n_attempts,
-        top_fraction_sweep=top_fraction_sweep,
-        S_sweep=S_sweep,
-        precision=precision,
-        accuracy_threshold=accuracy_threshold,
-        any_all_most=any_all_most,
-        verbose=True,
-    )
-    print(f"\nd={d}: max_facts={best}, best (top_fraction, S)={best_combo}")
-    path = _append_capacity_result(best, best_combo)
-    print(f"Appended result to {path}")
+    configs = CONFIGS
+    attempts = n_attempts
+    if testing:
+        # Cheap end-to-end validation: smallest d, few attempts, coarse precision.
+        configs = [dict(d=16, accuracy_threshold=1.0, any_all_most="any")]
+        attempts = 2
+
+    print(f"Running {len(configs)} capacity search config(s).")
+    for cfg in configs:
+        d = cfg["d"]
+        thr = cfg["accuracy_threshold"]
+        aam = cfg["any_all_most"]
+        S_sweep = S_sweep_for(d)
+        precision = 256 if testing else precision_for(d)
+
+        print(f"\n===== d={d}, accuracy_threshold={thr}, any_all_most={aam} =====")
+        best, combo = find_max_facts(
+            d, attempts, S_sweep, precision=precision,
+            accuracy_threshold=thr, any_all_most=aam, verbose=True,
+        )
+        print(f"d={d}: max_facts={best}, best (top_n, S)={combo}")
+        path = _append_capacity_result(
+            d, best, combo, thr, aam, attempts, precision, S_sweep)
+        print(f"Appended result to {path}")
