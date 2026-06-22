@@ -44,6 +44,9 @@ import modal
 seed = 42
 _HERE = os.path.dirname(os.path.abspath(__file__))
 RESULTS_DIR = os.path.join(_HERE, "hc2_sweep_results")
+# Top_n grid files live in their own subfolder; only the capacity_search_results_*
+# logs sit directly in RESULTS_DIR. See hc2_sweep_results/README.md.
+GRIDS_DIR = os.path.join(RESULTS_DIR, "topn_grids")
 CONN_CACHE_DIR = os.path.join(_HERE, "conn_cache")
 
 
@@ -82,8 +85,12 @@ def S_sweep_for(d):
 
 
 def precision_for(d):
-    """Binary-search stopping precision (stop when hi - lo < precision)."""
-    return 8 if d == 16 else 8 * 4 if d == 32 else 8 * 4 * 4 if d == 64 else 8 * 4 * 4 * 4
+    """Binary-search stopping precision (stop when hi - lo < precision).
+
+    d/2 matches the resolution the earlier top_fraction runs used, so the new
+    top_n numbers are directly comparable. The previous 8/32/128/512 formula was
+    too coarse for d>=64 and floored the small thr=1.0 capacities to 0."""
+    return d // 2
 
 
 def top_n_sweep_for(S):
@@ -218,7 +225,7 @@ def _ensure_conn(d, S_sweep, verbose=True):
 # ── Result caching (grid files: hc2_sweep_topn_d{d}_nfacts{nf}.json) ───────────
 
 def _grid_glob():
-    return os.path.join(RESULTS_DIR, "hc2_sweep_topn_d*_nfacts*.json")
+    return os.path.join(GRIDS_DIR, "hc2_sweep_topn_d*_nfacts*.json")
 
 
 def _load_cached_records(d, n_facts):
@@ -279,8 +286,8 @@ def _build_cells_for_n_facts(d, n_facts, n_attempts, S_sweep, conn_by_S):
 
 
 def _save_records(d, n_facts, records, n_attempts, S_sweep):
-    """Write a top_n grid result file (one per n_facts)."""
-    os.makedirs(RESULTS_DIR, exist_ok=True)
+    """Write a top_n grid result file (one per n_facts) into topn_grids/."""
+    os.makedirs(GRIDS_DIR, exist_ok=True)
     payload = {
         "settings": {
             "d": d,
@@ -296,7 +303,7 @@ def _save_records(d, n_facts, records, n_attempts, S_sweep):
         },
         "results": records,
     }
-    out_path = os.path.join(RESULTS_DIR, f"hc2_sweep_topn_d{d}_nfacts{n_facts}.json")
+    out_path = os.path.join(GRIDS_DIR, f"hc2_sweep_topn_d{d}_nfacts{n_facts}.json")
     base, ext = os.path.splitext(out_path)
     i = 1
     while os.path.exists(out_path):

@@ -104,12 +104,15 @@ def _run_one(args: dict) -> dict:
 
 
 RESULTS_DIR = os.path.join(_HERE, "hc2_sweep_results")
+# top_fraction grid files live in their own subfolder; capacity_search_results_*
+# logs sit directly in RESULTS_DIR. See hc2_sweep_results/README.md.
+GRIDS_DIR = os.path.join(RESULTS_DIR, "top_fraction_grids")
 
 
 def _load_cached_records(d, n_facts):
     """Pool every grid record for (d, n_facts) from the old-style grid files."""
     records = []
-    for path in sorted(glob.glob(os.path.join(RESULTS_DIR, "hc2_sweep_d*_nfacts*.json"))):
+    for path in sorted(glob.glob(os.path.join(GRIDS_DIR, "hc2_sweep_d*_nfacts*.json"))):
         with open(path, "r", encoding="utf-8") as f:
             payload = json.load(f)
         s = payload.get("settings", {})
@@ -154,8 +157,8 @@ def _build_cells_for_n_facts(d, n_facts, n_attempts, top_fraction_sweep, S_sweep
 
 
 def _save_records(d, n_facts, records, n_attempts, top_fraction_sweep, S_sweep):
-    """Write a grid result file in the schema hc2_sweep.py uses (one per n_facts)."""
-    os.makedirs(RESULTS_DIR, exist_ok=True)
+    """Write a grid result file (one per n_facts) into top_fraction_grids/."""
+    os.makedirs(GRIDS_DIR, exist_ok=True)
     payload = {
         "settings": {
             "d": d,
@@ -171,7 +174,7 @@ def _save_records(d, n_facts, records, n_attempts, top_fraction_sweep, S_sweep):
         },
         "results": records,
     }
-    out_path = os.path.join(RESULTS_DIR, f"hc2_sweep_d{d}_nfacts{n_facts}.json")
+    out_path = os.path.join(GRIDS_DIR, f"hc2_sweep_d{d}_nfacts{n_facts}.json")
     base, ext = os.path.splitext(out_path)
     i = 1
     while os.path.exists(out_path):

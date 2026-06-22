@@ -151,7 +151,9 @@ def _build_cells():
 
 @app.local_entrypoint()
 def main():
-    results_dir = os.path.join(_HERE, "hc2_sweep_results")
+    # Grid files live in the top_fraction_grids/ subfolder (see
+    # hc2_sweep_results/README.md); only capacity logs sit in the results root.
+    results_dir = os.path.join(_HERE, "hc2_sweep_results", "top_fraction_grids")
     os.makedirs(results_dir, exist_ok=True)
 
     cells = _build_cells()

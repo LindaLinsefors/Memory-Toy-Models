@@ -66,12 +66,13 @@ def _load_records(d, n_facts, results_dir=RESULTS_DIR, include_test=False):
     """
     records = []
     settings = None
-    # Match only grid files by name pattern (hc2_sweep_d{d}_nfacts{nf}.json and its
-    # _({i}) variants); optionally also the test_* ones. Any other .json in the
-    # folder (e.g. the JSONL capacity-search log) is ignored automatically.
-    paths = glob.glob(os.path.join(results_dir, "hc2_sweep_d*_nfacts*.json"))
+    # top_fraction grid files live in the top_fraction_grids/ subfolder (see
+    # hc2_sweep_results/README.md). Match the grid name pattern there; optionally
+    # also the test_* ones.
+    tf_dir = os.path.join(results_dir, "top_fraction_grids")
+    paths = glob.glob(os.path.join(tf_dir, "hc2_sweep_d*_nfacts*.json"))
     if include_test:
-        paths += glob.glob(os.path.join(results_dir, "test_hc2_sweep_d*_nfacts*.json"))
+        paths += glob.glob(os.path.join(tf_dir, "test_hc2_sweep_d*_nfacts*.json"))
     for path in sorted(paths):
         with open(path, "r", encoding="utf-8") as f:
             payload = json.load(f)
@@ -332,6 +333,11 @@ def plot_capacity_vs_d(path=None):
     capacity-search log (JSONL) via load_capacity_results. Points with max_facts<=0
     (e.g. a search that bottomed out) are dropped, since they can't appear on a log
     axis.
+
+    Also fits one power law (max_facts = C * d^k, i.e. a straight line in log-log
+    space) per accuracy_threshold, pooling the any/all/most points together, and
+    draws each fit in black with the threshold's line style. The fitted formula is
+    shown in the legend.
     """
     if path is None:
         path = os.path.join(RESULTS_DIR, "capacity_search_results.json")
@@ -339,11 +345,15 @@ def plot_capacity_vs_d(path=None):
     if not runs:
         raise FileNotFoundError(f"No capacity results found in {path}")
 
-    # color = any_all_most, style = accuracy_threshold.
+    # color = any_all_most, line+marker style = accuracy_threshold.
     aam_color = {"any": "tab:blue", "all": "tab:red", "most": "tab:green"}
-    styles = ["-", "--", ":", "-."]
+    aam_rank = {"any": 0, "most": 1, "all": 2}
+    # Explicit styles for the thresholds we care about; fall back for any others.
+    thr_style = {1.0: "-o", 0.9: "--x"}
+    fallback_styles = ["-o", "--x", ":s", "-.^"]
     thresholds = sorted({r.get("accuracy_threshold") for r in runs})
-    thr_style = {t: styles[i % len(styles)] for i, t in enumerate(thresholds)}
+    for i, t in enumerate(thresholds):
+        thr_style.setdefault(t, fallback_styles[i % len(fallback_styles)])
 
     # Group rows by (accuracy_threshold, any_all_most) -> {d: max_facts}.
     groups = defaultdict(dict)
@@ -352,21 +362,47 @@ def plot_capacity_vs_d(path=None):
 
     fig, ax = plt.subplots(figsize=(8, 6))
     all_ys = []
-    for (thr, aam) in sorted(groups, key=lambda k: (k[1], k[0])):
+    # Legend order: lower accuracy_threshold first, then any/most/all.
+    for (thr, aam) in sorted(groups, key=lambda k: (k[0], aam_rank.get(k[1], 99))):
         ds_mf = sorted(groups[(thr, aam)].items())
         xs = [d for d, mf in ds_mf if mf and mf > 0]
         ys = [mf for d, mf in ds_mf if mf and mf > 0]
         if not xs:
             continue
         all_ys.extend(ys)
-        ax.loglog(xs, ys, marker="o", markersize=5,
+        ax.loglog(xs, ys, thr_style[thr], markersize=5,
                   color=aam_color.get(aam, "tab:gray"),
-                  linestyle=thr_style[thr],
                   label=f"{aam}, acc>={thr}")
+
+    # Power-law fits (straight lines in log-log space), one per accuracy_threshold,
+    # pooling the any/all/most points. y = C * d^k.
+    thr_fit_ls = {1.0: "-", 0.9: "--"}
+    fallback_ls = ["-", "--", ":", "-."]
+    for i, t in enumerate(thresholds):
+        thr_fit_ls.setdefault(t, fallback_ls[i % len(fallback_ls)])
+
+    thr_points = defaultdict(list)
+    for (thr, aam), dmap in groups.items():
+        for dd, mf in dmap.items():
+            if mf and mf > 0:
+                thr_points[thr].append((dd, mf))
+
+    for thr in sorted(thr_points):
+        fx = np.array([d for d, _ in sorted(thr_points[thr])], dtype=float)
+        fy = np.array([mf for _, mf in sorted(thr_points[thr])], dtype=float)
+        if len(fx) < 2:
+            continue
+        k, b = np.polyfit(np.log(fx), np.log(fy), 1)
+        C = np.exp(b)
+        xline = np.array([fx.min(), fx.max()])
+        ax.loglog(xline, C * xline ** k, color="black", alpha=0.5,
+                  linestyle=thr_fit_ls[thr], linewidth=1.5,
+                  label=f"fit acc>={thr}: {C:.3g}·d^{k:.2f}")
 
     ax.set_xlabel("d (model size)")
     ax.set_ylabel("max_facts")
-    ax.set_title("Capacity vs d  (color = any/all/most, style = accuracy_threshold)")
+    ax.set_title("Capacity vs d  (color = any/all/most, style = accuracy_threshold; "
+                 "black = power-law fit)")
 
     # x ticks: the model sizes we sweep, as plain integers (no minor 10^x ticks).
     xticks = [16, 32, 64, 128, 256]
@@ -384,7 +420,7 @@ def plot_capacity_vs_d(path=None):
         ax.set_yticklabels([str(y) for y in yticks])
 
     ax.grid(True, which="both", ls="--", linewidth=0.5)
-    ax.legend(fontsize=8, ncol=2)
+    ax.legend(fontsize=8)
     fig.tight_layout()
     plt.show()
     return fig
@@ -412,4 +448,12 @@ for n_facts in [512, 1024, 2048, 4096, 8192]:
 plot_capacity_vs_d()
 # %%
 write_sorted_capacity_results()
+# %%
+
+_ = plot_capacity_vs_d(path=os.path.join(RESULTS_DIR, 
+                                         "capacity_search_results.json"))
+# %%
+_ = plot_capacity_vs_d(path=os.path.join(RESULTS_DIR, 
+                                         "capacity_search_results_topn.json"))
+
 # %%
