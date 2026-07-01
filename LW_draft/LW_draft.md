@@ -274,7 +274,11 @@ The plot below shows my data from binary search to find maximum number of fact a
 ### Optimal S is the square root of number of ReLU neurons
 To get the best version of my handcoded model, I do a hyperparameter sweep over $S$ and $top\_fraction$. From this I can extract the optimal $S$ for different model sizes by looking at $S$ from the winning ($S$, $top\_fraction$) pair.
 
-Doing so for the data from used in Figure 4, showed that $S\approx\sqrt{d}$. However, this does not tell me if $S$ depends on $n_{input\_vocab}$, $d_{MLP}$ or $n_{output\_vocab}$ since these all vary together in that experiment. 
+Doing so for the data from used in Figure 4, showed that $S\approx\sqrt{d}$. 
+
+![](best_S_vs_d.png)
+
+However, this does not tell me if $S$ depends on $n_{input\_vocab}$, $d_{MLP}$ or $n_{output\_vocab}$ since these all vary together in that experiment. 
 
 In the next experiment I did a binary search for max number of facts for every combination of the following parameters:
 
