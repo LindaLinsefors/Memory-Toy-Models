@@ -64,9 +64,9 @@ accuracy_threshold_list = [0.9, 1.0]
 any_most_all_list = ["any", "most", "all"]
 
 # Hyper parameters (the grid searched to decide whether an n_facts is storable).
-S_sweep = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+S_sweep = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
 top_frac_sweep = [0.00, 0.02, 0.04, 0.06, 0.08, 0.10, 0.12, 0.14, 0.16, 0.18, 
-                  0.20, 0.22, 0.24, 0.26, 0.28]
+                  0.20, 0.22, 0.24, 0.26, 0.28, 0.30, 0.32, 0.34, 0.36, 0.38]
 
 # Attempts per (S, top_fraction) cell; the reduction (any=max / most=median /
 # all=min) is taken over these. Matches the other capacity searches.
