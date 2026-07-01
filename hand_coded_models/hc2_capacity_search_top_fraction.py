@@ -31,6 +31,12 @@ d = 32
 accuracy_threshold = 0.9
 any_all_most = "all"
 
+# Use the positive-down-connection variant of HandCodedModel2 (see its
+# add_possitive_down_connections option). When True, sweep grids and the capacity
+# log are written to SEPARATE, _posdown-suffixed locations so they never mix with
+# the default runs.
+add_possitive_down_connections = True
+
 
 n_attempts = 11
 precision = 8 if d == 16 else 8 * 4 if d == 32 else 8 * 4 * 4 if d == 64 else 8 * 4 * 4 * 4
@@ -90,6 +96,7 @@ def _run_one(args: dict) -> dict:
         n_neurons_per_label=S,
         use_top_no_top_fraction="top_fraction",
         top_fraction=args["top_fraction"],
+        add_possitive_down_connections=args["add_possitive_down_connections"],
     )
     model = HandCodedModel2(settings, precomputed_conn=conn)
     _, best_guess_accuracy, _, _ = model.evaluate()
@@ -106,7 +113,10 @@ def _run_one(args: dict) -> dict:
 RESULTS_DIR = os.path.join(_HERE, "hc2_sweep_results")
 # top_fraction grid files live in their own subfolder; capacity_search_results_*
 # logs sit directly in RESULTS_DIR. See hc2_sweep_results/README.md.
-GRIDS_DIR = os.path.join(RESULTS_DIR, "top_fraction_grids")
+# The positive-down-connection variant gets its own _posdown-suffixed grid folder
+# and log so its results stay separate from the default model's.
+_variant = "_posdown" if add_possitive_down_connections else ""
+GRIDS_DIR = os.path.join(RESULTS_DIR, f"top_fraction_grids{_variant}")
 
 
 def _load_cached_records(d, n_facts):
@@ -151,6 +161,7 @@ def _build_cells_for_n_facts(d, n_facts, n_attempts, top_fraction_sweep, S_sweep
                     "seed": seed,
                     "input_vocab_size": 2 * d,
                     "output_vocab_size": d,
+                    "add_possitive_down_connections": add_possitive_down_connections,
                 })
                 idx += 1
     return cells
@@ -171,6 +182,7 @@ def _save_records(d, n_facts, records, n_attempts, top_fraction_sweep, S_sweep):
             "d_ff": d,
             "seed": seed,
             "metric": "best_guess_accuracy",
+            "add_possitive_down_connections": add_possitive_down_connections,
         },
         "results": records,
     }
@@ -281,7 +293,7 @@ def find_max_facts(d, n_attempts, top_fraction_sweep, S_sweep, precision=1,
     return best, best_combo
 
 
-CAPACITY_RESULTS_PATH = os.path.join(RESULTS_DIR, "capacity_search_results.json")
+CAPACITY_RESULTS_PATH = os.path.join(RESULTS_DIR, f"capacity_search_results{_variant}.json")
 
 
 def _append_capacity_result(max_facts, best_combo):
@@ -300,6 +312,7 @@ def _append_capacity_result(max_facts, best_combo):
         "precision": precision,
         "S_sweep": S_sweep,
         "top_fraction_sweep": top_fraction_sweep,
+        "add_possitive_down_connections": add_possitive_down_connections,
     }
     with open(CAPACITY_RESULTS_PATH, "a", encoding="utf-8") as f:
         f.write(json.dumps(record) + "\n")

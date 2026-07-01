@@ -299,6 +299,7 @@ class HandCodedModel2Settings:
         use_top_no_top_fraction: str = 'top_n',
         top_n: int = 0,
         top_fraction: float = 0.2,
+        add_possitive_down_connections = False
     ):
         self.seq_len = 2                   # each fact has exactly two input tokens (fixed)
         self.input_vocab_size = input_vocab_size
@@ -310,6 +311,7 @@ class HandCodedModel2Settings:
         self.use_top_no_top_fraction = use_top_no_top_fraction  # 'top_n' or 'top_fraction'
         self.top_n = top_n
         self.top_fraction = top_fraction
+        self.add_possitive_down_connections = add_possitive_down_connections
 
 
 class HandCodedModel2:
@@ -344,7 +346,7 @@ class HandCodedModel2:
         # generate_facts supports any n_facts; labels = arange(n_facts) % output_vocab_size
         self.facts = generate_facts(
             n_facts=settings.n_facts,
-            seq_len=2,
+            input_len=2,
             input_vocab_size=settings.input_vocab_size,
             output_vocab_size=settings.output_vocab_size,
             seed=settings.seed,
@@ -443,7 +445,10 @@ class HandCodedModel2:
         # If a guard neuron fires (wrong input for l): logit[l] ≤ -1  → correctly negative.
         # If NO guard neuron fires (input IS a fact for l): logit[l] = +1 → correctly positive.
         self.up_matrix   = mlp_up
-        self.down_matrix = -2.0 * conn.T                      # (n_labels, hidden_dim)
+        if settings.add_possitive_down_connections:
+            self.down_matrix = -2.0 * hidden_dim * conn.T + 1.0 * (1-conn.T)
+        else:
+            self.down_matrix = -2.0 * conn.T                      # (n_labels, hidden_dim)
         self.down_bias   = torch.ones(n_labels, device=device)
 
     def forward(self, x):

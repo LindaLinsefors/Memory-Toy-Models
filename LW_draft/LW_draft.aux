@@ -1,0 +1,35 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Why sequence memorisation}{1}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}The training data}{1}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Generating the training data}{1}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Model Architecture}{2}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Model variations}{2}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1}Attention}{2}{subsubsection.3.1.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces The full toy transformer model, with all the diffrent parts pressent.}}{3}{figure.caption.1}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:full}{{1}{3}{The full toy transformer model, with all the diffrent parts pressent}{figure.caption.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}MLP}{3}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Norms}{4}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}First experiment and result: What parts of the network matters?}{4}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Norms + No Recidual around MLP + No Bias + ReLU = Bad}{4}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}No Attention > Uniform Attention > Full Attention}{4}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}MLP}{5}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Norms}{5}{subsection.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Recidual Connection around the MLP}{5}{subsection.4.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Activation Function}{5}{subsection.4.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Challange / Benchmark for understanding}{5}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Model architecture}{5}{subsection.5.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces A simplified version of the toy model. The MLP is pressent but everything else (attention, nomrs, recidual connection around the MLP) is turned off.}}{6}{figure.caption.2}\protected@file@percent }
+\newlabel{fig:simple}{{2}{6}{A simplified version of the toy model. The MLP is pressent but everything else (attention, nomrs, recidual connection around the MLP) is turned off}{figure.caption.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Our attempt}{6}{subsection.5.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces This model is equivalent to the toy model configuration with settings Attn=None, FF=ON, Norm=OFF, Res=OFF, Bias=OFF, Act=ReLU.}}{7}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:hc}{{3}{7}{This model is equivalent to the toy model configuration with settings Attn=None, FF=ON, Norm=OFF, Res=OFF, Bias=OFF, Act=ReLU}{figure.caption.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.1}Assigning neurons to labels}{7}{subsubsection.5.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.2}Embedding weights}{7}{subsubsection.5.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Unembedding weights}{7}{subsection.5.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Maximum facts memorised per architectural configuration ($d_\text  {residual}=16$, $d_\text  {ff}=16$, CE loss). \textbf  {Attn} is the token-mixing mechanism: \emph  {None} (additive per-position embeddings), \emph  {Unif} (uniform/averaging attention, \texttt  {qk\_is\_one = True}), or \emph  {Full} (learned attention). The \emph  {Any} / \emph  {Majority} / \emph  {All} column groups apply the corresponding criterion (a fact count counts as learned if at least one / more than half / all of the $11$ attempts reach perfect accuracy); the four numbered columns within each group are independent repeats. Within each group the row-wise maximum is shown in \textbf  {bold} and values more than $20\%$ from the group's median are \fbox  {boxed} as outliers. For \texttt  {ff = False} rows the residual, bias and activation flags do not apply (N/A). Note that $1024$ is the dataset ceiling, so configurations reaching it have saturated the data rather than the model.}}{8}{table.caption.3}\protected@file@percent }
+\newlabel{tab:e5}{{1}{8}{Maximum facts memorised per architectural configuration ($d_\text {residual}=16$, $d_\text {ff}=16$, CE loss). \textbf {Attn} is the token-mixing mechanism: \emph {None} (additive per-position embeddings), \emph {Unif} (uniform/averaging attention, \texttt {qk\_is\_one = True}), or \emph {Full} (learned attention). The \emph {Any} / \emph {Majority} / \emph {All} column groups apply the corresponding criterion (a fact count counts as learned if at least one / more than half / all of the $11$ attempts reach perfect accuracy); the four numbered columns within each group are independent repeats. Within each group the row-wise maximum is shown in \textbf {bold} and values more than $20\%$ from the group's median are \fbox {boxed} as outliers. For \texttt {ff = False} rows the residual, bias and activation flags do not apply (N/A). Note that $1024$ is the dataset ceiling, so configurations reaching it have saturated the data rather than the model}{table.caption.3}{}}
+\gdef \@abspage@last{8}

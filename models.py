@@ -14,13 +14,13 @@ os.environ["WANDB_SILENT"] = "true"
 WANDB_PROJECT = "Memory Toy Models"
 
 class ModelSettings:
-    def __init__(self, seq_len=2, input_vocab_size=32, output_vocab_size=16, n_facts=64, seed=42,
+    def __init__(self, input_len=2, input_vocab_size=32, output_vocab_size=16, n_facts=64, seed=42,
                  d_residual=16, n_heads=1, d_ff=16,
                  attention=True, qk_is_one=False,
                  ff=True, bias=True, norms=True, ff_residual=True, ff_activation_type='GELU'):
         
         # Data dimensions
-        self.seq_len = seq_len
+        self.input_len = input_len
         self.input_vocab_size = input_vocab_size
         self.output_vocab_size = output_vocab_size
         self.n_facts = n_facts
@@ -49,27 +49,27 @@ ACTIVATION = {
 
 
 def generate_facts(n_facts: int, # of facts to generate,
-                   seq_len: int, # numer of input tokens per fact   
+                   input_len: int, # numer of input tokens per fact   
                    input_vocab_size: int, # of unique tokens in the vocabulary
                    output_vocab_size: int, # of unique targets
                    seed: int = 42
                   ) -> dict[str, torch.Tensor]:
     
-    if n_facts > input_vocab_size ** seq_len:
-        raise ValueError(f"Cannot generate {n_facts} unique facts with a vocabulary of size {input_vocab_size} and input length {seq_len}. Maximum unique facts: {input_vocab_size ** seq_len}")
+    if n_facts > input_vocab_size ** input_len:
+        raise ValueError(f"Cannot generate {n_facts} unique facts with a vocabulary of size {input_vocab_size} and input length {input_len}. Maximum unique facts: {input_vocab_size ** input_len}")
     
     device = torch.tensor(0).device  # respect default device
     generator = torch.Generator(device=device).manual_seed(seed)
 
     targets = torch.arange(n_facts) % output_vocab_size
 
-    if seq_len == 1:
+    if input_len == 1:
         inputs = torch.randperm(input_vocab_size, generator=generator)[:n_facts].unsqueeze(1)
-    elif seq_len == 2:
+    elif input_len == 2:
         all_possible_inputs = torch.cartesian_prod(torch.arange(input_vocab_size), torch.arange(input_vocab_size))
         inputs = all_possible_inputs[torch.randperm(all_possible_inputs.size(0), generator=generator)[:n_facts]]
     else:
-        inputs = torch.randint(0, input_vocab_size, (n_facts, seq_len), generator=generator)
+        inputs = torch.randint(0, input_vocab_size, (n_facts, input_len), generator=generator)
 
     sorted_indices = torch.argsort(targets)    
     return {"inputs": inputs[sorted_indices], "targets": targets[sorted_indices]}
@@ -86,7 +86,7 @@ class MemoryToyModel(nn.Module):
         if settings.attention:
             # Token and positional embeddings
             self.token_emb = nn.Embedding(settings.input_vocab_size, settings.d_residual)
-            self.pos_emb = nn.Embedding(settings.seq_len, settings.d_residual)
+            self.pos_emb = nn.Embedding(settings.input_len, settings.d_residual)
 
             # Single transformer layer
             self.attn = CausalSelfAttention(settings.d_residual, settings.n_heads, settings.qk_is_one)
@@ -94,7 +94,7 @@ class MemoryToyModel(nn.Module):
 
         else:
             self.token_emb = nn.ModuleList([nn.Embedding(settings.input_vocab_size, settings.d_residual) 
-                              for _ in range(settings.seq_len)])
+                              for _ in range(settings.input_len)])
 
         if settings.ff:
             self.ln2 = nn.RMSNorm(settings.d_residual) if settings.norms else nn.Identity()
@@ -109,7 +109,7 @@ class MemoryToyModel(nn.Module):
         self.head = nn.Linear(settings.d_residual, settings.output_vocab_size, bias=settings.bias)
 
         # Generate and store the facts as buffers so they are part of the model's state_dict
-        facts = generate_facts(settings.n_facts, settings.seq_len, 
+        facts = generate_facts(settings.n_facts, settings.input_len, 
                                     settings.input_vocab_size, settings.output_vocab_size, 
                                     settings.seed)
         self.register_buffer('fact_inputs', facts['inputs'])
@@ -123,7 +123,7 @@ class MemoryToyModel(nn.Module):
         settings = self.settings
 
         B, T = idx.shape
-        assert T == settings.seq_len, f"Sequence length is {T} but should be {settings.seq_len}"
+        assert T == settings.input_len, f"Sequence length is {T} but should be {settings.input_len}"
 
         # Embeddings and attention
         if settings.attention:

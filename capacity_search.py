@@ -99,7 +99,7 @@ def find_max_facts(settings: ModelSettings,
         The maximum n_facts for which the model achieved perfect accuracy
         (within the given precision).
     """
-    max_possible = settings.input_vocab_size ** settings.seq_len
+    max_possible = settings.input_vocab_size ** settings.input_len
     lo, hi = 1, max_possible
     best = 0  # highest n_facts confirmed learnable
 

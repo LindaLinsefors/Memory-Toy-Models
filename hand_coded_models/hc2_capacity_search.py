@@ -44,19 +44,28 @@ import modal
 seed = 42
 _HERE = os.path.dirname(os.path.abspath(__file__))
 RESULTS_DIR = os.path.join(_HERE, "hc2_sweep_results")
-# Top_n grid files live in their own subfolder; only the capacity_search_results_*
-# logs sit directly in RESULTS_DIR. See hc2_sweep_results/README.md.
-GRIDS_DIR = os.path.join(RESULTS_DIR, "topn_grids")
+
+# Setting: use the positive-down-connection variant of HandCodedModel2 (see its
+# add_possitive_down_connections option). When True, grids and the capacity log go
+# to SEPARATE _posdown-suffixed locations so they never mix with the default runs.
+add_possitive_down_connections = False # Does no do anything
+use_top_fraction = True
+
+# The search knob is either integer top_n or float top_fraction (set by
+# use_top_fraction above). Each mode writes to its own grid subfolder and capacity
+# log so the two never mix; KNOB is the per-record/settings field name for the knob.
+_mode_tag = "topfrac" if use_top_fraction else "topn"
+KNOB = "top_fraction" if use_top_fraction else "top_n"
+
+# Grid files live in their own subfolder; only the capacity_search_results_* logs
+# sit directly in RESULTS_DIR. See hc2_sweep_results/README.md.
+_variant = "_posdown" if add_possitive_down_connections else ""
+GRIDS_DIR = os.path.join(RESULTS_DIR, f"{_mode_tag}_grids{_variant}")
 CONN_CACHE_DIR = os.path.join(_HERE, "conn_cache")
 
 
 # ── Settings ──────────────────────────────────────────────────────────────────
 n_attempts = 11
-
-# Each n_facts grid is fanned out across ~this many Modal containers (the cap on
-# simultaneous containers). Cells are sized so the (S x attempt x top_n) work
-# splits into roughly this many balanced units.
-TARGET_TASKS = 1000
 
 # Each capacity search runs one (d, accuracy_threshold, any_all_most) config.
 # This list reproduces the 24-cell sweep you were doing by hand, now automated.
@@ -97,6 +106,17 @@ def top_n_sweep_for(S):
     """Integer top_n grid for a given S: 0 .. round(2.2*S) (covers observed optima)."""
     return list(range(0, round(2.2 * S) + 1))
 
+top_frac_sweep = [0.  , 0.02, 0.04, 0.06, 0.08, 0.1 , 0.12, 0.14, 0.16, 0.18,
+                  0.2 , 0.22, 0.24, 0.26, 0.28, 0.3 , 0.32, 0.34, 0.36, 0.38]
+
+
+def knob_sweep_for(S):
+    """The grid of suppression-strength values to sweep for a given S.
+
+    top_fraction mode: the fixed top_frac_sweep (same fractions for every S).
+    top_n mode: the per-S integer range top_n_sweep_for(S)."""
+    return top_frac_sweep if use_top_fraction else top_n_sweep_for(S)
+
 
 # All connection matrices use this fixed seed, so a given (d, S) maps to ONE matrix.
 MATRIX_SEED = seed
@@ -121,10 +141,23 @@ image = (
     .add_local_file(os.path.join(_HERE, "hc2.py"), "/root/hc2.py")
 )
 
+# Connection matrices live on a Modal Volume (one file per (d, S)), NOT in each task
+# input. Shipping the matrix inside every cell made input upload the bottleneck that
+# capped container fan-out; reading it from the Volume keeps inputs tiny.
+conn_volume = modal.Volume.from_name("hc2-conn-cache", create_if_missing=True)
+CONN_VOL_MOUNT = "/conn_cache"
 
-@app.function(image=image, timeout=86400, max_containers=TARGET_TASKS)
+
+def _conn_vol_name(D, S):
+    return f"d{D}_s{S}.npy"
+
+
+@app.function(image=image, timeout=86400, volumes={CONN_VOL_MOUNT: conn_volume})
 def _build_conn(arg):
-    """Build the ONE connection matrix for a (D, S). arg = (D, S). Returns (arg, matrix)."""
+    """Build the ONE connection matrix for a (D, S) and persist it to the Volume.
+
+    Idempotent: returns immediately if the file already exists. arg = (D, S)."""
+    import os
     import sys
     import warnings
     if "/root" not in sys.path:
@@ -132,30 +165,48 @@ def _build_conn(arg):
     from hc2 import make_connection_matrix
 
     D, S = arg
+    path = os.path.join(CONN_VOL_MOUNT, _conn_vol_name(D, S))
+    if os.path.exists(path):
+        return
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         m = make_connection_matrix(D=D, T=D, S=S, seed=MATRIX_SEED)
-    return (arg, m)
+    np.save(path, m)
+    conn_volume.commit()
 
 
-@app.function(image=image, timeout=86400, max_containers=TARGET_TASKS)
+@app.function(image=image, timeout=86400, volumes={CONN_VOL_MOUNT: conn_volume})
 def _run_one(cell):
-    """Evaluate one (S, attempt, n_facts) over its whole top_n grid, reusing the
-    precomputed connection matrix carried in the cell. Returns a list of records.
+    """Evaluate one (S, attempt, knob) for a given n_facts, loading the precomputed
+    connection matrix for (d, S) from the Volume. `knob` is an integer top_n or a
+    float top_fraction (selected by cell["use_top_fraction"]). Returns one record.
 
     Per-attempt variety comes from permuting the matrix's label columns (and from
     re-seeding the constructor's tie-breaking) — no matrix is rebuilt."""
+    import os
     import sys
     if "/root" not in sys.path:
         sys.path.insert(0, "/root")
     import torch
     from hc2 import HandCodedModel2, HandCodedModel2Settings
 
-    conn = cell["conn"]                 # np.ndarray (d_ff, n_labels), shared base matrix for this S
+    d = cell["d"]
     S = cell["S"]
+    # (d_ff, n_labels) base matrix for this (d, S), read from the Volume not the input.
+    # A warm container may hold a stale Volume view (matrices for a new d committed
+    # after it mounted); reload once and retry if the file isn't visible yet.
+    path = os.path.join(CONN_VOL_MOUNT, _conn_vol_name(d, S))
+    try:
+        conn = np.load(path)
+    except FileNotFoundError:
+        conn_volume.reload()
+        conn = np.load(path)
     attempt = cell["attempt"]
     n_facts = cell["n_facts"]
     tie_seed = cell["tie_seed"]
+    use_top_fraction = cell["use_top_fraction"]
+    knob_value = cell["knob_value"]
+    knob_index = cell["knob_index"]
 
     # Per-attempt randomness without rebuilding: permute the label COLUMNS (axis 1
     # = output labels) of the shared matrix, so which labels share neurons differs
@@ -164,72 +215,80 @@ def _run_one(cell):
     perm = np.random.default_rng(tie_seed).permutation(conn.shape[1])
     conn = conn[:, perm]
 
-    records = []
-    for top_n in cell["top_n_list"]:
-        # Reproducible random tie-breaking inside the constructor (varies per attempt).
-        torch.manual_seed(tie_seed + top_n)
-        settings = HandCodedModel2Settings(
-            input_vocab_size=cell["input_vocab_size"],
-            output_vocab_size=cell["output_vocab_size"],
-            n_facts=n_facts,
-            seed=cell["seed"],
-            d_ff=cell["d_ff"],
-            n_neurons_per_label=S,
-            use_top_no_top_fraction="top_n",
-            top_n=top_n,
-        )
-        model = HandCodedModel2(settings, precomputed_conn=conn)
-        _, best_guess_accuracy, _, _ = model.evaluate()
-        records.append({
-            "n_facts": n_facts,
-            "S": S,
-            "top_n": top_n,
-            "attempt": attempt,
-            "tie_seed": tie_seed,
-            "best_guess_accuracy": best_guess_accuracy,
-        })
-    return records
+    # Reproducible random tie-breaking inside the constructor (varies per attempt).
+    # Seed with the knob's grid index so top_n runs (index == top_n) reproduce exactly.
+    torch.manual_seed(tie_seed + knob_index)
+    if use_top_fraction:
+        mode, top_n_arg, top_fraction_arg = "top_fraction", 0, knob_value
+    else:
+        mode, top_n_arg, top_fraction_arg = "top_n", knob_value, 0.2
+    settings = HandCodedModel2Settings(
+        input_vocab_size=cell["input_vocab_size"],
+        output_vocab_size=cell["output_vocab_size"],
+        n_facts=n_facts,
+        seed=cell["seed"],
+        d_ff=cell["d_ff"],
+        n_neurons_per_label=S,
+        use_top_no_top_fraction=mode,
+        top_n=top_n_arg,
+        top_fraction=top_fraction_arg,
+        add_possitive_down_connections=cell["add_possitive_down_connections"],
+    )
+    model = HandCodedModel2(settings, precomputed_conn=conn)
+    _, best_guess_accuracy, _, _ = model.evaluate()
+    knob_key = "top_fraction" if use_top_fraction else "top_n"
+    return {
+        "n_facts": n_facts,
+        "S": S,
+        knob_key: knob_value,
+        "attempt": attempt,
+        "tie_seed": tie_seed,
+        "best_guess_accuracy": best_guess_accuracy,
+    }
 
 
-# ── Connection-matrix cache (driver-side disk + Modal build) ──────────────────
+# ── Connection-matrix cache (Modal Volume, seeded from legacy local conn_cache/) ──
 
 def _conn_path(D, S):
     return os.path.join(CONN_CACHE_DIR, f"d{D}_s{S}.npy")
 
 
-def _ensure_conn(d, S_sweep, verbose=True):
-    """Return {S: matrix} for all S (one matrix per (d, S)), building the missing
-    ones once on Modal and caching every matrix to disk under conn_cache/."""
-    os.makedirs(CONN_CACHE_DIR, exist_ok=True)
-    out = {}
-    to_build = []          # list of (d, S)
-    for S in S_sweep:
-        p = _conn_path(d, S)
-        if os.path.exists(p):
-            out[S] = np.load(p)
-        else:
-            to_build.append((d, S))
+def _ensure_conn(d, S_sweep, verbose=False):
+    """Ensure every (d, S) connection matrix exists on the Volume (one per S).
 
+    Any matrix already present in the legacy local conn_cache/ is uploaded (so prior
+    builds are reused, no recompute); the rest are built on Modal, which writes them
+    straight to the Volume. _build_conn is idempotent, so already-present matrices
+    are skipped cheaply. Reused across all n_facts/knob/attempt/config evaluations."""
+    # Reuse prior local builds by uploading them to the Volume (idempotent overwrite).
+    to_upload = [(p, _conn_vol_name(d, S)) for S in S_sweep
+                 if os.path.exists(p := _conn_path(d, S))]
+    if to_upload:
+        if verbose:
+            print(f"  Uploading {len(to_upload)} cached matrices for d={d} to the Volume ...")
+        with conn_volume.batch_upload(force=True) as batch:
+            for local_path, remote_name in to_upload:
+                batch.put_file(local_path, remote_name)
+
+    # Build any with no local copy; _build_conn writes them to the Volume directly.
+    to_build = [(d, S) for S in S_sweep if not os.path.exists(_conn_path(d, S))]
     if to_build:
         if verbose:
             print(f"  Building {len(to_build)} connection matrices on Modal "
-                  f"(d={d}, one per S); reused across all n_facts/top_n/attempts/configs ...")
-        for (D, S), m in _build_conn.map(to_build):
-            np.save(_conn_path(D, S), m)
-            out[S] = m
-    elif verbose:
-        print(f"  All {len(out)} connection matrices for d={d} loaded from cache.")
-    return out
+                  f"(d={d}, one per S); written to the Volume, reused everywhere ...")
+        list(_build_conn.map(to_build))
+    elif verbose and not to_upload:
+        print(f"  All connection matrices for d={d} already present.")
 
 
 # ── Result caching (grid files: hc2_sweep_topn_d{d}_nfacts{nf}.json) ───────────
 
 def _grid_glob():
-    return os.path.join(GRIDS_DIR, "hc2_sweep_topn_d*_nfacts*.json")
+    return os.path.join(GRIDS_DIR, f"hc2_sweep_{_mode_tag}_d*_nfacts*.json")
 
 
 def _load_cached_records(d, n_facts):
-    """Pool every top_n grid record for (d, n_facts) from disk."""
+    """Pool every grid record for (d, n_facts) from disk."""
     records = []
     for path in sorted(glob.glob(_grid_glob())):
         with open(path, "r", encoding="utf-8") as f:
@@ -241,52 +300,47 @@ def _load_cached_records(d, n_facts):
 
 
 def _covers(records, S_sweep, n_attempts):
-    """True if `records` already hold >= n_attempts runs for every (S, top_n) wanted."""
+    """True if `records` already hold >= n_attempts runs for every (S, knob) wanted."""
     counts = defaultdict(int)
     for r in records:
-        counts[(r["S"], r["top_n"])] += 1
+        counts[(r["S"], r[KNOB])] += 1
     for S in S_sweep:
-        for tn in top_n_sweep_for(S):
-            if counts[(S, tn)] < n_attempts:
+        for knob in knob_sweep_for(S):
+            if counts[(S, knob)] < n_attempts:
                 return False
     return True
 
 
-def _build_cells_for_n_facts(d, n_facts, n_attempts, S_sweep, conn_by_S):
-    """Fan a grid out into ~TARGET_TASKS balanced units for Modal.
+def _build_cells_for_n_facts(d, n_facts, n_attempts, S_sweep):
+    """One Modal task per (S, attempt, knob) evaluation (knob = top_n or top_fraction).
 
-    A unit is one (S, attempt) plus a CHUNK of that S's top_n grid. Splitting the
-    top_n grid into chunks (rather than one big cell per (S, attempt)) keeps unit
-    durations uniform — high-S cells no longer run 15x longer than low-S ones — so
-    Modal can keep many more containers busy at once. All chunks of an (S, attempt)
-    use the same per-attempt column permutation (it is derived from tie_seed)."""
-    # Total (S, attempt, top_n) evaluations -> chunk size that hits ~TARGET_TASKS units.
-    total = sum(n_attempts * len(top_n_sweep_for(S)) for S in S_sweep)
-    chunk = max(1, round(total / TARGET_TASKS))
-
+    Cells carry only (d, S) to locate the matrix on the Volume — never the matrix
+    itself — so each input stays tiny and Modal can fan out freely."""
     cells = []
     for S in S_sweep:
-        tns = top_n_sweep_for(S)
-        conn = conn_by_S[S]
         for a in range(n_attempts):
-            for i in range(0, len(tns), chunk):
+            tie_seed = _tie_seed(S, a)
+            for knob_index, knob_value in enumerate(knob_sweep_for(S)):
                 cells.append({
-                    "conn": conn,
+                    "d": d,
                     "S": S,
                     "attempt": a,
                     "n_facts": n_facts,
-                    "tie_seed": _tie_seed(S, a),
-                    "top_n_list": tns[i:i + chunk],
+                    "tie_seed": tie_seed,
+                    "use_top_fraction": use_top_fraction,
+                    "knob_value": knob_value,
+                    "knob_index": knob_index,
                     "input_vocab_size": 2 * d,
                     "output_vocab_size": d,
                     "d_ff": d,
                     "seed": seed,
+                    "add_possitive_down_connections": add_possitive_down_connections,
                 })
     return cells
 
 
 def _save_records(d, n_facts, records, n_attempts, S_sweep):
-    """Write a top_n grid result file (one per n_facts) into topn_grids/."""
+    """Write a grid result file (one per n_facts) into the mode's grid subfolder."""
     os.makedirs(GRIDS_DIR, exist_ok=True)
     payload = {
         "settings": {
@@ -299,11 +353,12 @@ def _save_records(d, n_facts, records, n_attempts, S_sweep):
             "d_ff": d,
             "seed": seed,
             "metric": "best_guess_accuracy",
-            "search_mode": "top_n",
+            "search_mode": KNOB,
+            "add_possitive_down_connections": add_possitive_down_connections,
         },
         "results": records,
     }
-    out_path = os.path.join(GRIDS_DIR, f"hc2_sweep_topn_d{d}_nfacts{n_facts}.json")
+    out_path = os.path.join(GRIDS_DIR, f"hc2_sweep_{_mode_tag}_d{d}_nfacts{n_facts}.json")
     base, ext = os.path.splitext(out_path)
     i = 1
     while os.path.exists(out_path):
@@ -316,13 +371,13 @@ def _save_records(d, n_facts, records, n_attempts, S_sweep):
 
 # ── Grid evaluation ───────────────────────────────────────────────────────────
 
-def _evaluate_n_facts(d, n_attempts, n_facts, S_sweep, conn_by_S,
-                      accuracy_threshold=1.0, any_all_most="any", verbose=True):
-    """Decide whether n_facts is storable, by sweeping (S, top_n).
+def _evaluate_n_facts(d, n_attempts, n_facts, S_sweep,
+                      accuracy_threshold=1.0, any_all_most="any", verbose=False):
+    """Decide whether n_facts is storable, by sweeping (S, knob).
 
-    Returns (success, best_combination) where best_combination is the (top_n, S)
-    whose any/all/most score is highest. Uses the disk cache if a covering grid
-    already exists; otherwise runs the grid on Modal and saves it.
+    Returns (success, best_combination) where best_combination is the (knob, S)
+    whose any/all/most score is highest (knob = top_n or top_fraction). Uses the
+    disk cache if a covering grid already exists; otherwise runs it on Modal and saves.
     """
     if any_all_most not in ("any", "all", "most"):
         raise ValueError("any_all_most must be 'any', 'all', or 'most'")
@@ -332,20 +387,19 @@ def _evaluate_n_facts(d, n_attempts, n_facts, S_sweep, conn_by_S,
         if verbose:
             print(f"    n_facts={n_facts}: loaded grid from cache ({len(records)} records)")
     else:
-        cells = _build_cells_for_n_facts(d, n_facts, n_attempts, S_sweep, conn_by_S)
+        cells = _build_cells_for_n_facts(d, n_facts, n_attempts, S_sweep)
         if verbose:
             print(f"    n_facts={n_facts}: running {len(cells)} cells on Modal ...")
-        nested = list(_run_one.map(cells))
-        records = [r for cell_records in nested for r in cell_records]
+        records = list(_run_one.map(cells))
         path = _save_records(d, n_facts, records, n_attempts, S_sweep)
         if verbose:
             print(f"    n_facts={n_facts}: wrote {len(records)} records to {path}")
 
-    # Collect each (S, top_n) cell's runs, restricted to the wanted grid.
-    wanted = {(S, tn) for S in S_sweep for tn in top_n_sweep_for(S)}
+    # Collect each (S, knob) cell's runs, restricted to the wanted grid.
+    wanted = {(S, knob) for S in S_sweep for knob in knob_sweep_for(S)}
     cells = defaultdict(list)
     for r in records:
-        key = (r["S"], r["top_n"])
+        key = (r["S"], r[KNOB])
         if key in wanted:
             cells[key].append(r["best_guess_accuracy"])
 
@@ -355,16 +409,16 @@ def _evaluate_n_facts(d, n_attempts, n_facts, S_sweep, conn_by_S,
 
     best_score = -1.0
     best_combination = None
-    for (S, tn), accs in cells.items():
+    for (S, knob), accs in cells.items():
         score = float(reduce_fn(accs))
         if score > best_score:
             best_score = score
-            best_combination = (tn, S)
+            best_combination = (knob, S)
 
     success = best_score >= accuracy_threshold
     if verbose and best_combination is not None:
-        tn, S = best_combination
-        print(f"    n_facts={n_facts}: best {any_all_most} cell (top_n={tn}, S={S}) "
+        knob, S = best_combination
+        print(f"    n_facts={n_facts}: best {any_all_most} cell ({KNOB}={knob}, S={S}) "
               f"score={best_score:.4f} {'>=' if success else '<'} {accuracy_threshold} "
               f"-> {'PASS' if success else 'fail'}")
     return success, best_combination
@@ -373,13 +427,15 @@ def _evaluate_n_facts(d, n_attempts, n_facts, S_sweep, conn_by_S,
 # ── Binary search over n_facts ────────────────────────────────────────────────
 
 def find_max_facts(d, n_attempts, S_sweep, precision=1,
-                   accuracy_threshold=1.0, any_all_most="any", verbose=True):
+                   accuracy_threshold=1.0, any_all_most="any", verbose=False):
     """Binary-search the maximum storable n_facts. max_possible = (2*d)^2 = 4*d**2.
 
-    Returns (best_n_facts, best_combination) with best_combination = (top_n, S).
+    Returns (best_n_facts, best_combination) with best_combination = (knob, S),
+    where knob is the winning top_n or top_fraction.
     """
-    # Build/cache the connection matrices for this d ONCE (one per S); reused everywhere.
-    conn_by_S = _ensure_conn(d, S_sweep, verbose=verbose)
+    # Ensure the connection matrices for this d are on the Volume ONCE (one per S);
+    # reused by every evaluation below without ever entering a task input.
+    _ensure_conn(d, S_sweep, verbose=verbose)
 
     max_possible = 4 * d ** 2
     lo, hi = 1, max_possible
@@ -394,7 +450,7 @@ def find_max_facts(d, n_attempts, S_sweep, precision=1,
         if verbose:
             print(f"Trying n_facts = {mid} ...")
         success, combo = _evaluate_n_facts(
-            d, n_attempts, mid, S_sweep, conn_by_S,
+            d, n_attempts, mid, S_sweep,
             accuracy_threshold=accuracy_threshold,
             any_all_most=any_all_most, verbose=verbose,
         )
@@ -412,7 +468,7 @@ def find_max_facts(d, n_attempts, S_sweep, precision=1,
         if verbose:
             print(f"Trying n_facts = {max_possible} (max possible) ...")
         success, combo = _evaluate_n_facts(
-            d, n_attempts, max_possible, S_sweep, conn_by_S,
+            d, n_attempts, max_possible, S_sweep,
             accuracy_threshold=accuracy_threshold,
             any_all_most=any_all_most, verbose=verbose,
         )
@@ -420,33 +476,35 @@ def find_max_facts(d, n_attempts, S_sweep, precision=1,
             best, best_combo = max_possible, combo
 
     if verbose:
-        print(f"\nMax storable facts: {best}  (best top_n, S = {best_combo})")
+        print(f"\nMax storable facts: {best}  (best {KNOB}, S = {best_combo})")
     return best, best_combo
 
 
 # ── Result logging + driver ───────────────────────────────────────────────────
 # Separate log from the old top_fraction runs (capacity_search_results.json) so
-# the two approaches' results never mix and nothing old is overwritten.
-CAPACITY_RESULTS_PATH = os.path.join(RESULTS_DIR, "capacity_search_results_topn.json")
+# the two approaches' results never mix and nothing old is overwritten. The
+# positive-down-connection variant adds a further _posdown suffix.
+CAPACITY_RESULTS_PATH = os.path.join(RESULTS_DIR, f"capacity_search_results_{_mode_tag}{_variant}.json")
 
 
 def _append_capacity_result(d, max_facts, best_combo, accuracy_threshold,
                             any_all_most, n_attempts, precision, S_sweep):
     """Append one JSON line summarising a run; never touches previous lines."""
     os.makedirs(RESULTS_DIR, exist_ok=True)
-    best_top_n, best_S = (best_combo if best_combo is not None else (None, None))
+    best_knob, best_S = (best_combo if best_combo is not None else (None, None))
     record = {
         "timestamp": datetime.now().isoformat(timespec="seconds"),
         "d": d,
         "max_facts": max_facts,
-        "best_top_n": best_top_n,
+        f"best_{KNOB}": best_knob,
         "best_S": best_S,
         "accuracy_threshold": accuracy_threshold,
         "any_all_most": any_all_most,
         "n_attempts": n_attempts,
         "precision": precision,
         "S_sweep": S_sweep,
-        "search_mode": "top_n",
+        "search_mode": KNOB,
+        "add_possitive_down_connections": add_possitive_down_connections,
     }
     with open(CAPACITY_RESULTS_PATH, "a", encoding="utf-8") as f:
         f.write(json.dumps(record) + "\n")
@@ -473,9 +531,9 @@ def main():
         print(f"\n===== d={d}, accuracy_threshold={thr}, any_all_most={aam} =====")
         best, combo = find_max_facts(
             d, attempts, S_sweep, precision=precision,
-            accuracy_threshold=thr, any_all_most=aam, verbose=True,
+            accuracy_threshold=thr, any_all_most=aam, verbose=False,
         )
-        print(f"d={d}: max_facts={best}, best (top_n, S)={combo}")
+        print(f"d={d}: max_facts={best}, best ({KNOB}, S)={combo}")
         path = _append_capacity_result(
             d, best, combo, thr, aam, attempts, precision, S_sweep)
         print(f"Appended result to {path}")

@@ -1,8 +1,8 @@
 \begin{tabular}{@{}cccccc|cccc|cccc|cccc@{}}
 \toprule
- &  &  &  &  &  & \multicolumn{4}{|c}{\textbf{Any of 11}} & \multicolumn{4}{|c}{\textbf{Majority of 11}} & \multicolumn{4}{|c}{\textbf{All of 11}} \\
+ &  &  &  &  &  & \multicolumn{4}{|c}{\textbf{Any of 11}} & \multicolumn{4}{|c}{\textbf{Most of 11}} & \multicolumn{4}{|c}{\textbf{All of 11}} \\
 \cmidrule(lr){7-10}\cmidrule(lr){11-14}\cmidrule(lr){15-18}
-\textbf{Attn} & \textbf{FF} & \textbf{Norm} & \textbf{Res} & \textbf{Bias} & \textbf{Act} & (1) & (2) & (3) & (4) & (1) & (2) & (3) & (4) & (1) & (2) & (3) & (4) \\
+\textbf{Attn} & \textbf{MLP} & \textbf{Norm} & \textbf{Res} & \textbf{Bias} & \textbf{Act} & (1) & (2) & (3) & (4) & (1) & (2) & (3) & (4) & (1) & (2) & (3) & (4) \\
 \midrule
 None & \cmark & \xmark & \xmark & \xmark & GELU & 776 & 760 & 784 & \textbf{896} & 688 & 672 & \textbf{704} & \textbf{704} & \textbf{640} & 560 & 600 & 560 \\
 None & \cmark & \xmark & \xmark & \xmark & ReLU & 664 & 688 & 736 & \textbf{816} & 568 & 568 & 504 & \textbf{576} & 416 & \fbox{184} & \fbox{\textbf{448}} & 288 \\

@@ -326,18 +326,30 @@ def write_sorted_capacity_results(path=None, out_path=None):
     return None
 
 
-def plot_capacity_vs_d(path=None):
-    """Log-log plot of max_facts vs d, one line per (accuracy_threshold, any_all_most).
+def _draw_capacity_vs_d(ax, path=None, aam_color=None, decorate=True,
+                        y_field="max_facts", y_log=True):
+    """Draw the hc2 capacity-vs-d plot onto a given Axes (no figure / no show).
 
     Color encodes any_all_most; line style encodes accuracy_threshold. Reads the
-    capacity-search log (JSONL) via load_capacity_results. Points with max_facts<=0
+    capacity-search log (JSONL) via load_capacity_results. Points with y_field<=0
     (e.g. a search that bottomed out) are dropped, since they can't appear on a log
     axis.
 
-    Also fits one power law (max_facts = C * d^k, i.e. a straight line in log-log
+    y_field selects which column to plot on the y axis: one of "max_facts" (default),
+    "best_top_n", "best_S" or "best_top_fraction".
+
+    y_log toggles the y-axis scale: log (default) or linear. The x axis is always
+    log. With a linear y axis the powers-of-two y ticks are dropped (matplotlib
+    auto-ticks instead) and the power-law fits render as curves rather than lines.
+
+    Also fits one power law (y_field = C * d^k, i.e. a straight line in log-log
     space) per accuracy_threshold, pooling the any/all/most points together, and
     draws each fit in black with the threshold's line style. The fitted formula is
     shown in the legend.
+
+    aam_color overrides the any/most/all colors. decorate=False skips the axis
+    labels/ticks/title/legend (so a caller can overlay several datasets and set
+    those once). Returns the list of plotted y_field values (for shared tick ranges).
     """
     if path is None:
         path = os.path.join(RESULTS_DIR, "capacity_search_results.json")
@@ -345,8 +357,13 @@ def plot_capacity_vs_d(path=None):
     if not runs:
         raise FileNotFoundError(f"No capacity results found in {path}")
 
+    # x is always log; y toggles between log and linear.
+    ax.set_xscale("log")
+    ax.set_yscale("log" if y_log else "linear")
+
     # color = any_all_most, line+marker style = accuracy_threshold.
-    aam_color = {"any": "tab:blue", "all": "tab:red", "most": "tab:green"}
+    if aam_color is None:
+        aam_color = {"any": "tab:blue", "all": "tab:red", "most": "tab:green"}
     aam_rank = {"any": 0, "most": 1, "all": 2}
     # Explicit styles for the thresholds we care about; fall back for any others.
     thr_style = {1.0: "-o", 0.9: "--x"}
@@ -355,24 +372,27 @@ def plot_capacity_vs_d(path=None):
     for i, t in enumerate(thresholds):
         thr_style.setdefault(t, fallback_styles[i % len(fallback_styles)])
 
-    # Group rows by (accuracy_threshold, any_all_most) -> {d: max_facts}.
+    # Group rows by (accuracy_threshold, any_all_most) -> {d: y_field}.
     groups = defaultdict(dict)
     for r in runs:
-        groups[(r["accuracy_threshold"], r["any_all_most"])][r["d"]] = r["max_facts"]
+        groups[(r["accuracy_threshold"], r["any_all_most"])][r["d"]] = r[y_field]
 
-    fig, ax = plt.subplots(figsize=(8, 6))
     all_ys = []
+    # On a log y axis, zeros (or negatives) can't be shown, so drop them; on a
+    # linear axis keep them (0 is a meaningful position there).
+    keep = (lambda mf: mf is not None and mf > 0) if y_log \
+        else (lambda mf: mf is not None)
     # Legend order: lower accuracy_threshold first, then any/most/all.
     for (thr, aam) in sorted(groups, key=lambda k: (k[0], aam_rank.get(k[1], 99))):
         ds_mf = sorted(groups[(thr, aam)].items())
-        xs = [d for d, mf in ds_mf if mf and mf > 0]
-        ys = [mf for d, mf in ds_mf if mf and mf > 0]
+        xs = [d for d, mf in ds_mf if keep(mf)]
+        ys = [mf for d, mf in ds_mf if keep(mf)]
         if not xs:
             continue
         all_ys.extend(ys)
-        ax.loglog(xs, ys, thr_style[thr], markersize=5,
-                  color=aam_color.get(aam, "tab:gray"),
-                  label=f"{aam}, acc>={thr}")
+        ax.plot(xs, ys, thr_style[thr], markersize=5,
+                color=aam_color.get(aam, "tab:gray"),
+                label=f"{aam}, acc>={thr}")
 
     # Power-law fits (straight lines in log-log space), one per accuracy_threshold,
     # pooling the any/all/most points. y = C * d^k.
@@ -394,33 +414,520 @@ def plot_capacity_vs_d(path=None):
             continue
         k, b = np.polyfit(np.log(fx), np.log(fy), 1)
         C = np.exp(b)
+        # Dense x so the power law renders as a smooth curve on a linear y axis
+        # (on a log y axis it is a straight line either way).
+        xline = np.geomspace(fx.min(), fx.max(), 100)
+        ax.plot(xline, C * xline ** k, color="black", alpha=0.5,
+                linestyle=thr_fit_ls[thr], linewidth=1.5,
+                label=f"fit acc>={thr}: {C:.3g}·d^{k:.2f}")
+
+    if decorate:
+        ax.set_xlabel("d (model size)")
+        ax.set_ylabel(y_field)
+        ax.set_title(f"{y_field} vs d  ({os.path.basename(path)})")
+
+        # x ticks: the model sizes we sweep, as plain integers (no minor 10^x ticks).
+        xticks = [16, 32, 64, 128, 256]
+        ax.set_xticks(xticks)
+        ax.set_xticks([], minor=True)
+        ax.set_xticklabels([str(x) for x in xticks])
+
+        # y ticks: powers of two spanning the plotted range (log axis only;
+        # for a linear axis matplotlib's auto-ticks are more sensible).
+        if y_log and all_ys:
+            lo = int(np.floor(np.log2(min(all_ys))))
+            hi = int(np.ceil(np.log2(max(all_ys))))
+            yticks = [2 ** n for n in range(lo, hi + 1)]
+            ax.set_yticks(yticks)
+            ax.set_yticks([], minor=True)
+            ax.set_yticklabels([str(y) for y in yticks])
+
+        ax.grid(True, which="both", ls="--", linewidth=0.5)
+        ax.legend(fontsize=8)
+
+    return all_ys
+
+
+def plot_capacity_vs_d(path=None, y_field="max_facts", y_log=True):
+    """Log-x plot of y_field vs d, one line per (accuracy_threshold, any_all_most).
+
+    y_field selects the y axis column: "max_facts" (default), "best_top_n", "best_S"
+    or "best_top_fraction". y_log toggles the y-axis between log (default) and linear.
+
+    Thin wrapper around _draw_capacity_vs_d: makes its own figure, shows it, and
+    returns it. See that helper for the full description of what is drawn.
+    """
+    fig, ax = plt.subplots(figsize=(8, 6))
+    _draw_capacity_vs_d(ax, path=path, y_field=y_field, y_log=y_log)
+    fig.tight_layout()
+    plt.show()
+    return fig
+
+
+def _find_e7_dir():
+    """Locate the E7/ experiment folder (sibling of hand_coded_models/).
+
+    Mirrors _find_results_dir: walk upward from this file and the cwd looking for a
+    directory named E7.
+    """
+    candidates = []
+    try:
+        here = os.path.dirname(os.path.abspath(__file__))
+    except NameError:
+        here = None
+    for start in [p for p in (here, os.getcwd()) if p]:
+        cur = start
+        while True:
+            candidates.append(os.path.join(cur, "E7"))
+            parent = os.path.dirname(cur)
+            if parent == cur:
+                break
+            cur = parent
+    for c in candidates:
+        if os.path.isdir(c):
+            return c
+    return candidates[0] if candidates else "E7"
+
+
+def _draw_e7(ax, experiment_dir=None, include=("simple", "full"), aam_color=None,
+             decorate=True):
+    """Draw the E7 max_facts-vs-d_residual plot onto a given Axes (no figure / show).
+
+    Mirrors E7/E7_plot.py: one colored line per log file (color = any/most/all,
+    style = model type), plus one black power-law fit per model-type group (pooling
+    any/most/all), with the fitted formula in the legend. `include` keeps only log
+    files whose name contains one of the listed model types (None = keep all).
+
+    aam_color overrides the any/most/all colors. decorate=False skips the axis
+    labels/ticks/title/legend (so a caller can overlay several datasets and set
+    those once). Returns the list of plotted max_facts (for shared tick ranges).
+    """
+    if experiment_dir is None:
+        experiment_dir = _find_e7_dir()
+
+    log_files = [f[:-6] for f in os.listdir(experiment_dir)
+                 if f.endswith(".jsonl") and f != "test_log.jsonl"
+                 and os.path.getsize(os.path.join(experiment_dir, f)) > 0]
+    if include is not None:
+        log_files = [f for f in log_files if any(g in f for g in include)]
+
+    # Colors match the hc2 capacity plot for any/most/all (unless overridden).
+    if aam_color is None:
+        aam_color = {"any": "tab:blue", "all": "tab:red", "most": "tab:green"}
+    colors = aam_color
+    styles = {"full": "-o", "simple": "--x", "nb": ":s"}
+    fit_styles = {"full": "-", "simple": "--", "nb": ":"}
+    group_order = {"simple": 0, "full": 1, "nb": 2}
+    category_order = {"any": 0, "most": 1, "all": 2}
+
+    def sort_key(name):
+        group = next((v for k, v in group_order.items() if k in name), 99)
+        category = next((v for k, v in category_order.items() if k in name), 99)
+        return (group, category, name)
+    log_files = sorted(log_files, key=sort_key)
+
+    group_points = defaultdict(list)
+    all_ys = []
+    for log_file in log_files:
+        # load_capacity_results is a generic JSONL reader (path + records list).
+        runs = load_capacity_results(os.path.join(experiment_dir, log_file + ".jsonl"))
+        ds = [run["settings"]["d_residual"] for run in runs]
+        max_facts = [run["max_facts"] for run in runs]
+
+        color = next((c for k, c in colors.items() if k in log_file), None)
+        style = next((s for k, s in styles.items() if k in log_file), "-o")
+        ax.loglog(ds, max_facts, style, color=color, label=log_file)
+
+        all_ys.extend([mf for mf in max_facts if mf and mf > 0])
+        group = next((g for g in group_order if g in log_file), None)
+        for d, mf in zip(ds, max_facts):
+            if mf and mf > 0:
+                group_points[group].append((d, mf))
+
+    # Power-law fits, one per model-type group (pooling any/most/all). y = C * d^k.
+    for group in sorted(group_points, key=lambda g: group_order.get(g, 99)):
+        pts = sorted(group_points[group])
+        if len(pts) < 2:
+            continue
+        fx = np.array([d for d, _ in pts], dtype=float)
+        fy = np.array([mf for _, mf in pts], dtype=float)
+        k, b = np.polyfit(np.log(fx), np.log(fy), 1)
+        C = np.exp(b)
         xline = np.array([fx.min(), fx.max()])
         ax.loglog(xline, C * xline ** k, color="black", alpha=0.5,
-                  linestyle=thr_fit_ls[thr], linewidth=1.5,
-                  label=f"fit acc>={thr}: {C:.3g}·d^{k:.2f}")
+                  linestyle=fit_styles.get(group, "-"), linewidth=1.5,
+                  label=f"fit {group}: {C:.3g}·d^{k:.2f}")
 
-    ax.set_xlabel("d (model size)")
+    if decorate:
+        ax.set_xlabel("d_residual")
+        ax.set_ylabel("max_facts")
+        ax.set_title("E7: max_facts vs d_residual  (color = any/most/all, "
+                     "style = model type; black = power-law fit)")
+
+        xticks = [16, 32, 64, 128]
+        ax.set_xticks(xticks)
+        ax.set_xticks([], minor=True)
+        ax.set_xticklabels([str(x) for x in xticks])
+        if all_ys:
+            lo = int(np.floor(np.log2(min(all_ys))))
+            hi = int(np.ceil(np.log2(max(all_ys))))
+            yticks = [2 ** n for n in range(lo, hi + 1)]
+            ax.set_yticks(yticks)
+            ax.set_yticks([], minor=True)
+            ax.set_yticklabels([str(y) for y in yticks])
+
+        ax.grid(True, which="both", ls="--", linewidth=0.5)
+        ax.legend(fontsize=8)
+
+    return all_ys
+
+
+def plot_capacity_vs_d_and_e7(path=None, e7_dir=None):
+    """Overlay the hc2 capacity plot and the E7 plot on a single Axes.
+
+    Both are max_facts vs model size (d / d_residual) on the same log-log axes. The
+    hc2 lines keep the standard tab colors; the E7 lines are recolored (for this
+    plot only) so the two datasets are distinguishable: red->orange, green->lime,
+    blue->skyblue. Ticks span the combined range of both datasets.
+    """
+    fig, ax = plt.subplots(figsize=(11, 7))
+    ys = _draw_capacity_vs_d(ax, path=path, decorate=False)
+
+    # Recolor E7 (for this plot only): any(blue)->skyblue, all(red)->orange,
+    # most(green)->lime.
+    e7_color = {"any": "skyblue", "all": "orange", "most": "lime"}
+    ys += _draw_e7(ax, experiment_dir=e7_dir, aam_color=e7_color, decorate=False)
+
+    ax.set_xlabel("d  /  d_residual  (model size)")
     ax.set_ylabel("max_facts")
-    ax.set_title("Capacity vs d  (color = any/all/most, style = accuracy_threshold; "
-                 "black = power-law fit)")
+    ax.set_title("Capacity vs model size: HandCodedModel2 (tab colors) "
+                 "+ E7 (orange/lime/skyblue)")
 
-    # x ticks: the model sizes we sweep, as plain integers (no minor 10^x ticks).
     xticks = [16, 32, 64, 128, 256]
     ax.set_xticks(xticks)
     ax.set_xticks([], minor=True)
     ax.set_xticklabels([str(x) for x in xticks])
-
-    # y ticks: powers of two spanning the plotted max_facts range.
-    if all_ys:
-        lo = int(np.floor(np.log2(min(all_ys))))
-        hi = int(np.ceil(np.log2(max(all_ys))))
+    if ys:
+        lo = int(np.floor(np.log2(min(ys))))
+        hi = int(np.ceil(np.log2(max(ys))))
         yticks = [2 ** n for n in range(lo, hi + 1)]
         ax.set_yticks(yticks)
         ax.set_yticks([], minor=True)
         ax.set_yticklabels([str(y) for y in yticks])
 
     ax.grid(True, which="both", ls="--", linewidth=0.5)
-    ax.legend(fontsize=8)
+    ax.legend(fontsize=7, loc="center left", bbox_to_anchor=(1.0, 0.5))
+    fig.tight_layout()
+    plt.show()
+    return fig
+
+
+def plot_decoupled_capacity_grids(accuracy_threshold, any_all_most,
+                                  input_vocab_sizes=(16, 32), path=None):
+    """2x2 heatmap grid from capacity_search_results_topfrac_decoupled.json.
+
+    Layout (for the default input_vocab_sizes=(16, 32)):
+        columns : input_vocab_size   (left = 16, right = 32)
+        top row    -> max_facts       (each square annotated with the max_facts number)
+        bottom row -> best_S          (each square annotated with the best_S number)
+
+    In every subplot the x-axis is d_ff and the y-axis is output_vocab_size. A row
+    that is generated by the decoupled capacity search has one record per
+    (input_vocab_size, output_vocab_size, d_ff, accuracy_threshold, any_all_most),
+    so accuracy_threshold and any_all_most must be given to pick a single value per
+    square. Color is scaled per row (shared across the columns) so the two
+    input_vocab_size panels in a row are directly comparable.
+    """
+    if path is None:
+        path = os.path.join(RESULTS_DIR, "capacity_search_results_topfrac_decoupled.json")
+    runs = load_capacity_results(path)
+    if not runs:
+        raise FileNotFoundError(f"No capacity results found in {path}")
+
+    # Keep only rows matching the requested success criterion and the wanted columns.
+    sel = [r for r in runs
+           if r.get("accuracy_threshold") == accuracy_threshold
+           and r.get("any_all_most") == any_all_most
+           and r.get("input_vocab_size") in input_vocab_sizes]
+    if not sel:
+        raise ValueError(
+            f"No rows for accuracy_threshold={accuracy_threshold}, "
+            f"any_all_most={any_all_most}, input_vocab_size in {input_vocab_sizes} "
+            f"(in {os.path.basename(path)})"
+        )
+
+    # Shared axes across all subplots: d_ff on x, output_vocab_size on y.
+    d_ff_values = sorted({r["d_ff"] for r in sel})
+    ov_values = sorted({r["output_vocab_size"] for r in sel})
+    d_idx = {d: j for j, d in enumerate(d_ff_values)}
+    o_idx = {o: i for i, o in enumerate(ov_values)}
+
+    def grid_for(iv, field):
+        """(output_vocab_size x d_ff) array of `field` for one input_vocab_size."""
+        arr = np.full((len(ov_values), len(d_ff_values)), np.nan)
+        for r in sel:
+            if r["input_vocab_size"] == iv:
+                arr[o_idx[r["output_vocab_size"]], d_idx[r["d_ff"]]] = r[field]
+        return arr
+
+    fields = ["max_facts", "best_S"]  # top row, bottom row
+    n_col = len(input_vocab_sizes)
+    fig, axes = plt.subplots(2, n_col, figsize=(3.4 * n_col + 1, 7), squeeze=False)
+
+    for row, field in enumerate(fields):
+        grids = [grid_for(iv, field) for iv in input_vocab_sizes]
+        # Shared color scale per row so the columns are comparable.
+        finite = np.concatenate([g[np.isfinite(g)].ravel() for g in grids]
+                                or [np.array([])])
+        vmin = float(finite.min()) if finite.size else 0.0
+        vmax = float(finite.max()) if finite.size else 1.0
+        for col, iv in enumerate(input_vocab_sizes):
+            ax = axes[row][col]
+            grid = grids[col]
+            im = ax.imshow(grid, origin="lower", aspect="auto", cmap="viridis",
+                           vmin=vmin, vmax=vmax)
+            ax.set_xticks(range(len(d_ff_values)))
+            ax.set_xticklabels(d_ff_values)
+            ax.set_yticks(range(len(ov_values)))
+            ax.set_yticklabels(ov_values)
+            ax.set_xlabel("d_ff")
+            ax.set_ylabel("output_vocab_size")
+            ax.set_title(f"{field}  |  input_vocab_size={iv}")
+
+            # Annotate each square with its number (blank where there is no data).
+            for i in range(len(ov_values)):
+                for j in range(len(d_ff_values)):
+                    v = grid[i, j]
+                    if np.isnan(v):
+                        continue
+                    frac = 0.0 if vmax == vmin else (v - vmin) / (vmax - vmin)
+                    ax.text(j, i, f"{int(round(v))}", ha="center", va="center",
+                            color="white" if frac < 0.5 else "black", fontsize=10)
+            fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+
+    fig.suptitle(
+        f"Decoupled capacity grids  |  accuracy_threshold={accuracy_threshold}, "
+        f"any_all_most={any_all_most}", fontsize=12)
+    fig.tight_layout(rect=[0, 0, 1, 0.96])
+    plt.show()
+    return fig
+
+
+def _scatter_best_S_vs(x_field, path=None, spread=0.012, reference=None,
+                       legend_between=None, ax=None):
+    """Log-log scatter of best_S vs `x_field` for every row in the decoupled log.
+
+    One point per record in capacity_search_results_topfrac_decoupled.json (all
+    input_vocab_size / output_vocab_size / accuracy_threshold / any_all_most rows
+    are shown together), with a least-squares power-law best fit.
+
+    x_field and best_S only take a handful of discrete values, so many rows land
+    on the exact same spot. To show how many, the rows sharing an (x, best_S) are
+    laid out in a neat horizontal row, centered on their true x and spaced by
+    `spread` (a step in log10 units, so partly-overlapping on the log x-axis). y
+    stays at the true best_S. Set spread=0 to stack them exactly.
+
+    reference: optional (func, label) drawing a hypothesis line y=func(x) in black.
+    The fit and the reference always use the raw (un-fanned) values.
+
+    legend_between: optional (y_low, y_high) placing the legend, left-aligned,
+    centered vertically in that y-band (data coords). Handy when a corner of the
+    plot is empty. None uses matplotlib's default best placement.
+
+    ax: draw onto this Axes instead of making a new figure (used by the 2x2 grid).
+    When ax is None a standalone figure is created and shown.
+    """
+    if path is None:
+        path = os.path.join(RESULTS_DIR, "capacity_search_results_topfrac_decoupled.json")
+    runs = load_capacity_results(path)
+    if not runs:
+        raise FileNotFoundError(f"No capacity results found in {path}")
+
+    x = np.array([r[x_field] for r in runs], dtype=float)
+    best_S = np.array([r["best_S"] for r in runs], dtype=float)
+    # Log-log axes can't show non-positive values; drop them (best_S can be 0/None).
+    ok = np.isfinite(x) & np.isfinite(best_S) & (x > 0) & (best_S > 0)
+    x, best_S = x[ok], best_S[ok]
+
+    math_x = x_field.replace("_", r"\_")  # LaTeX-safe name for the formula labels
+
+    own_fig = ax is None
+    fig, ax = (plt.subplots(figsize=(8, 6)) if own_fig else (ax.figure, ax))
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    # Fan out the rows that share an (x, best_S): line them up horizontally,
+    # centered on the true x, spaced evenly in log space so they partly overlap.
+    x_plot = x.copy()
+    groups = defaultdict(list)
+    for idx, key in enumerate(zip(x, best_S)):
+        groups[key].append(idx)
+    for (xv, _sy), idxs in groups.items():
+        n = len(idxs)
+        offsets = np.arange(n) - (n - 1) / 2.0  # symmetric: e.g. -1,0,1
+        for off, idx in zip(offsets, idxs):
+            x_plot[idx] = xv * 10.0 ** (off * spread)
+    ax.scatter(x_plot, best_S, s=25, alpha=0.5, edgecolor="none",
+               color="tab:blue", label=f"data ({len(x)} rows)")
+
+    xline = np.geomspace(x.min(), x.max(), 100)
+
+    # Optional hypothesis line.
+    if reference is not None:
+        ref_func, ref_label = reference
+        ax.plot(xline, ref_func(xline), color="black", lw=1.8, label=ref_label)
+
+    # Best-fit power law best_S = C * x^k (a straight line in log-log space).
+    k, b = np.polyfit(np.log(x), np.log(best_S), 1)
+    C = np.exp(b)
+    ax.plot(xline, C * xline ** k, color="tab:red", lw=1.8, linestyle="--",
+            label=fr"Best fit: $best\_S = {C:.3g}\cdot {math_x}^{{{k:.2f}}}$")
+
+    ax.set_xlabel(x_field)
+    ax.set_ylabel("best_S")
+    ax.set_title(f"best_S vs {x_field}  ({os.path.basename(path)}, {len(x)} points)")
+
+    # Integer ticks that match the swept values.
+    xticks = sorted({int(v) for v in np.unique(x)})
+    ax.set_xticks(xticks)
+    ax.set_xticks([], minor=True)
+    ax.set_xticklabels([str(v) for v in xticks])
+    yticks = sorted({int(v) for v in np.unique(best_S)})
+    ax.set_yticks(yticks)
+    ax.set_yticks([], minor=True)
+    ax.set_yticklabels([str(v) for v in yticks])
+
+    ax.grid(True, which="both", ls="--", linewidth=0.5)
+    if legend_between is not None:
+        y_low, y_high = legend_between
+        y_center = (y_low * y_high) ** 0.5  # geometric center (log y-axis)
+        ax.legend(loc="center left", framealpha=0.9,
+                  bbox_to_anchor=(x.min(), y_center), bbox_transform=ax.transData)
+    else:
+        ax.legend()
+    if own_fig:
+        fig.tight_layout()
+        plt.show()
+    return fig
+
+
+def plot_best_S_vs_d_ff(path=None, spread=0.012):
+    """best_S vs d_ff (log-log), with the best_S = sqrt(d_ff) hypothesis line and
+    a power-law best fit. See _scatter_best_S_vs for the layout details."""
+    return _scatter_best_S_vs(
+        "d_ff", path=path, spread=spread,
+        reference=(np.sqrt, r"Hypotesis: $best\_S = \sqrt{d\_ff}$"))
+
+
+def plot_best_S_vs_input_vocab(path=None, spread=0.0087, ax=None):
+    """best_S vs input_vocab_size (log-log), with a power-law best fit only (no
+    hypothesis line). See _scatter_best_S_vs for the layout details.
+
+    Default spread is tuned so the on-screen dot spacing matches
+    plot_best_S_vs_output_vocab (its narrower x-range needs a smaller spread)."""
+    return _scatter_best_S_vs("input_vocab_size", path=path, spread=spread,
+                              legend_between=(1, 2), ax=ax)
+
+
+def plot_best_S_vs_output_vocab(path=None, spread=0.012, ax=None):
+    """best_S vs output_vocab_size (log-log), with a power-law best fit only (no
+    hypothesis line). See _scatter_best_S_vs for the layout details."""
+    return _scatter_best_S_vs("output_vocab_size", path=path, spread=spread,
+                              legend_between=(1, 2), ax=ax)
+
+
+def _strip_best_S_by(x_field, path=None, order=None, spread=0.06, ax=None,
+                     xlabel=None):
+    """Strip plot of best_S grouped by a categorical `x_field`.
+
+    For a discrete x (e.g. accuracy_threshold with 2 values, or any_all_most with
+    3 categories) a fit is not meaningful, so this just shows the raw datapoints:
+    every row is plotted at its category's x-position, with no fitted/summary line.
+
+    As in the log-log scatters, rows sharing a (category, best_S) are fanned out
+    into a neat horizontal row (here linearly, since x is categorical) spaced by
+    `spread` so overlapping rows are visible. `order` fixes the category order on
+    the x-axis; default is sorted unique values.
+
+    xlabel overrides the x-axis label (pass "" to hide it; None uses x_field).
+    ax: draw onto this Axes instead of making a new figure (used by the 2x2 grid).
+    """
+    if path is None:
+        path = os.path.join(RESULTS_DIR, "capacity_search_results_topfrac_decoupled.json")
+    runs = load_capacity_results(path)
+    if not runs:
+        raise FileNotFoundError(f"No capacity results found in {path}")
+
+    # Keep rows with a usable best_S; category values may be numbers or strings.
+    rows = [(r[x_field], float(r["best_S"])) for r in runs
+            if r.get("best_S") is not None and np.isfinite(float(r["best_S"]))]
+    if not rows:
+        raise ValueError(f"No usable best_S rows for x_field={x_field}")
+
+    cats = order if order is not None else sorted({c for c, _ in rows})
+    pos = {c: i for i, c in enumerate(cats)}
+
+    own_fig = ax is None
+    fig, ax = (plt.subplots(figsize=(8, 6)) if own_fig else (ax.figure, ax))
+
+    # Fan out rows sharing a (category, best_S): line them up horizontally around
+    # the category's integer x-position, spaced linearly so they partly overlap.
+    by_cell = defaultdict(list)
+    for c, s in rows:
+        if c in pos:
+            by_cell[(c, s)].append(s)
+    for (c, s), vals in by_cell.items():
+        n = len(vals)
+        offsets = (np.arange(n) - (n - 1) / 2.0) * spread
+        ax.scatter(pos[c] + offsets, [s] * n, s=25, alpha=0.5,
+                   edgecolor="none", color="tab:blue")
+
+    ax.set_xticks(range(len(cats)))
+    ax.set_xticklabels([str(c) for c in cats])
+    ax.set_xlim(-0.5, len(cats) - 0.5)
+    ax.set_xlabel(x_field if xlabel is None else xlabel)
+    ax.set_ylabel("best_S")
+    ax.set_title(f"best_S vs {x_field}  ({os.path.basename(path)}, {len(rows)} points)")
+    ax.grid(True, axis="y", ls="--", linewidth=0.5)
+    if own_fig:
+        fig.tight_layout()
+        plt.show()
+    return fig
+
+
+def plot_best_S_vs_accuracy_threshold(path=None, spread=0.0197, ax=None):
+    """Strip plot of best_S grouped by accuracy_threshold (raw datapoints only).
+    See _strip_best_S_by for details. Default spread is tuned so the on-screen dot
+    spacing matches plot_best_S_vs_output_vocab."""
+    return _strip_best_S_by("accuracy_threshold", path=path, spread=spread, ax=ax)
+
+
+def plot_best_S_vs_any_all_most(path=None, spread=0.0296, ax=None):
+    """Strip plot of best_S grouped by any/most/all (raw datapoints only).
+    See _strip_best_S_by for details. Default spread is tuned so the on-screen dot
+    spacing matches plot_best_S_vs_output_vocab. The x-axis label is hidden (the
+    any/most/all tick labels already name the categories)."""
+    return _strip_best_S_by("any_all_most", path=path, spread=spread,
+                            order=["any", "most", "all"], ax=ax, xlabel="")
+
+
+def plot_best_S_grid(path=None):
+    """2x2 grid of the four best_S plots: input_vocab_size & output_vocab_size (top),
+    accuracy_threshold & any_all_most (bottom). Reuses each plot's own drawing via
+    its ax argument, so the panels match the standalone versions."""
+    fig, axes = plt.subplots(2, 2, figsize=(15, 11))
+    plot_best_S_vs_input_vocab(path=path, ax=axes[0][0])
+    plot_best_S_vs_output_vocab(path=path, ax=axes[0][1])
+    plot_best_S_vs_accuracy_threshold(path=path, ax=axes[1][0])
+    plot_best_S_vs_any_all_most(path=path, ax=axes[1][1])
+    for a in axes.ravel():  # drop the per-panel titles + enlarge text in the grid
+        a.set_title("")
+        a.xaxis.label.set_size(15)
+        a.yaxis.label.set_size(15)
+        a.tick_params(labelsize=13)
+        leg = a.get_legend()
+        if leg is not None:
+            for txt in leg.get_texts():
+                txt.set_fontsize(12)
     fig.tight_layout()
     plt.show()
     return fig
@@ -453,7 +960,49 @@ write_sorted_capacity_results()
 _ = plot_capacity_vs_d(path=os.path.join(RESULTS_DIR, 
                                          "capacity_search_results.json"))
 # %%
-_ = plot_capacity_vs_d(path=os.path.join(RESULTS_DIR, 
+_ = plot_capacity_vs_d(path=os.path.join(RESULTS_DIR,
                                          "capacity_search_results_topn.json"))
 
+# %%
+y_log = True
+_ = plot_capacity_vs_d(path=os.path.join(RESULTS_DIR,
+                                         "capacity_search_results_topn.json"),
+                       y_field="best_S", y_log = y_log)
+_ = plot_capacity_vs_d(path=os.path.join(RESULTS_DIR,
+                                         "capacity_search_results_topfrac.json"),
+                       y_field="best_S", y_log=y_log)
+
+# %%
+y_log = False
+_ = plot_capacity_vs_d(path=os.path.join(RESULTS_DIR,
+                                         "capacity_search_results_topn.json"),
+                       y_field="best_top_n", y_log=y_log)
+_ = plot_capacity_vs_d(path=os.path.join(RESULTS_DIR,
+                                         "capacity_search_results_topfrac.json"),
+                       y_field="best_top_fraction", y_log=y_log)
+# %%
+_ = plot_capacity_vs_d_and_e7()
+
+# %%
+_ = plot_decoupled_capacity_grids(accuracy_threshold=1.0, any_all_most="any")
+# %%
+_ = plot_best_S_vs_d_ff()
+# %%
+_ = plot_best_S_vs_input_vocab()
+_ = plot_best_S_vs_output_vocab()
+_ = plot_best_S_vs_accuracy_threshold()
+_ = plot_best_S_vs_any_all_most()
+# %%
+_ = plot_best_S_grid()
+# %%
+for accuracy_threshold in [0.9, 1.0]:
+    for any_all_most in ["any", "most", "all"]:
+        plot_decoupled_capacity_grids(accuracy_threshold, any_all_most)
+
+# %%
+_ = plot_best_S_vs_input_vocab()
+# %%
+_ = plot_best_S_vs_output_vocab()
+# %%
+_ = plot_best_S_grid()
 # %%

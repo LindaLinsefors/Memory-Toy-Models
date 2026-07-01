@@ -45,7 +45,7 @@ OUTLIER_FRAC = 0.20
 CM = r"\cmark"
 XM = r"\xmark"
 ATTLABEL = {"none": "None", "uni": "Unif", "full": "Full"}
-CRIT_LABEL = {"any": "Any of 11", "most": "Majority of 11", "all": "All of 11"}
+CRIT_LABEL = {"any": "Any of 11", "most": "Most of 11", "all": "All of 11"}
 ATT_ORDER = ["none", "uni", "full"]
 
 
@@ -165,7 +165,7 @@ def generate(col_values, groups):
     for _title, idxs, subs in groups:
         for i, s in zip(idxs, subs):
             sub_by_col[i] = s
-    header2 = [r"\textbf{Attn}", r"\textbf{FF}", r"\textbf{Norm}",
+    header2 = [r"\textbf{Attn}", r"\textbf{MLP}", r"\textbf{Norm}",
                r"\textbf{Res}", r"\textbf{Bias}", r"\textbf{Act}"] + sub_by_col
     lines.append(" & ".join(header2) + r" \\")
     lines.append(r"\midrule")
