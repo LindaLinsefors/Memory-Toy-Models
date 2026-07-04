@@ -1,0 +1,95 @@
+{
+  "settings": {
+    "d": 32,
+    "n_facts": 2368,
+    "n_attempts": 11,
+    "input_vocab_size": 64,
+    "output_vocab_size": 32,
+    "d_ff": 32,
+    "seed": 42,
+    "metric": "best_guess_accuracy",
+    "model": "FullyTrainedModel2",
+    "n_epochs": 5000,
+    "lr": 0.01,
+    "patience": 100
+  },
+  "results": [
+    {
+      "n_facts": 2368,
+      "attempt": 0,
+      "init_seed": 0,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 3046
+    },
+    {
+      "n_facts": 2368,
+      "attempt": 1,
+      "init_seed": 1,
+      "best_guess_accuracy": 0.9898648858070374,
+      "epochs_run": 2477
+    },
+    {
+      "n_facts": 2368,
+      "attempt": 2,
+      "init_seed": 2,
+      "best_guess_accuracy": 0.9594594836235046,
+      "epochs_run": 2296
+    },
+    {
+      "n_facts": 2368,
+      "attempt": 3,
+      "init_seed": 3,
+      "best_guess_accuracy": 0.9970439672470093,
+      "epochs_run": 3565
+    },
+    {
+      "n_facts": 2368,
+      "attempt": 4,
+      "init_seed": 4,
+      "best_guess_accuracy": 0.9940878748893738,
+      "epochs_run": 3050
+    },
+    {
+      "n_facts": 2368,
+      "attempt": 5,
+      "init_seed": 5,
+      "best_guess_accuracy": 0.9966216683387756,
+      "epochs_run": 3030
+    },
+    {
+      "n_facts": 2368,
+      "attempt": 6,
+      "init_seed": 6,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 2460
+    },
+    {
+      "n_facts": 2368,
+      "attempt": 7,
+      "init_seed": 7,
+      "best_guess_accuracy": 0.9970439672470093,
+      "epochs_run": 2908
+    },
+    {
+      "n_facts": 2368,
+      "attempt": 8,
+      "init_seed": 8,
+      "best_guess_accuracy": 0.9940878748893738,
+      "epochs_run": 2612
+    },
+    {
+      "n_facts": 2368,
+      "attempt": 9,
+      "init_seed": 9,
+      "best_guess_accuracy": 0.9949324727058411,
+      "epochs_run": 2304
+    },
+    {
+      "n_facts": 2368,
+      "attempt": 10,
+      "init_seed": 10,
+      "best_guess_accuracy": 0.9966216683387756,
+      "epochs_run": 2656
+    }
+  ]
+}

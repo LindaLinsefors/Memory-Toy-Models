@@ -1,0 +1,95 @@
+{
+  "settings": {
+    "d": 128,
+    "n_facts": 1728,
+    "n_attempts": 11,
+    "input_vocab_size": 256,
+    "output_vocab_size": 128,
+    "d_ff": 128,
+    "seed": 42,
+    "metric": "best_guess_accuracy",
+    "model": "RandomUpModel2",
+    "n_epochs": 5000,
+    "lr": 0.01,
+    "patience": 100
+  },
+  "results": [
+    {
+      "n_facts": 1728,
+      "attempt": 0,
+      "init_seed": 0,
+      "best_guess_accuracy": 0.9965277910232544,
+      "epochs_run": 2536
+    },
+    {
+      "n_facts": 1728,
+      "attempt": 1,
+      "init_seed": 1,
+      "best_guess_accuracy": 0.9965277910232544,
+      "epochs_run": 2677
+    },
+    {
+      "n_facts": 1728,
+      "attempt": 2,
+      "init_seed": 2,
+      "best_guess_accuracy": 0.9988425970077515,
+      "epochs_run": 2713
+    },
+    {
+      "n_facts": 1728,
+      "attempt": 3,
+      "init_seed": 3,
+      "best_guess_accuracy": 0.9982638955116272,
+      "epochs_run": 2757
+    },
+    {
+      "n_facts": 1728,
+      "attempt": 4,
+      "init_seed": 4,
+      "best_guess_accuracy": 0.9976851940155029,
+      "epochs_run": 2485
+    },
+    {
+      "n_facts": 1728,
+      "attempt": 5,
+      "init_seed": 5,
+      "best_guess_accuracy": 0.9971064925193787,
+      "epochs_run": 2619
+    },
+    {
+      "n_facts": 1728,
+      "attempt": 6,
+      "init_seed": 6,
+      "best_guess_accuracy": 0.9994212985038757,
+      "epochs_run": 2520
+    },
+    {
+      "n_facts": 1728,
+      "attempt": 7,
+      "init_seed": 7,
+      "best_guess_accuracy": 0.9965277910232544,
+      "epochs_run": 2638
+    },
+    {
+      "n_facts": 1728,
+      "attempt": 8,
+      "init_seed": 8,
+      "best_guess_accuracy": 0.9965277910232544,
+      "epochs_run": 2740
+    },
+    {
+      "n_facts": 1728,
+      "attempt": 9,
+      "init_seed": 9,
+      "best_guess_accuracy": 0.9982638955116272,
+      "epochs_run": 2675
+    },
+    {
+      "n_facts": 1728,
+      "attempt": 10,
+      "init_seed": 10,
+      "best_guess_accuracy": 0.9982638955116272,
+      "epochs_run": 2505
+    }
+  ]
+}

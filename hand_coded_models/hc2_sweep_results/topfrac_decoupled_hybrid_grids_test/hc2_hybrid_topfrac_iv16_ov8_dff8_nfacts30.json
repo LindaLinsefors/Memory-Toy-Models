@@ -1,0 +1,2930 @@
+{
+  "settings": {
+    "input_vocab_size": 16,
+    "output_vocab_size": 8,
+    "d_ff": 8,
+    "n_facts": 30,
+    "n_attempts": 2,
+    "S_sweep": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "top_frac_sweep": [
+      0.0,
+      0.02,
+      0.04,
+      0.06,
+      0.08,
+      0.1,
+      0.12,
+      0.14,
+      0.16,
+      0.18,
+      0.2,
+      0.22,
+      0.24,
+      0.26,
+      0.28,
+      0.3,
+      0.32,
+      0.34,
+      0.36,
+      0.38
+    ],
+    "seed": 42,
+    "metric": "best_guess_accuracy",
+    "search_mode": "top_fraction",
+    "model": "HybridModel2",
+    "n_epochs": 5000,
+    "lr": 0.01,
+    "patience": 100
+  },
+  "results": [
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.0,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 291
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.02,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 298
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.04,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 461
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.06,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 270
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.08,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 389
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.1,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 257
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.12,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 337
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.14,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 195
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.16,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.8666666746139526,
+      "epochs_run": 189
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.18,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 233
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.2,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.8666666746139526,
+      "epochs_run": 237
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.22,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 247
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.24,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 256
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.26,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 399
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.28,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 254
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.3,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 243
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.32,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 250
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.34,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 288
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.36,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 278
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.38,
+      "attempt": 0,
+      "tie_seed": 10000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 278
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.0,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 198
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.02,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.8333333134651184,
+      "epochs_run": 217
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.04,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 413
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.06,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 220
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.08,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 278
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.1,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 300
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.12,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 316
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.14,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 209
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.16,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 307
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.18,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 212
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.2,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.8333333134651184,
+      "epochs_run": 292
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.22,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 272
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.24,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 221
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.26,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 333
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.28,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.8666666746139526,
+      "epochs_run": 233
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.3,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 302
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.32,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 222
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.34,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 457
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.36,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 211
+    },
+    {
+      "n_facts": 30,
+      "S": 1,
+      "top_fraction": 0.38,
+      "attempt": 1,
+      "tie_seed": 10001,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 187
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.0,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 177
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.02,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 161
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.04,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 188
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.06,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 285
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.08,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 190
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.1,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 201
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.12,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 239
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.14,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 207
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.16,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 198
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.18,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 220
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.2,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 188
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.22,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 175
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.24,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 169
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.26,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 246
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.28,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 169
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.3,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 206
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.32,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 276
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.34,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 174
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.36,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 202
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.38,
+      "attempt": 0,
+      "tie_seed": 20000,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 255
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.0,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 167
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.02,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 293
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.04,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 172
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.06,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 297
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.08,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 222
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.1,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 158
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.12,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 188
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.14,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 199
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.16,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 241
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.18,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 119
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.2,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 130
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.22,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 297
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.24,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 260
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.26,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 205
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.28,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 240
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.3,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 151
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.32,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 184
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.34,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 229
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.36,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 0.8666666746139526,
+      "epochs_run": 193
+    },
+    {
+      "n_facts": 30,
+      "S": 2,
+      "top_fraction": 0.38,
+      "attempt": 1,
+      "tie_seed": 20001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 308
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.0,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 125
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.02,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 156
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.04,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 114
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.06,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 136
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.08,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 69
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.1,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 180
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.12,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 220
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.14,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 86
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.16,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.18,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 120
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.2,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 81
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.22,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 128
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.24,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 126
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.26,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 150
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.28,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 257
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.3,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 243
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.32,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 184
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.34,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 185
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.36,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 239
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.38,
+      "attempt": 0,
+      "tie_seed": 30000,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 105
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.0,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 291
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.02,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 340
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.04,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 247
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.06,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 255
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.08,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 226
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.1,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 179
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.12,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 216
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.14,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 93
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.16,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 297
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.18,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 149
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.2,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 188
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.22,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.24,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 160
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.26,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 189
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.28,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 180
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.3,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 205
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.32,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 375
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.34,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 184
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.36,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 265
+    },
+    {
+      "n_facts": 30,
+      "S": 3,
+      "top_fraction": 0.38,
+      "attempt": 1,
+      "tie_seed": 30001,
+      "best_guess_accuracy": 0.8666666746139526,
+      "epochs_run": 238
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.0,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 218
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.02,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 246
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.04,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 186
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.06,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 261
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.08,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 160
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.1,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 178
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.12,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 158
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.14,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 241
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.16,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.8666666746139526,
+      "epochs_run": 166
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.18,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 159
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.2,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.8666666746139526,
+      "epochs_run": 230
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.22,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.8333333134651184,
+      "epochs_run": 193
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.24,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.8333333134651184,
+      "epochs_run": 256
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.26,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 157
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.28,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.800000011920929,
+      "epochs_run": 167
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.3,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.7666666507720947,
+      "epochs_run": 156
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.32,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.800000011920929,
+      "epochs_run": 159
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.34,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.8333333134651184,
+      "epochs_run": 204
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.36,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.800000011920929,
+      "epochs_run": 166
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.38,
+      "attempt": 0,
+      "tie_seed": 40000,
+      "best_guess_accuracy": 0.8333333134651184,
+      "epochs_run": 276
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.0,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.8666666746139526,
+      "epochs_run": 208
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.02,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 194
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.04,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.8666666746139526,
+      "epochs_run": 240
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.06,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 155
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.08,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 262
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.1,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 307
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.12,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 218
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.14,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.8666666746139526,
+      "epochs_run": 220
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.16,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 206
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.18,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.8666666746139526,
+      "epochs_run": 155
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.2,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.8666666746139526,
+      "epochs_run": 211
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.22,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.9666666388511658,
+      "epochs_run": 179
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.24,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 267
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.26,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 268
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.28,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.8999999761581421,
+      "epochs_run": 174
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.3,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.800000011920929,
+      "epochs_run": 147
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.32,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.9333333373069763,
+      "epochs_run": 304
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.34,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.7666666507720947,
+      "epochs_run": 260
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.36,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.8666666746139526,
+      "epochs_run": 174
+    },
+    {
+      "n_facts": 30,
+      "S": 4,
+      "top_fraction": 0.38,
+      "attempt": 1,
+      "tie_seed": 40001,
+      "best_guess_accuracy": 0.8666666746139526,
+      "epochs_run": 248
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.0,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.7333333492279053,
+      "epochs_run": 275
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.02,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.7666666507720947,
+      "epochs_run": 178
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.04,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.699999988079071,
+      "epochs_run": 198
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.06,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.7666666507720947,
+      "epochs_run": 161
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.08,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.7666666507720947,
+      "epochs_run": 173
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.1,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.699999988079071,
+      "epochs_run": 255
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.12,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.7333333492279053,
+      "epochs_run": 168
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.14,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.7666666507720947,
+      "epochs_run": 246
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.16,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.7333333492279053,
+      "epochs_run": 186
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.18,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.6666666865348816,
+      "epochs_run": 162
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.2,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.7666666507720947,
+      "epochs_run": 245
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.22,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.7666666507720947,
+      "epochs_run": 159
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.24,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.699999988079071,
+      "epochs_run": 155
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.26,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.800000011920929,
+      "epochs_run": 164
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.28,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.7333333492279053,
+      "epochs_run": 231
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.3,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.6666666865348816,
+      "epochs_run": 139
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.32,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.6666666865348816,
+      "epochs_run": 152
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.34,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.7333333492279053,
+      "epochs_run": 375
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.36,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.6666666865348816,
+      "epochs_run": 146
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.38,
+      "attempt": 0,
+      "tie_seed": 50000,
+      "best_guess_accuracy": 0.699999988079071,
+      "epochs_run": 147
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.0,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.6666666865348816,
+      "epochs_run": 362
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.02,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.699999988079071,
+      "epochs_run": 255
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.04,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.6000000238418579,
+      "epochs_run": 157
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.06,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.699999988079071,
+      "epochs_run": 231
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.08,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.5333333611488342,
+      "epochs_run": 128
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.1,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.5333333611488342,
+      "epochs_run": 148
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.12,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.6333333253860474,
+      "epochs_run": 236
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.14,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.699999988079071,
+      "epochs_run": 241
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.16,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.6333333253860474,
+      "epochs_run": 271
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.18,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.6666666865348816,
+      "epochs_run": 207
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.2,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.699999988079071,
+      "epochs_run": 193
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.22,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.7333333492279053,
+      "epochs_run": 190
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.24,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.7333333492279053,
+      "epochs_run": 173
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.26,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.7666666507720947,
+      "epochs_run": 165
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.28,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.7666666507720947,
+      "epochs_run": 228
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.3,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.6666666865348816,
+      "epochs_run": 146
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.32,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.699999988079071,
+      "epochs_run": 212
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.34,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.800000011920929,
+      "epochs_run": 252
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.36,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.7333333492279053,
+      "epochs_run": 155
+    },
+    {
+      "n_facts": 30,
+      "S": 5,
+      "top_fraction": 0.38,
+      "attempt": 1,
+      "tie_seed": 50001,
+      "best_guess_accuracy": 0.800000011920929,
+      "epochs_run": 258
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.0,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.5,
+      "epochs_run": 229
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.02,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.5,
+      "epochs_run": 250
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.04,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.46666666865348816,
+      "epochs_run": 239
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.06,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.46666666865348816,
+      "epochs_run": 199
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.08,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.46666666865348816,
+      "epochs_run": 135
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.1,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.5,
+      "epochs_run": 206
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.12,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.5,
+      "epochs_run": 178
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.14,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.4333333373069763,
+      "epochs_run": 214
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.16,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.5,
+      "epochs_run": 140
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.18,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.5666666626930237,
+      "epochs_run": 211
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.2,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.46666666865348816,
+      "epochs_run": 193
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.22,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.5666666626930237,
+      "epochs_run": 197
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.24,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.6000000238418579,
+      "epochs_run": 206
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.26,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.5333333611488342,
+      "epochs_run": 190
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.28,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.5333333611488342,
+      "epochs_run": 180
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.3,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.6000000238418579,
+      "epochs_run": 194
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.32,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.5333333611488342,
+      "epochs_run": 138
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.34,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.5333333611488342,
+      "epochs_run": 123
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.36,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.5666666626930237,
+      "epochs_run": 143
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.38,
+      "attempt": 0,
+      "tie_seed": 60000,
+      "best_guess_accuracy": 0.6000000238418579,
+      "epochs_run": 197
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.0,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.6000000238418579,
+      "epochs_run": 226
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.02,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.6666666865348816,
+      "epochs_run": 235
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.04,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.5666666626930237,
+      "epochs_run": 185
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.06,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.5666666626930237,
+      "epochs_run": 127
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.08,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.46666666865348816,
+      "epochs_run": 143
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.1,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.5333333611488342,
+      "epochs_run": 204
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.12,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.6666666865348816,
+      "epochs_run": 240
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.14,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.5333333611488342,
+      "epochs_run": 220
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.16,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.5666666626930237,
+      "epochs_run": 224
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.18,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.46666666865348816,
+      "epochs_run": 128
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.2,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.6000000238418579,
+      "epochs_run": 208
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.22,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.6000000238418579,
+      "epochs_run": 183
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.24,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.6333333253860474,
+      "epochs_run": 218
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.26,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.46666666865348816,
+      "epochs_run": 135
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.28,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.5333333611488342,
+      "epochs_run": 205
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.3,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.5666666626930237,
+      "epochs_run": 191
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.32,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.5333333611488342,
+      "epochs_run": 156
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.34,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.6333333253860474,
+      "epochs_run": 128
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.36,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.6333333253860474,
+      "epochs_run": 212
+    },
+    {
+      "n_facts": 30,
+      "S": 6,
+      "top_fraction": 0.38,
+      "attempt": 1,
+      "tie_seed": 60001,
+      "best_guess_accuracy": 0.5333333611488342,
+      "epochs_run": 162
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.0,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.36666667461395264,
+      "epochs_run": 144
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.02,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.36666667461395264,
+      "epochs_run": 127
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.04,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.3333333432674408,
+      "epochs_run": 148
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.06,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.3333333432674408,
+      "epochs_run": 136
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.08,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.3333333432674408,
+      "epochs_run": 133
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.1,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.3333333432674408,
+      "epochs_run": 143
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.12,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.36666667461395264,
+      "epochs_run": 145
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.14,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.3333333432674408,
+      "epochs_run": 136
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.16,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.4333333373069763,
+      "epochs_run": 147
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.18,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.36666667461395264,
+      "epochs_run": 136
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.2,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.5,
+      "epochs_run": 174
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.22,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.36666667461395264,
+      "epochs_run": 144
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.24,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.4333333373069763,
+      "epochs_run": 147
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.26,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.4333333373069763,
+      "epochs_run": 144
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.28,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.5333333611488342,
+      "epochs_run": 132
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.3,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.46666666865348816,
+      "epochs_run": 158
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.32,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.4333333373069763,
+      "epochs_run": 159
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.34,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.4333333373069763,
+      "epochs_run": 171
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.36,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.46666666865348816,
+      "epochs_run": 167
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.38,
+      "attempt": 0,
+      "tie_seed": 70000,
+      "best_guess_accuracy": 0.46666666865348816,
+      "epochs_run": 131
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.0,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.36666667461395264,
+      "epochs_run": 129
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.02,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.30000001192092896,
+      "epochs_run": 140
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.04,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.3333333432674408,
+      "epochs_run": 128
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.06,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.3333333432674408,
+      "epochs_run": 139
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.08,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.3333333432674408,
+      "epochs_run": 129
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.1,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.3333333432674408,
+      "epochs_run": 129
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.12,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.36666667461395264,
+      "epochs_run": 139
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.14,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.3333333432674408,
+      "epochs_run": 149
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.16,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.36666667461395264,
+      "epochs_run": 135
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.18,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.36666667461395264,
+      "epochs_run": 149
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.2,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.4000000059604645,
+      "epochs_run": 151
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.22,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.4333333373069763,
+      "epochs_run": 121
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.24,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.46666666865348816,
+      "epochs_run": 180
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.26,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.46666666865348816,
+      "epochs_run": 133
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.28,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.5,
+      "epochs_run": 137
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.3,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.46666666865348816,
+      "epochs_run": 137
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.32,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.4333333373069763,
+      "epochs_run": 130
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.34,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.46666666865348816,
+      "epochs_run": 124
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.36,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.46666666865348816,
+      "epochs_run": 145
+    },
+    {
+      "n_facts": 30,
+      "S": 7,
+      "top_fraction": 0.38,
+      "attempt": 1,
+      "tie_seed": 70001,
+      "best_guess_accuracy": 0.4333333373069763,
+      "epochs_run": 130
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.0,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 114
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.02,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.04,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.06,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.08,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.1,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.12,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.14,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.16,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.18,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 123
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.2,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.22,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.24,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 112
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.26,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.28,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.3,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.32,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.34,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.36,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.38,
+      "attempt": 0,
+      "tie_seed": 80000,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.0,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.02,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.04,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.06,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.08,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.1,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.12,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.14,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.16,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 123
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.18,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.2,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.22,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 112
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.24,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.26,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.28,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.3,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.32,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.34,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.36,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 101
+    },
+    {
+      "n_facts": 30,
+      "S": 8,
+      "top_fraction": 0.38,
+      "attempt": 1,
+      "tie_seed": 80001,
+      "best_guess_accuracy": 0.13333334028720856,
+      "epochs_run": 124
+    }
+  ]
+}

@@ -11,7 +11,31 @@ The goal of mech-interp is to be able to take a model (possibly together with it
 
 In this post, I study sequence memorization as a toy model for any factual lookup where some combination of multiple tokens carries a meaning that is substantially different from any linear combination of the individual tokens. 
 
-# The training data
+# Outline
+- **Traning data** \
+What is the task we are getting these models to perform
+
+- **Model arcitectures** \
+[section summary]
+
+- **Experimental Results 1: Which parts of the network matters** \
+[section summary]
+
+- **Experimental Results 2: Scaling** \
+[section summary]
+
+- **Challenge / Benchmark for understanding** \
+[section summary]
+
+- **My attempt**\
+My own attempt to solve the above challange. 
+
+- **Experimental Results 3: Comparing trained, hand-coded and hybrid models**\
+[section summary]
+
+
+
+# Training data
 
 The training data are sequences of three tokens, two input tokens and one output token. Given an input of two tokens, the network is trained to predict the next token (i.e. the output token).
 
@@ -70,7 +94,7 @@ def generate_facts(n_facts: int, # of facts to generate,
     return {"inputs": inputs[sorted_indices], "targets": targets[sorted_indices]}
 ```
 
-# Model Architecture
+# Model architectures
 
 The full toy model is a small one layer transformer. In addition to training the full model, I also try turning off various parts in various combination, to see what parts of the model is important for the sequence memorization task.
 
@@ -121,7 +145,7 @@ The norms can also be turned on and off. Each of the norms for the readin to the
 
 *Figure 2: A simplified version of the toy model. The MLP is present but everything else (attention, norms, residual connection around the MLP) is turned off.*
 
-# First experiment and result: What parts of the network matters?
+# Experimental Results 1: Which parts of the network matters
 
 I trained all different versions of the toy model, to see how many facts each of them could learn. There are some patterns, but unfortunately for most of them, I can't separate what is due to expressibility of the model and what is due to learnability.
 
@@ -189,7 +213,12 @@ GELU is typically better than ReLU. The difference is typically small -0.2% to +
 Again the exception is Norm + No Residual around the MLP + No Bias, where switching from ReLU to GELU boosts the number of learnable facts with 58% - 79%.
 
 
+# Experimental result 2: Scaling
+How do the number of learnable facts grow with model size? To find this out, I picked two of the very many model architecute varieties and sclade them up. Specifically the modeld achitectures shown in Figure 1 and Figure 2.
 
+![](scaling_only_trained.png)
+
+*Figure 3*
 
 
 # Challenge / Benchmark for understanding
@@ -213,7 +242,7 @@ I can simplify it further down to this:
 
 ![This model is equivalent to the toy model configuration with settings Attn=None, FF=ON, Norm=OFF, Res=OFF, Bias=OFF, Act=ReLU.](Memory%20Toy%20Model%20-%20Hand%20Coded.png)
 
-*Figure 3: This model architecture is equivalent to the toy model configuration with settings Attn=None, MLP=✅, Norm=❌, Res=❌, Bias=❌, Act=ReLU.*
+*Figure 4: This model architecture is equivalent to the toy model configuration with settings Attn=None, MLP=✅, Norm=❌, Res=❌, Bias=❌, Act=ReLU.*
 
 If you want to give the challenge a go, feel free to use this architecture, or any other that you find easier to work with. The final goal is to be able to write down functional weights for the full transformer model, but I think it's ok to start with a simpler case.
 
@@ -224,6 +253,7 @@ My algorithm has three steps
 - Assign $S$ number ReLU neurons to each label. This means that each neuron will be assigned to several labels. These assignments should achieve both of: Each neuron should have approximately the same labels assigned to it as any other neuron; The max neuron overlap between any pair of labels, should be as small as possible.
 - Choose the embedding weights such that each ReLU neuron assigned to label $l$ will output zero for all facts with label $l$.
 - Assigned negative weights going from ReLU neurons assigned to label $l$, to the logit for $l$.
+- Hyperparameter sweep: Repeat the above for different values of the construction's two hyperparameters, to find the best ones.
 
 ### Assigning neurons to labels
 There are $d_{MLP}$ ReLU neurons, and $n_{output\_vocab}$ labels. Each label gets assigned $S\geq1$ neurons. In most of my experiments $d_{MLP}=n_{output\_vocab}$, which means for any $S>1$, the assignments will overlap.
@@ -256,45 +286,39 @@ The last step is simple. Each unembedding weight is $-1$ from ReLU neurons to la
 
 I did also try assigning positive values everywhere else, but for the success criteria I use (looking at arg_max of the logits), adding these positive values makes no difference. I fist noticed this empirically, but it's also a mathematical fact.
 
-## Results
-As to be expected, my hand coded models are not as good as trained models, and it especially struggles to reach full accuracy. But if I accept 90% accuracy for the hand coded model, it scales almost as well as the trained model, but with a significantly worse pre-factor.
+### Hybrid model: Half hand-coded, half learned
+Same as above except the unembedding weights are randomly initialized and trained.
+
+### Hyperparameter search over S and top_fraction
+When testing the capacity of this model design, I always to a hyperparameter search over $S$ and $top\_fraction$. 
+
+For the hand-coded models the winning $S$ is typically $S\approx\sqrt{d}$ where $d$ is the model dimension. For hybrid models, this number is a bit smaller.
+
+For the hand-coded models the winning $top\_fraction$ is typically in the range $0-0.28$. For the hybrid models the number is a bit larger.
+
+See appendix B and C here [link] for details.
+
+# Experimental Results 3: Comparing trained, hand-coded and hybrid models
+As to be expected, my hand-coded models are not as good as trained models, and it especially struggles to reach full accuracy. But if I accept 90% accuracy for the hand-coded model, it scales almost as well as the trained model, but with a worse pre-factor.
 
 The plot below shows my data from binary search to find maximum number of fact a model can learn. 
-- The trained models are using the architectures "full" (Figure 1, GELU and bias) and "simple" (Figure 2, with ReLU and no bias). These models are trained on Cross-Entropy loss.
-- The handcoded models are generated according to the algorithm described in the previous section. For each datapoint I selected the best result from a hyperparameter sweep over $S$ and $top\_fraction$
+- The model arcitecture is the one shown in Fig 3, for all models
+- **trained**: All waigiths are lerned
+- **hybrid**: Embedding weights are selected according to my algorithsm, and unembedding weights are trained.
+- **hand-coded**: All weights are sellected according to my algorithm.
+- **rand-emn**: Embedding weights are randomly initialised and frozen. Unembedding weights are trained.
+- Training (when applicable) is done with Adam, lr=1e-2, up to 5000 with early stopping if max 100% acuracy is reached, or if accuracy has not inproved for 100 epochs. 
 - All models are evaluated on accuracy, by which I mean percentage of facts it correctly predicts. This is calculated as $mean(argmax(logits)==labels)$
-- For the trained models, the required accuracy is always 100%, for the handcoded models, I show the result for both required accuracy 90% and 100%. 
-- Each experiment is run 11 times with the same facts but different random initialisations (for the trained models) or different random shuffles of neuron allocations, and different shufflings as tiebreaker in step 2 Embedding weights (for the hand coded models). "any"/"most"/"all" indicate if the success criteria is that any most or all of the runs needs to reach the desired accuracy.
+- **acc $\leq$ 0.9** means that an accuracy has to be at lease 90% for model to counts as successful
+- **acc = 1** menas that accuracy has to be 100% for model to count as successful.
+- Each experiment is run 11 times with the same facts but different random initialisations (for the trained models) or different random shuffles of neuron allocations, and different shufflings as tiebreaker in step 2 Embedding weights (for the hand-coded models). **any**/**most**/**all** indicate if the success criteria is that any most or all of the runs needs to reach the desired accuracy.
 - Best fit lines are over aggregations of any/most/all.
-- $d$ is the dimension of the model. $n_{input\_vocab}=2d$, $d_{MLP}=d$, $n_{output\_vocab}=d$
+- model size, $d$ is the dimension of the model. $n_{input\_vocab}=2d$, $d_{MLP}=d$, $n_{output\_vocab}=d$
 
-![](hc_vs_learned.png)
-*Figure 4: Maximum number of facts learnable by different models*
 
-### Optimal S is the square root of number of ReLU neurons
-To get the best version of my handcoded model, I do a hyperparameter sweep over $S$ and $top\_fraction$. From this I can extract the optimal $S$ for different model sizes by looking at $S$ from the winning ($S$, $top\_fraction$) pair.
-
-Doing so for the data from used in Figure 4, showed that $S\approx\sqrt{d}$. 
-
-![](best_S_vs_d.png)
-
-However, this does not tell me if $S$ depends on $n_{input\_vocab}$, $d_{MLP}$ or $n_{output\_vocab}$ since these all vary together in that experiment. 
-
-In the next experiment I did a binary search for max number of facts for every combination of the following parameters:
-
-- $n_{input\_vocab} = 16, 32, 64$
-- $d_{MLP} = 8,16,32,64$
-- $n_{output\_vocab} = 8, 16, 32, 64$
-- accuracy requirement = 90%, 100%
-- success aggregation = any, most, all
-
-Here's how the optimal $S$ depends on all of them.
-
-![](best_S_vs_d_MLP.png)
+![](scaling.png)
 *Figure 5*
 
-![](best_S_vs.png)
-*Figure 6*
 
 
 

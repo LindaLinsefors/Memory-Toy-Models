@@ -14,11 +14,10 @@ include = ["simple", "full"]  # include only these model types in the plot; set 
 experiment_dir = "E7"
 log_files = [f[:-6] for f in os.listdir(experiment_dir) if f.endswith(".jsonl") and f != "test_log.jsonl" and os.path.getsize(os.path.join(experiment_dir, f)) > 0]
 
-# Colors match hc2_sweep_plot.py for any/most/all.
-colors = {"any": "tab:blue", "all": "tab:red", "most": "tab:green"}
-styles = {"full": "-o", "simple": "--x", "nb": ":s"}
-# Line style (no marker) for each group's power-law fit line.
-fit_styles = {"full": "-", "simple": "--", "nb": ":"}
+# Color encodes the model type; marker encodes the any/most/all rule
+# (matching the capacity-vs-model-size plots in hc2_sweep_plot.py).
+group_colors = {"simple": "tab:blue", "full": "mediumvioletred", "nb": "tab:gray"}
+category_markers = {"any": "o", "most": "^", "all": "x"}
 
 # Keep only groups listed in include (None = keep all)
 if include is not None:
@@ -43,19 +42,21 @@ for log_file in log_files:
         ds.append(run['settings']['d_residual'])
         max_facts.append(run["max_facts"])
 
-    color = next((c for k, c in colors.items() if k in log_file), None)
-    style = next((s for k, s in styles.items() if k in log_file), "-o")
+    group = next((g for g in group_order if g in log_file), None)
+    category = next((c for c in category_order if c in log_file), None)
 
-    plt.loglog(ds, max_facts, style, color=color, label=log_file)
+    plt.loglog(ds, max_facts, "-", marker=category_markers.get(category),
+               markersize=5, color=group_colors.get(group),
+               label=f"{group}, {category}")
 
     # Pool points by group (any/most/all together) for the power-law fits below.
-    group = next((g for g in group_order if g in log_file), None)
     for d, mf in zip(ds, max_facts):
         if mf and mf > 0:
             group_points[group].append((d, mf))
 
 # Power-law fits (straight lines in log-log space), one per group, pooling the
 # any/most/all points together. max_facts = C * d^k; formula shown in legend.
+# Broad translucent lines in the group's color, like the hc2 capacity plots.
 for group in sorted(group_points, key=lambda g: group_order.get(g, 99)):
     pts = sorted(group_points[group])
     if len(pts) < 2:
@@ -65,13 +66,13 @@ for group in sorted(group_points, key=lambda g: group_order.get(g, 99)):
     k, b = np.polyfit(np.log(fx), np.log(fy), 1)
     C = np.exp(b)
     xline = np.array([fx.min(), fx.max()])
-    plt.loglog(xline, C * xline ** k, color="black", alpha=0.5,
-               linestyle=fit_styles.get(group, "-"), linewidth=1.5,
+    plt.loglog(xline, C * xline ** k, color=group_colors.get(group), alpha=0.4,
+               linestyle="-", linewidth=3,
                label=f"fit {group}: {C:.3g}·d^{k:.2f}")
 
-plt.xlabel("d_residual")
-plt.ylabel("max_facts")
-plt.title("E6: max_facts vs d_residual")
+plt.xlabel("model size (d)")
+plt.ylabel("max facts")
+plt.title("Capacity vs model size")
 plt.legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
 
 x_ticks = [16, 32, 64, 128]

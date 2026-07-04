@@ -1,0 +1,95 @@
+{
+  "settings": {
+    "d": 16,
+    "n_facts": 816,
+    "n_attempts": 11,
+    "input_vocab_size": 32,
+    "output_vocab_size": 16,
+    "d_ff": 16,
+    "seed": 42,
+    "metric": "best_guess_accuracy",
+    "model": "FullyTrainedModel2",
+    "n_epochs": 5000,
+    "lr": 0.01,
+    "patience": 100
+  },
+  "results": [
+    {
+      "n_facts": 816,
+      "attempt": 0,
+      "init_seed": 0,
+      "best_guess_accuracy": 0.7965686321258545,
+      "epochs_run": 1353
+    },
+    {
+      "n_facts": 816,
+      "attempt": 1,
+      "init_seed": 1,
+      "best_guess_accuracy": 0.7634804248809814,
+      "epochs_run": 1120
+    },
+    {
+      "n_facts": 816,
+      "attempt": 2,
+      "init_seed": 2,
+      "best_guess_accuracy": 0.8468137383460999,
+      "epochs_run": 1874
+    },
+    {
+      "n_facts": 816,
+      "attempt": 3,
+      "init_seed": 3,
+      "best_guess_accuracy": 0.7977941632270813,
+      "epochs_run": 1580
+    },
+    {
+      "n_facts": 816,
+      "attempt": 4,
+      "init_seed": 4,
+      "best_guess_accuracy": 0.75,
+      "epochs_run": 1143
+    },
+    {
+      "n_facts": 816,
+      "attempt": 5,
+      "init_seed": 5,
+      "best_guess_accuracy": 0.8529412150382996,
+      "epochs_run": 1809
+    },
+    {
+      "n_facts": 816,
+      "attempt": 6,
+      "init_seed": 6,
+      "best_guess_accuracy": 0.7781863212585449,
+      "epochs_run": 1010
+    },
+    {
+      "n_facts": 816,
+      "attempt": 7,
+      "init_seed": 7,
+      "best_guess_accuracy": 0.8039215803146362,
+      "epochs_run": 1389
+    },
+    {
+      "n_facts": 816,
+      "attempt": 8,
+      "init_seed": 8,
+      "best_guess_accuracy": 0.7928921580314636,
+      "epochs_run": 1692
+    },
+    {
+      "n_facts": 816,
+      "attempt": 9,
+      "init_seed": 9,
+      "best_guess_accuracy": 0.8897058963775635,
+      "epochs_run": 2309
+    },
+    {
+      "n_facts": 816,
+      "attempt": 10,
+      "init_seed": 10,
+      "best_guess_accuracy": 0.8958333730697632,
+      "epochs_run": 2753
+    }
+  ]
+}

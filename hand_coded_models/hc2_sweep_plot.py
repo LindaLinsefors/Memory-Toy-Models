@@ -188,7 +188,7 @@ def show_grid(d, n_facts):
                    label="≥ 1 run at 100% accuracy"),
     ]
     ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(1.18, 1.0),
-              fontsize=8, framealpha=0.9)
+              fontsize=9, framealpha=0.9)
 
     ax.set_title(
         f"HandCodedModel2 best_guess_accuracy\n"
@@ -229,7 +229,7 @@ def plot_accuracy_vs_top_fraction(d, n_facts):
     ax.set_title(f"Accuracy vs top_fraction (d={d}, n_facts={n_facts})")
     ax.set_ylim(0, 1.02)
     ax.grid(True, ls="--", linewidth=0.5)
-    ax.legend(ncol=2, fontsize=8, title="S")
+    ax.legend(ncol=2, fontsize=9, title="S")
     fig.tight_layout()
     plt.show()
     return fig
@@ -422,7 +422,7 @@ def _draw_capacity_vs_d(ax, path=None, aam_color=None, decorate=True,
                 label=f"fit acc>={thr}: {C:.3g}·d^{k:.2f}")
 
     if decorate:
-        ax.set_xlabel("d (model size)")
+        ax.set_xlabel("model size (d)")
         ax.set_ylabel(y_field)
         ax.set_title(f"{y_field} vs d  ({os.path.basename(path)})")
 
@@ -443,7 +443,7 @@ def _draw_capacity_vs_d(ax, path=None, aam_color=None, decorate=True,
             ax.set_yticklabels([str(y) for y in yticks])
 
         ax.grid(True, which="both", ls="--", linewidth=0.5)
-        ax.legend(fontsize=8)
+        ax.legend(fontsize=9)
 
     return all_ys
 
@@ -577,20 +577,28 @@ def _draw_e7(ax, experiment_dir=None, include=("simple", "full"), aam_color=None
             ax.set_yticklabels([str(y) for y in yticks])
 
         ax.grid(True, which="both", ls="--", linewidth=0.5)
-        ax.legend(fontsize=8)
+        ax.legend(fontsize=9)
 
     return all_ys
 
 
-def plot_capacity_vs_d_and_e7(path=None, e7_dir=None):
+def plot_capacity_vs_d_and_e7(path=None, e7_dir=None, figsize=(11, 7)):
     """Overlay the hc2 capacity plot and the E7 plot on a single Axes.
 
     Both are max_facts vs model size (d / d_residual) on the same log-log axes. The
     hc2 lines keep the standard tab colors; the E7 lines are recolored (for this
     plot only) so the two datasets are distinguishable: red->orange, green->lime,
     blue->skyblue. Ticks span the combined range of both datasets.
+
+    path defaults to capacity_search_results_topfrac.json — the FINE-grid
+    top_fraction sweep (0.00-0.38 in 0.02 steps), the same log
+    plot_capacity_vs_d_all_models uses for its hand-coded line. (The old default,
+    capacity_search_results.json, holds the June-19 coarse 0.1-0.9 runs; pass it
+    explicitly to reproduce the old plot.)
     """
-    fig, ax = plt.subplots(figsize=(11, 7))
+    if path is None:
+        path = os.path.join(RESULTS_DIR, "capacity_search_results_topfrac.json")
+    fig, ax = plt.subplots(figsize=figsize)
     ys = _draw_capacity_vs_d(ax, path=path, decorate=False)
 
     # Recolor E7 (for this plot only): any(blue)->skyblue, all(red)->orange,
@@ -598,8 +606,8 @@ def plot_capacity_vs_d_and_e7(path=None, e7_dir=None):
     e7_color = {"any": "skyblue", "all": "orange", "most": "lime"}
     ys += _draw_e7(ax, experiment_dir=e7_dir, aam_color=e7_color, decorate=False)
 
-    ax.set_xlabel("d  /  d_residual  (model size)")
-    ax.set_ylabel("max_facts")
+    ax.set_xlabel("model size (d)")
+    ax.set_ylabel("max facts")
     ax.set_title("Capacity vs model size: HandCodedModel2 (tab colors) "
                  "+ E7 (orange/lime/skyblue)")
 
@@ -616,10 +624,262 @@ def plot_capacity_vs_d_and_e7(path=None, e7_dir=None):
         ax.set_yticklabels([str(y) for y in yticks])
 
     ax.grid(True, which="both", ls="--", linewidth=0.5)
-    ax.legend(fontsize=7, loc="center left", bbox_to_anchor=(1.0, 0.5))
+    ax.legend(fontsize=9, loc="center left", bbox_to_anchor=(1.0, 0.5))
     fig.tight_layout()
     plt.show()
     return fig
+
+
+def plot_capacity_vs_d_all_models(thresholds=(0.9, 1.0),
+                                  any_all_most=("any", "most", "all"),
+                                  results_dir=None, figsize=(11, 7),
+                                  y_field="max_facts", models=None,
+                                  ylabel=None, title=None, references=None,
+                                  y_log=True, yticks=None, fit_type="power",
+                                  point_spread=0.0):
+    """Overlay the capacity-vs-d curves of all four model variants on one log-log plot.
+
+    Reads the four capacity-search JSONL logs (skipping any that don't exist yet,
+    e.g. sweeps still running):
+        capacity_search_results_topfrac.json         hand-coded up + hand-coded down
+        capacity_search_results_topfrac_hybrid.json  hand-coded up + TRAINED down
+        capacity_search_results_randomup.json        RANDOM frozen up + trained down
+        capacity_search_results_fulltrain.json       whole network trained
+
+    Encoding (color = model variant, since that is the comparison here):
+        color      : model variant (trained blue, hybrid orange,
+                     hand-coded green, rand-emb red)
+        line style : accuracy_threshold (solid = 1.0, dashed = 0.9)
+        marker     : any_all_most (any = o, most = ^, all = x)
+
+    Power-law fits (max_facts = C * d^k, straight lines in log-log space) are drawn
+    per (model, accuracy_threshold), pooling the any/most/all points, in the model's
+    color (translucent, no markers) with the fitted formula in the legend — the same
+    pooling plot_capacity_vs_d_and_e7's components use.
+
+    thresholds / any_all_most filter what is drawn (the full 4x2x3 legend is busy;
+    e.g. any_all_most=("most",) gives one line per model and threshold). Rows with
+    y_field <= 0 are dropped (they can't appear on a log axis); if a log holds
+    several rows for the same (d, threshold, rule), the latest wins.
+
+    y_field: which log column goes on the y axis ("max_facts" default; e.g.
+    "best_S" — only the hand-coded and hybrid logs have S). models: which model
+    variants to include, by name (default: all four). ylabel / title: override
+    the default axis label and title. references: optional list of
+    (func, label, color) hypothesis lines y = func(d), drawn across the data's
+    x range.
+    """
+    if results_dir is None:
+        results_dir = RESULTS_DIR
+
+    # Order sets the legend: trained, hybrid, hand-coded, rand-emb
+    # (roughly strongest to weakest, so the legend reads top-down like the plot).
+    model_files = [
+        ("trained", "capacity_search_results_fulltrain.json", "tab:blue"),
+        ("hybrid", "capacity_search_results_topfrac_hybrid.json", "tab:orange"),
+        ("hand-coded", "capacity_search_results_topfrac.json", "tab:green"),
+        ("rand-emb", "capacity_search_results_randomup.json", "tab:red"),
+    ]
+    if models is not None:
+        # Keep the caller's order: `models` sets legend/draw order, not just the filter.
+        by_name = {mf[0]: mf for mf in model_files}
+        model_files = [by_name[m] for m in models if m in by_name]
+    thr_style = {1.0: "-", 0.9: "--"}
+    aam_marker = {"any": "o", "most": "^", "all": "x"}
+    aam_rank = {"any": 0, "most": 1, "all": 2}
+
+    def thr_label(thr):
+        """Legend text for a threshold: 'acc=1' for 1.0, 'acc≥thr' otherwise."""
+        return "acc=1" if thr == 1.0 else fr"acc$\geq${thr}"
+
+    fig, ax = plt.subplots(figsize=figsize)
+    ax.set_xscale("log")
+    ax.set_yscale("log" if y_log else "linear")
+
+    # On a log y axis, zeros/negatives can't be shown, so those rows are
+    # dropped; on a linear axis (y_log=False) they are kept — only missing
+    # values are dropped. Fits always use the positive points only.
+    keep = (lambda v: v is not None and v > 0) if y_log \
+        else (lambda v: v is not None)
+
+    all_xs, all_ys = [], []
+    draw_queue = []  # ("data"/"fit", kwargs) in legend order; drawn after
+    for model_name, fname, color in model_files:
+        path = os.path.join(results_dir, fname)
+        runs = load_capacity_results(path)
+        if not runs:
+            print(f"(skipping {model_name}: no results in {fname})")
+            continue
+
+        # Group rows by (threshold, rule) -> {d: y_field}; the latest row wins.
+        groups = defaultdict(dict)
+        for r in runs:
+            if r.get("accuracy_threshold") in thresholds \
+                    and r.get("any_all_most") in any_all_most:
+                groups[(r["accuracy_threshold"], r["any_all_most"])][r["d"]] = r.get(y_field)
+
+        thr_points = defaultdict(list)  # threshold -> pooled (d, y_field) for the fit
+        for (thr, aam) in sorted(groups, key=lambda k: (k[0], aam_rank.get(k[1], 99))):
+            ds_mf = sorted(groups[(thr, aam)].items())
+            xs = [d for d, mf in ds_mf if keep(mf)]
+            ys = [mf for d, mf in ds_mf if keep(mf)]
+            if not xs:
+                continue
+            all_xs.extend(xs)
+            all_ys.extend(ys)
+            # A power-law fit needs log(y), so it can only use positive points;
+            # the linlog fit (y linear in log2(d)) handles zeros fine.
+            thr_points[thr].extend(
+                (x, y) for x, y in zip(xs, ys)
+                if fit_type == "linlog" or y > 0)
+            draw_queue.append(("data", dict(
+                xs=xs, ys=ys, fmt=thr_style.get(thr, ":"),
+                marker=aam_marker.get(aam), color=color,
+                label=f"{model_name}: {aam}, {thr_label(thr)}")))
+
+        # One fit per threshold for this model, pooling any/most/all.
+        for thr in sorted(thr_points):
+            pts = sorted(thr_points[thr])
+            if len({d for d, _ in pts}) < 2:
+                continue
+            fx = np.array([d for d, _ in pts], dtype=float)
+            fy = np.array([mf for _, mf in pts], dtype=float)
+            # Dense x so the fit renders as a smooth curve whatever the axes.
+            xline = np.geomspace(fx.min(), fx.max(), 100)
+            if fit_type == "linlog":
+                # y = a*log2(d) + b — linear in log model size; unlike a power
+                # law it can pass through (and be fit to) zero values.
+                a, b = np.polyfit(np.log2(fx), fy, 1)
+                yline = a * np.log2(xline) + b
+                fit_label = (f"fit {model_name} {thr_label(thr)}: "
+                             f"{a:.3g}·log2(d) {b:+.3g}")
+            else:  # power law: y = C * d^k
+                k, b = np.polyfit(np.log(fx), np.log(fy), 1)
+                C = np.exp(b)
+                yline = C * xline ** k
+                fit_label = f"fit {model_name} {thr_label(thr)}: {C:.3g}·d^{k:.2f}"
+            draw_queue.append(("fit", dict(
+                xline=xline, yline=yline, color=color,
+                ls=thr_style.get(thr, ":"), label=fit_label)))
+
+    # Fan out data points that several lines share: points with the exact same
+    # (d, y) get small symmetric x offsets (a step in log10 units, like the
+    # scatter plots' spread), so coinciding lines/markers stay visible.
+    # point_spread=0 (the default) keeps every point exactly at its true d.
+    if point_spread:
+        occurrences = defaultdict(list)  # (d, y) -> [(queue idx, point idx)]
+        for qi, (kind, kw) in enumerate(draw_queue):
+            if kind == "data":
+                for pi, xy in enumerate(zip(kw["xs"], kw["ys"])):
+                    occurrences[xy].append((qi, pi))
+        for (x, _y), locs in occurrences.items():
+            if len(locs) < 2:
+                continue
+            offsets = np.arange(len(locs)) - (len(locs) - 1) / 2.0
+            for off, (qi, pi) in zip(offsets, locs):
+                kw = draw_queue[qi][1]
+                kw.setdefault("x_plot", list(kw["xs"]))
+                kw["x_plot"][pi] = x * 10.0 ** (off * point_spread)
+
+    for kind, kw in draw_queue:
+        if kind == "data":
+            ax.plot(kw.get("x_plot", kw["xs"]), kw["ys"], kw["fmt"],
+                    marker=kw["marker"], markersize=5, color=kw["color"],
+                    label=kw["label"])
+        else:
+            ax.plot(kw["xline"], kw["yline"], color=kw["color"], alpha=0.4,
+                    linestyle=kw["ls"], linewidth=3, label=kw["label"])
+
+    # Optional hypothesis lines y = func(d), drawn across the data's x range.
+    if references and all_xs:
+        xline = np.geomspace(min(all_xs), max(all_xs), 100)
+        for func, ref_label, ref_color in references:
+            ax.plot(xline, func(xline), color=ref_color, lw=1.8, label=ref_label)
+
+    if ylabel is None:
+        ylabel = "max facts" if y_field == "max_facts" else y_field
+    if title is None:
+        title = ("Capacity vs model size\n"
+                 + " / ".join(name for name, _, _ in model_files))
+    ax.set_xlabel("model size (d)")
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+
+    xticks = [x for x in [16, 32, 64, 128, 256] if not all_xs or x <= max(all_xs)]
+    ax.set_xticks(xticks)
+    ax.set_xticks([], minor=True)
+    ax.set_xticklabels([str(x) for x in xticks])
+    if yticks is not None:
+        # Explicit y ticks (and so horizontal gridlines) from the caller,
+        # trimmed to the range the data actually covers.
+        if all_ys:
+            yticks = [t for t in yticks if min(all_ys) <= t <= max(all_ys)]
+        ax.set_yticks(yticks)
+        ax.set_yticks([], minor=True)
+    elif y_log and all_ys:
+        # Powers-of-two y ticks (log axis only; linear keeps auto ticks).
+        lo = int(np.floor(np.log2(min(all_ys))))
+        hi = int(np.ceil(np.log2(max(all_ys))))
+        yticks = [2 ** n for n in range(lo, hi + 1)]
+        ax.set_yticks(yticks)
+        ax.set_yticks([], minor=True)
+        ax.set_yticklabels([str(y) for y in yticks])
+
+    ax.grid(True, which="both", ls="--", linewidth=0.5)
+    ax.legend(fontsize=9, loc="center left", bbox_to_anchor=(1.0, 0.5))
+    fig.tight_layout()
+    plt.show()
+    return fig
+
+
+def plot_best_S_vs_d(thresholds=(0.9, 1.0), any_all_most=("any", "most", "all"),
+                     results_dir=None, figsize=(11, 7), point_spread=0.008):
+    """best_S vs model size d, hand-coded and hybrid only (log-log).
+
+    Same layout/encoding as plot_capacity_vs_d_all_models (color = model, line
+    style = threshold, marker = any/most/all, translucent power-law fits), just
+    with best_S on the y axis. Only these two variants sweep S — the trained and
+    rand-emb models have no S at all — so only their logs are drawn.
+    """
+    return plot_capacity_vs_d_all_models(
+        thresholds=thresholds, any_all_most=any_all_most,
+        results_dir=results_dir, figsize=figsize,
+        y_field="best_S", models=("hand-coded", "hybrid"),
+        ylabel="best S",
+        # Several lines often pick the same (d, S); fan those points out
+        # slightly in x so the coinciding lines stay visible (0 turns it off).
+        point_spread=point_spread,
+        title="Best performing S vs model size\nhand-coded / hybrid",
+        references=[
+            (np.sqrt, r"$\sqrt{d}$", "black"),
+        ])
+
+
+def plot_best_top_fraction_vs_d(thresholds=(0.9, 1.0),
+                                any_all_most=("any", "most", "all"),
+                                results_dir=None, figsize=(11, 7),
+                                point_spread=0.008):
+    """best_top_fraction vs model size d, hand-coded and hybrid only.
+
+    Same layout/encoding as plot_best_S_vs_d (color = model, line style =
+    threshold, marker = any/most/all, translucent power-law fits), but with the
+    winning top_fraction on the y axis — on a LINEAR scale, since
+    best_top_fraction can be 0, which a log axis cannot show (x stays log).
+    Only the hand-coded and hybrid logs have a top_fraction.
+    """
+    return plot_capacity_vs_d_all_models(
+        thresholds=thresholds, any_all_most=any_all_most,
+        results_dir=results_dir, figsize=figsize,
+        y_field="best_top_fraction", models=("hand-coded", "hybrid"),
+        ylabel="best top_fraction", y_log=False,
+        # Horizontal gridlines at exactly the swept top_fraction values.
+        yticks=[round(0.02 * i, 2) for i in range(20)],
+        # Fit y = a*log2(d) + b: unlike a power law it can use the tf=0 points.
+        fit_type="linlog",
+        # Several lines often pick the same (d, top_fraction); fan those points
+        # out slightly in x so the coinciding lines stay visible (0 turns it off).
+        point_spread=point_spread,
+        title="Best performing top_fraction vs model size\nhand-coded / hybrid")
 
 
 def plot_decoupled_capacity_grids(accuracy_threshold, any_all_most,
@@ -714,7 +974,11 @@ def plot_decoupled_capacity_grids(accuracy_threshold, any_all_most,
 
 
 def _scatter_best_S_vs(x_field, path=None, spread=0.012, reference=None,
-                       legend_between=None, ax=None):
+                       legend_between=None, ax=None, figsize=(8, 6),
+                       xlabel=None, title=None,
+                       y_field="best_S", y_log=True, yticks=None, ylabel=None,
+                       fit_xy_label=False, fit_x_name=None,
+                       legend_framealpha=None):
     """Log-log scatter of best_S vs `x_field` for every row in the decoupled log.
 
     One point per record in capacity_search_results_topfrac_decoupled.json (all
@@ -736,6 +1000,16 @@ def _scatter_best_S_vs(x_field, path=None, spread=0.012, reference=None,
 
     ax: draw onto this Axes instead of making a new figure (used by the 2x2 grid).
     When ax is None a standalone figure is created and shown.
+
+    xlabel / title: override the default x-axis label (x_field) and the default
+    auto-generated title. None keeps the defaults.
+
+    y_field / y_log / yticks / ylabel: which log column goes on the y axis
+    (default best_S), whether the y axis is log (default) or linear, explicit y
+    ticks (trimmed to the data range; None keeps the y_field-specific default),
+    and the y-axis label. On a log y axis non-positive rows are dropped and the
+    fit is a power law; on a linear axis zeros are kept and the fit is
+    y = a*log2(x) + b (which can pass through zero).
     """
     if path is None:
         path = os.path.join(RESULTS_DIR, "capacity_search_results_topfrac_decoupled.json")
@@ -744,30 +1018,36 @@ def _scatter_best_S_vs(x_field, path=None, spread=0.012, reference=None,
         raise FileNotFoundError(f"No capacity results found in {path}")
 
     x = np.array([r[x_field] for r in runs], dtype=float)
-    best_S = np.array([r["best_S"] for r in runs], dtype=float)
-    # Log-log axes can't show non-positive values; drop them (best_S can be 0/None).
-    ok = np.isfinite(x) & np.isfinite(best_S) & (x > 0) & (best_S > 0)
-    x, best_S = x[ok], best_S[ok]
+    yv = np.array([np.nan if r.get(y_field) is None else r[y_field]
+                   for r in runs], dtype=float)
+    # A log y axis can't show non-positive values, so they are dropped there;
+    # on a linear axis (y_log=False) zeros are kept — only missing are dropped.
+    ok = np.isfinite(x) & np.isfinite(yv) & (x > 0)
+    if y_log:
+        ok &= yv > 0
+    x, yv = x[ok], yv[ok]
 
-    math_x = x_field.replace("_", r"\_")  # LaTeX-safe name for the formula labels
+    # LaTeX-safe name for the formula labels: fit_x_name if given, else the
+    # xlabel override, else the raw field name.
+    math_x = (fit_x_name or (x_field if xlabel is None else xlabel)).replace("_", r"\_")
 
     own_fig = ax is None
-    fig, ax = (plt.subplots(figsize=(8, 6)) if own_fig else (ax.figure, ax))
+    fig, ax = (plt.subplots(figsize=figsize) if own_fig else (ax.figure, ax))
     ax.set_xscale("log")
-    ax.set_yscale("log")
-    # Fan out the rows that share an (x, best_S): line them up horizontally,
+    ax.set_yscale("log" if y_log else "linear")
+    # Fan out the rows that share an (x, y): line them up horizontally,
     # centered on the true x, spaced evenly in log space so they partly overlap.
     x_plot = x.copy()
     groups = defaultdict(list)
-    for idx, key in enumerate(zip(x, best_S)):
+    for idx, key in enumerate(zip(x, yv)):
         groups[key].append(idx)
     for (xv, _sy), idxs in groups.items():
         n = len(idxs)
         offsets = np.arange(n) - (n - 1) / 2.0  # symmetric: e.g. -1,0,1
         for off, idx in zip(offsets, idxs):
             x_plot[idx] = xv * 10.0 ** (off * spread)
-    ax.scatter(x_plot, best_S, s=25, alpha=0.5, edgecolor="none",
-               color="tab:blue", label=f"data ({len(x)} rows)")
+    ax.scatter(x_plot, yv, s=25, alpha=0.5, edgecolor="none",
+               color="tab:blue")
 
     xline = np.geomspace(x.min(), x.max(), 100)
 
@@ -776,46 +1056,85 @@ def _scatter_best_S_vs(x_field, path=None, spread=0.012, reference=None,
         ref_func, ref_label = reference
         ax.plot(xline, ref_func(xline), color="black", lw=1.8, label=ref_label)
 
-    # Best-fit power law best_S = C * x^k (a straight line in log-log space).
-    k, b = np.polyfit(np.log(x), np.log(best_S), 1)
-    C = np.exp(b)
-    ax.plot(xline, C * xline ** k, color="tab:red", lw=1.8, linestyle="--",
-            label=fr"Best fit: $best\_S = {C:.3g}\cdot {math_x}^{{{k:.2f}}}$")
+    math_y = y_field.replace("_", r"\_")
+    if y_log:
+        # Best-fit power law y = C * x^k (a straight line in log-log space).
+        k, b = np.polyfit(np.log(x), np.log(yv), 1)
+        C = np.exp(b)
+        yline = C * xline ** k
+        if fit_xy_label:
+            # Plain "y = ... x ..." with 2 significant digits.
+            fit_label = fr"Best fit: $y = {C:.2g}\cdot x^{{{k:.2g}}}$"
+        else:
+            fit_label = fr"Best fit: ${math_y} = {C:.3g}\cdot {math_x}^{{{k:.2f}}}$"
+    else:
+        # y = a*log2(x) + b — linear in log x; unlike a power law it can pass
+        # through (and be fit to) zero values.
+        a, b = np.polyfit(np.log2(x), yv, 1)
+        yline = a * np.log2(xline) + b
+        if fit_xy_label:
+            # Plain "y = ... log2(x) ..." with 2 significant digits.
+            fit_label = fr"Best fit: $y = {a:.2g}\cdot\log_2(x) {b:+.2g}$"
+        else:
+            fit_label = fr"Best fit: ${math_y} = {a:.3g}\cdot\log_2({math_x}) {b:+.3g}$"
+    ax.plot(xline, yline, color="tab:red", lw=1.8, linestyle="--",
+            label=fit_label)
 
-    ax.set_xlabel(x_field)
-    ax.set_ylabel("best_S")
-    ax.set_title(f"best_S vs {x_field}  ({os.path.basename(path)}, {len(x)} points)")
+    ax.set_xlabel(x_field if xlabel is None else xlabel)
+    if ylabel is None:
+        ylabel = "best S" if y_field == "best_S" else y_field
+    ax.set_ylabel(ylabel)
+    if title is None:
+        title = f"{y_field} vs {x_field}  ({os.path.basename(path)}, {len(x)} points)"
+    ax.set_title(title)
 
     # Integer ticks that match the swept values.
     xticks = sorted({int(v) for v in np.unique(x)})
     ax.set_xticks(xticks)
     ax.set_xticks([], minor=True)
     ax.set_xticklabels([str(v) for v in xticks])
-    yticks = sorted({int(v) for v in np.unique(best_S)})
-    ax.set_yticks(yticks)
-    ax.set_yticks([], minor=True)
-    ax.set_yticklabels([str(v) for v in yticks])
+    if yticks is not None:
+        # Explicit y ticks from the caller, trimmed to the data's range.
+        ax.set_yticks([t for t in yticks if yv.min() <= t <= yv.max()])
+        ax.set_yticks([], minor=True)
+    elif y_log:
+        # Tick every integer in the data's range (not just the values present,
+        # so gridline rows stay evenly spaced even when some value never
+        # occurs) ...
+        yticks = list(range(int(yv.min()), int(yv.max()) + 1))
+        ax.set_yticks(yticks)
+        ax.set_yticks([], minor=True)
+        # ... but only print the labels below — consecutive integers overlap
+        # on the log axis otherwise.
+        labels_to_keep = {1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22}
+        ax.set_yticklabels([str(v) if v in labels_to_keep else "" for v in yticks])
 
     ax.grid(True, which="both", ls="--", linewidth=0.5)
+    # legend_framealpha: legend background opacity (None keeps the defaults).
     if legend_between is not None:
         y_low, y_high = legend_between
-        y_center = (y_low * y_high) ** 0.5  # geometric center (log y-axis)
-        ax.legend(loc="center left", framealpha=0.9,
+        # Center of the band: geometric on a log y axis, arithmetic on linear.
+        y_center = (y_low * y_high) ** 0.5 if y_log else (y_low + y_high) / 2.0
+        ax.legend(loc="center left",
+                  framealpha=0.9 if legend_framealpha is None else legend_framealpha,
                   bbox_to_anchor=(x.min(), y_center), bbox_transform=ax.transData)
     else:
-        ax.legend()
+        ax.legend(framealpha=legend_framealpha)
     if own_fig:
         fig.tight_layout()
         plt.show()
     return fig
 
 
-def plot_best_S_vs_d_ff(path=None, spread=0.012):
+def plot_best_S_vs_d_ff(path=None, spread=0.012, figsize=(8, 6)):
     """best_S vs d_ff (log-log), with the best_S = sqrt(d_ff) hypothesis line and
     a power-law best fit. See _scatter_best_S_vs for the layout details."""
+    variant = "hand-coded model" if path is None else "hybrid model"
     return _scatter_best_S_vs(
-        "d_ff", path=path, spread=spread,
-        reference=(np.sqrt, r"Hypotesis: $best\_S = \sqrt{d\_ff}$"))
+        "d_ff", path=path, spread=spread, figsize=figsize,
+        xlabel="hidden layer size (d_MLP)", fit_x_name="d_MLP",
+        title="Best performing S vs hidden layer size\n" + variant,
+        reference=(np.sqrt, r"Hypotesis: $best\_S = \sqrt{d\_MLP}$"))
 
 
 def plot_best_S_vs_input_vocab(path=None, spread=0.0087, ax=None):
@@ -836,7 +1155,8 @@ def plot_best_S_vs_output_vocab(path=None, spread=0.012, ax=None):
 
 
 def _strip_best_S_by(x_field, path=None, order=None, spread=0.06, ax=None,
-                     xlabel=None):
+                     xlabel=None, ylog=False,
+                     y_field="best_S", yticks=None, ylabel=None):
     """Strip plot of best_S grouped by a categorical `x_field`.
 
     For a discrete x (e.g. accuracy_threshold with 2 values, or any_all_most with
@@ -849,7 +1169,12 @@ def _strip_best_S_by(x_field, path=None, order=None, spread=0.06, ax=None,
     the x-axis; default is sorted unique values.
 
     xlabel overrides the x-axis label (pass "" to hide it; None uses x_field).
+    ylog: log-scale the y axis, with the same integer ticks / thinned labels as
+    the log-log scatters (so the panel matches them in a grid).
     ax: draw onto this Axes instead of making a new figure (used by the 2x2 grid).
+    y_field / yticks / ylabel: which log column goes on the y axis (default
+    best_S), explicit y ticks (trimmed to the data range; for linear axes, e.g.
+    top_fraction), and the y-axis label.
     """
     if path is None:
         path = os.path.join(RESULTS_DIR, "capacity_search_results_topfrac_decoupled.json")
@@ -857,11 +1182,11 @@ def _strip_best_S_by(x_field, path=None, order=None, spread=0.06, ax=None,
     if not runs:
         raise FileNotFoundError(f"No capacity results found in {path}")
 
-    # Keep rows with a usable best_S; category values may be numbers or strings.
-    rows = [(r[x_field], float(r["best_S"])) for r in runs
-            if r.get("best_S") is not None and np.isfinite(float(r["best_S"]))]
+    # Keep rows with a usable y value; category values may be numbers or strings.
+    rows = [(r[x_field], float(r[y_field])) for r in runs
+            if r.get(y_field) is not None and np.isfinite(float(r[y_field]))]
     if not rows:
-        raise ValueError(f"No usable best_S rows for x_field={x_field}")
+        raise ValueError(f"No usable {y_field} rows for x_field={x_field}")
 
     cats = order if order is not None else sorted({c for c, _ in rows})
     pos = {c: i for i, c in enumerate(cats)}
@@ -885,8 +1210,24 @@ def _strip_best_S_by(x_field, path=None, order=None, spread=0.06, ax=None,
     ax.set_xticklabels([str(c) for c in cats])
     ax.set_xlim(-0.5, len(cats) - 0.5)
     ax.set_xlabel(x_field if xlabel is None else xlabel)
-    ax.set_ylabel("best_S")
-    ax.set_title(f"best_S vs {x_field}  ({os.path.basename(path)}, {len(rows)} points)")
+    ax.set_ylabel(("best S" if y_field == "best_S" else y_field)
+                  if ylabel is None else ylabel)
+    ax.set_title(f"{y_field} vs {x_field}  ({os.path.basename(path)}, {len(rows)} points)")
+    if yticks is not None:
+        # Explicit y ticks from the caller, trimmed to the data's range.
+        yv = [s for _, s in rows]
+        ax.set_yticks([t for t in yticks if min(yv) <= t <= max(yv)])
+        ax.set_yticks([], minor=True)
+    elif ylog:
+        ax.set_yscale("log")
+        svals = [int(s) for _, s in rows]
+        # Tick every integer in the range (not just values present), so the
+        # gridline rows stay evenly spaced.
+        yticks = list(range(min(svals), max(svals) + 1))
+        ax.set_yticks(yticks)
+        ax.set_yticks([], minor=True)
+        labels_to_keep = {1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22}
+        ax.set_yticklabels([str(v) if v in labels_to_keep else "" for v in yticks])
     ax.grid(True, axis="y", ls="--", linewidth=0.5)
     if own_fig:
         fig.tight_layout()
@@ -894,33 +1235,52 @@ def _strip_best_S_by(x_field, path=None, order=None, spread=0.06, ax=None,
     return fig
 
 
-def plot_best_S_vs_accuracy_threshold(path=None, spread=0.0197, ax=None):
+def plot_best_S_vs_accuracy_threshold(path=None, spread=0.0197, ax=None, ylog=False):
     """Strip plot of best_S grouped by accuracy_threshold (raw datapoints only).
     See _strip_best_S_by for details. Default spread is tuned so the on-screen dot
     spacing matches plot_best_S_vs_output_vocab."""
-    return _strip_best_S_by("accuracy_threshold", path=path, spread=spread, ax=ax)
+    return _strip_best_S_by("accuracy_threshold", path=path, spread=spread, ax=ax,
+                            ylog=ylog)
 
 
-def plot_best_S_vs_any_all_most(path=None, spread=0.0296, ax=None):
+def plot_best_S_vs_any_all_most(path=None, spread=0.0296, ax=None, ylog=False):
     """Strip plot of best_S grouped by any/most/all (raw datapoints only).
     See _strip_best_S_by for details. Default spread is tuned so the on-screen dot
     spacing matches plot_best_S_vs_output_vocab. The x-axis label is hidden (the
     any/most/all tick labels already name the categories)."""
     return _strip_best_S_by("any_all_most", path=path, spread=spread,
-                            order=["any", "most", "all"], ax=ax, xlabel="")
+                            order=["any", "most", "all"], ax=ax, xlabel="",
+                            ylog=ylog)
 
 
-def plot_best_S_grid(path=None):
+def plot_best_S_grid(path=None, figsize=(15, 11)):
     """2x2 grid of the four best_S plots: input_vocab_size & output_vocab_size (top),
     accuracy_threshold & any_all_most (bottom). Reuses each plot's own drawing via
-    its ax argument, so the panels match the standalone versions."""
-    fig, axes = plt.subplots(2, 2, figsize=(15, 11))
+    its ax argument, so the panels match the standalone versions — except that in
+    the grid, all four y axes are log (ylog=True for the bottom strip plots) and
+    the x-axis labels are spelled out in plain English."""
+    fig, axes = plt.subplots(2, 2, figsize=figsize)
     plot_best_S_vs_input_vocab(path=path, ax=axes[0][0])
     plot_best_S_vs_output_vocab(path=path, ax=axes[0][1])
-    plot_best_S_vs_accuracy_threshold(path=path, ax=axes[1][0])
-    plot_best_S_vs_any_all_most(path=path, ax=axes[1][1])
+    plot_best_S_vs_accuracy_threshold(path=path, ax=axes[1][0], ylog=True)
+    plot_best_S_vs_any_all_most(path=path, ax=axes[1][1], ylog=True)
+
+    # Plain-English x-axis labels ("" is the any/most/all panel, which hides its
+    # label when standalone; in the grid it gets a descriptive one).
+    plain_xlabels = {
+        "input_vocab_size": "input vocab size",
+        "output_vocab_size": "output vocab size",
+        "accuracy_threshold": "required accuracy",
+        "": "how many attempts must succeed",
+    }
+    # y numbers printed in the grid (every value keeps its tick/gridline; this
+    # only thins the labels, and only here — the standalone plots are untouched).
+    grid_y_labels = {1, 2, 3, 4, 5, 6, 8, 10, 14, 18, 22}
     for a in axes.ravel():  # drop the per-panel titles + enlarge text in the grid
         a.set_title("")
+        a.set_xlabel(plain_xlabels.get(a.get_xlabel(), a.get_xlabel()))
+        a.set_yticklabels([str(int(v)) if int(v) in grid_y_labels else ""
+                           for v in a.get_yticks()])
         a.xaxis.label.set_size(15)
         a.yaxis.label.set_size(15)
         a.tick_params(labelsize=13)
@@ -928,7 +1288,82 @@ def plot_best_S_grid(path=None):
         if leg is not None:
             for txt in leg.get_texts():
                 txt.set_fontsize(12)
+    variant = "hand-coded model" if path is None else "hybrid model"
+    fig.suptitle("Best performing S vs everything else\n" + variant,
+                 fontsize=18, y=0.995)
     fig.tight_layout()
+    # tight_layout ignores the suptitle; set the axes top explicitly so the
+    # panels start right below the two title lines.
+    fig.subplots_adjust(top=0.925)
+    plt.show()
+    return fig
+
+
+def plot_best_top_fraction_vs_d_ff(path=None, spread=0.012, figsize=(8, 6)):
+    """best_top_fraction vs d_ff, like plot_best_S_vs_d_ff but with a LINEAR y
+    axis (top_fraction can be 0, which a log axis can't show), gridlines at the
+    swept top_fraction values, and a y = a*log2(d_MLP) + b best fit."""
+    variant = "hand-coded model" if path is None else "hybrid model"
+    return _scatter_best_S_vs(
+        "d_ff", path=path, spread=spread, figsize=figsize,
+        y_field="best_top_fraction", y_log=False,
+        yticks=[round(0.02 * i, 2) for i in range(20)],
+        ylabel="best top_fraction", xlabel="d_MLP", fit_xy_label=True,
+        legend_framealpha=0.4,
+        title="Best performing top_fraction vs hidden layer size (d_MLP)\n" + variant)
+
+
+def plot_best_top_fraction_grid(path=None, figsize=(15, 11)):
+    """2x2 grid like plot_best_S_grid but for best_top_fraction.
+
+    Same panels (input_vocab_size & output_vocab_size scatters on top,
+    accuracy_threshold & any_all_most strips below) and the same plain-English
+    x labels, but every y axis is LINEAR with gridlines at the swept
+    top_fraction values (top_fraction can be 0, which a log axis can't show);
+    only the 0.04 multiples are labelled to keep the axes readable."""
+    tf_kwargs = dict(path=path, y_field="best_top_fraction",
+                     ylabel="best top_fraction",
+                     yticks=[round(0.02 * i, 2) for i in range(20)])
+    fig, axes = plt.subplots(2, 2, figsize=figsize)
+    _scatter_best_S_vs("input_vocab_size", spread=0.0087, ax=axes[0][0],
+                       y_log=False, fit_xy_label=True, legend_framealpha=0.4,
+                       **tf_kwargs)
+    _scatter_best_S_vs("output_vocab_size", spread=0.012, ax=axes[0][1],
+                       y_log=False, fit_xy_label=True, legend_framealpha=0.4,
+                       **tf_kwargs)
+    _strip_best_S_by("accuracy_threshold", spread=0.0197, ax=axes[1][0],
+                     **tf_kwargs)
+    _strip_best_S_by("any_all_most", spread=0.0296, ax=axes[1][1],
+                     order=["any", "most", "all"], xlabel="", **tf_kwargs)
+
+    # Plain-English x-axis labels ("" is the any/most/all panel, which hides its
+    # label when standalone; in the grid it gets a descriptive one).
+    plain_xlabels = {
+        "input_vocab_size": "input vocab size",
+        "output_vocab_size": "output vocab size",
+        "accuracy_threshold": "required accuracy",
+        "": "how many attempts must succeed",
+    }
+    for a in axes.ravel():  # drop the per-panel titles + enlarge text in the grid
+        a.set_title("")
+        a.set_xlabel(plain_xlabels.get(a.get_xlabel(), a.get_xlabel()))
+        # Label only the 0.04 multiples; gridlines stay at every 0.02 tick.
+        a.set_yticklabels([f"{v:.2f}" if round(v * 100) % 4 == 0 else ""
+                           for v in a.get_yticks()])
+        a.xaxis.label.set_size(15)
+        a.yaxis.label.set_size(15)
+        a.tick_params(labelsize=13)
+        leg = a.get_legend()
+        if leg is not None:
+            for txt in leg.get_texts():
+                txt.set_fontsize(12)
+    variant = "hand-coded model" if path is None else "hybrid model"
+    fig.suptitle("Best performing top_fraction vs everything else\n" + variant,
+                 fontsize=18, y=0.995)
+    fig.tight_layout()
+    # tight_layout ignores the suptitle; set the axes top explicitly so the
+    # panels start right below the two title lines.
+    fig.subplots_adjust(top=0.925)
     plt.show()
     return fig
 
@@ -971,6 +1406,9 @@ _ = plot_capacity_vs_d(path=os.path.join(RESULTS_DIR,
 _ = plot_capacity_vs_d(path=os.path.join(RESULTS_DIR,
                                          "capacity_search_results_topfrac.json"),
                        y_field="best_S", y_log=y_log)
+_ = plot_capacity_vs_d(path=os.path.join(RESULTS_DIR,
+                                         "capacity_search_results_topfrac_hybrid.json"),
+                       y_field="best_S", y_log=y_log)
 
 # %%
 y_log = False
@@ -984,9 +1422,21 @@ _ = plot_capacity_vs_d(path=os.path.join(RESULTS_DIR,
 _ = plot_capacity_vs_d_and_e7()
 
 # %%
+_ = plot_capacity_vs_d_all_models()
+# %%
+# Less busy variant: only the 'most' rule -> one line per model and threshold.
+_ = plot_capacity_vs_d_all_models(any_all_most=("most",))
+# %%
+# best_S vs d for the two S-sweeping variants (hand-coded and hybrid).
+_ = plot_best_S_vs_d()
+# %%
+# best_top_fraction vs d for the same two variants (linear y axis).
+_ = plot_best_top_fraction_vs_d()
+
+# %%
 _ = plot_decoupled_capacity_grids(accuracy_threshold=1.0, any_all_most="any")
 # %%
-_ = plot_best_S_vs_d_ff()
+_ = plot_best_S_vs_d_ff(figsize=(6, 6))
 # %%
 _ = plot_best_S_vs_input_vocab()
 _ = plot_best_S_vs_output_vocab()
@@ -994,6 +1444,10 @@ _ = plot_best_S_vs_accuracy_threshold()
 _ = plot_best_S_vs_any_all_most()
 # %%
 _ = plot_best_S_grid()
+# %%
+# top_fraction versions of the d_ff scatter and the 2x2 grid (linear y axes).
+_ = plot_best_top_fraction_vs_d_ff()
+_ = plot_best_top_fraction_grid()
 # %%
 for accuracy_threshold in [0.9, 1.0]:
     for any_all_most in ["any", "most", "all"]:
@@ -1005,4 +1459,31 @@ _ = plot_best_S_vs_input_vocab()
 _ = plot_best_S_vs_output_vocab()
 # %%
 _ = plot_best_S_grid()
+# %%
+_ = plot_capacity_vs_d_all_models(figsize=(9, 7))
+
+# %%
+_ = plot_best_S_vs_d(figsize=(8, 5))
+# %%
+_ = plot_best_S_vs_d_ff(figsize=(6, 5))
+
+_ = plot_best_S_grid(figsize=(12, 8))
+# %%
+_ = plot_best_S_vs_d_ff(figsize=(6, 5), path=os.path.join(RESULTS_DIR, "capacity_search_results_topfrac_decoupled_hybrid.json"))
+
+_ = plot_best_S_grid(figsize=(12, 8), path=os.path.join(RESULTS_DIR, "capacity_search_results_topfrac_decoupled_hybrid.json"))
+# %%
+_ = plot_best_top_fraction_vs_d(figsize=(8, 5))
+# %%
+
+
+_ = plot_best_top_fraction_vs_d_ff(figsize=(6, 5))
+
+_ = plot_best_top_fraction_grid(figsize=(12, 8))
+
+_ = plot_best_top_fraction_vs_d_ff(figsize=(6, 5),
+                                   path=os.path.join(RESULTS_DIR, "capacity_search_results_topfrac_decoupled_hybrid.json"))
+
+_ = plot_best_top_fraction_grid(figsize=(12, 8),
+                                path=os.path.join(RESULTS_DIR, "capacity_search_results_topfrac_decoupled_hybrid.json"))
 # %%

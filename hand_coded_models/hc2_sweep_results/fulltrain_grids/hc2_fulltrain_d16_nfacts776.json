@@ -1,0 +1,95 @@
+{
+  "settings": {
+    "d": 16,
+    "n_facts": 776,
+    "n_attempts": 11,
+    "input_vocab_size": 32,
+    "output_vocab_size": 16,
+    "d_ff": 16,
+    "seed": 42,
+    "metric": "best_guess_accuracy",
+    "model": "FullyTrainedModel2",
+    "n_epochs": 5000,
+    "lr": 0.01,
+    "patience": 100
+  },
+  "results": [
+    {
+      "n_facts": 776,
+      "attempt": 0,
+      "init_seed": 0,
+      "best_guess_accuracy": 0.9355669617652893,
+      "epochs_run": 2586
+    },
+    {
+      "n_facts": 776,
+      "attempt": 1,
+      "init_seed": 1,
+      "best_guess_accuracy": 0.8041236996650696,
+      "epochs_run": 1330
+    },
+    {
+      "n_facts": 776,
+      "attempt": 2,
+      "init_seed": 2,
+      "best_guess_accuracy": 0.9613401889801025,
+      "epochs_run": 2256
+    },
+    {
+      "n_facts": 776,
+      "attempt": 3,
+      "init_seed": 3,
+      "best_guess_accuracy": 0.9110824465751648,
+      "epochs_run": 2263
+    },
+    {
+      "n_facts": 776,
+      "attempt": 4,
+      "init_seed": 4,
+      "best_guess_accuracy": 0.844072163105011,
+      "epochs_run": 1272
+    },
+    {
+      "n_facts": 776,
+      "attempt": 5,
+      "init_seed": 5,
+      "best_guess_accuracy": 0.9587628841400146,
+      "epochs_run": 3215
+    },
+    {
+      "n_facts": 776,
+      "attempt": 6,
+      "init_seed": 6,
+      "best_guess_accuracy": 0.8853092789649963,
+      "epochs_run": 1917
+    },
+    {
+      "n_facts": 776,
+      "attempt": 7,
+      "init_seed": 7,
+      "best_guess_accuracy": 0.9664947986602783,
+      "epochs_run": 2379
+    },
+    {
+      "n_facts": 776,
+      "attempt": 8,
+      "init_seed": 8,
+      "best_guess_accuracy": 0.8737112879753113,
+      "epochs_run": 1692
+    },
+    {
+      "n_facts": 776,
+      "attempt": 9,
+      "init_seed": 9,
+      "best_guess_accuracy": 0.8337628841400146,
+      "epochs_run": 1111
+    },
+    {
+      "n_facts": 776,
+      "attempt": 10,
+      "init_seed": 10,
+      "best_guess_accuracy": 0.7731958627700806,
+      "epochs_run": 734
+    }
+  ]
+}

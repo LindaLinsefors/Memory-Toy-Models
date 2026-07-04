@@ -1,0 +1,1 @@
+{"timestamp": "2026-07-03T16:21:26", "d": 16, "max_facts": 512, "best_score": 1.0, "accuracy_threshold": 1.0, "any_all_most": "any", "n_attempts": 2, "precision": 256, "model": "FullyTrainedModel2", "n_epochs": 5000, "lr": 0.01, "patience": 100}

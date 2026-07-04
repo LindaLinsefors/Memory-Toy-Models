@@ -1,0 +1,32 @@
+{
+  "settings": {
+    "d": 16,
+    "n_facts": 512,
+    "n_attempts": 2,
+    "input_vocab_size": 32,
+    "output_vocab_size": 16,
+    "d_ff": 16,
+    "seed": 42,
+    "metric": "best_guess_accuracy",
+    "model": "FullyTrainedModel2",
+    "n_epochs": 5000,
+    "lr": 0.01,
+    "patience": 100
+  },
+  "results": [
+    {
+      "n_facts": 512,
+      "attempt": 0,
+      "init_seed": 0,
+      "best_guess_accuracy": 0.99609375,
+      "epochs_run": 594
+    },
+    {
+      "n_facts": 512,
+      "attempt": 1,
+      "init_seed": 1,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 512
+    }
+  ]
+}
