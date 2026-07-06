@@ -146,6 +146,7 @@ The norms can also be turned on and off. Each of the norms for the readin to the
 *Figure 2: A simplified version of the toy model. The MLP is present but everything else (attention, norms, residual connection around the MLP) is turned off.*
 
 # Experimental Results 1: Which parts of the network matters
+The point of this experiment is to figure out what parts of the network is important for the sequence memorization task, so that I know what parts are safe to ignore or even remove, in order to make understanding the model easier.
 
 I trained all different versions of the toy model, to see how many facts each of them could learn. There are some patterns, but unfortunately for most of them, I can't separate what is due to expressibility of the model and what is due to learnability.
 
