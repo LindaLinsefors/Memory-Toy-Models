@@ -6,17 +6,20 @@ This post is an appendix to [main post]. This is for people who have read the ma
 ![](table_attention.png)
 *Table A.1: Dual embedding vs. uniform attention vs. full attention.*
 
+![](table_ff.png)
+*Table A.2: MLP*
+
 ![](table_norm.png)
-*Table A.2: Norms vs. no norms.*
+*Table A.3: Norms vs. no norms.*
 
 ![](table_residual.png)
-*Table A.3: With vs. without residual connection around the MLP.*
+*Table A.4: With vs. without residual connection around the MLP.*
 
 ![](table_bias.png)
-*Table A.4: With vs. bias in the MLP.*
+*Table A.5: With vs. Bias in the MLP.*
 
 ![](table_activation.png)
-*Table A.5: GELU vs. ReLU.*
+*Table A.6: GELU vs. ReLU.*
 
 
 

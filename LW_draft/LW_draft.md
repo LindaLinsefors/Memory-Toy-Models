@@ -200,7 +200,11 @@ More surprising is that uniform attention is outperforming learned attention, gi
 
 ### MLP
 
-Because there are many more settings with MLP than without MLP, it's not possible to do the same pairwise comparison. However, it's clear from the numbers in Table 1, that the MLP is very important. Removing the MLP approximately cuts the number of learnable facts in half.
+Not supprisingly, adding the MLP makes the biggest diffrence for number of learnable facts, out of any setting. 
+
+- Adding an MLP block make the network able to learn 324-794 more facts, which is 60%-373% more
+- Adding an MLP block makes the biggest diffrence when Mixing={2Emb, Unif Atten} and Norm=❌. This is proabbly becasue in this setting the MLP's ReLU or GELU neruons are the only non-lineareties. 
+- Adding an MLP block makes the smallest diffreince when Mixing=2Emb, and Noms=❌.
 
 ### Norms
 
