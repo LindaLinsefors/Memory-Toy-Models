@@ -1,8 +1,26 @@
-This post is an applendix to [main post]. This is for people who read the mian post and want more details. Almost everyone should not spend time reasing this.
+This post is an appendix to [main post]. This is for people who have read the main post and want more details. 
 
 
 
 # Appendix A: More on what parts of the model matter
+![](table_attention.png)
+*Table A.1: Dual embedding vs. uniform attention vs. full attention.*
+
+![](table_norm.png)
+*Table A.2: Norms vs. no norms.*
+
+![](table_residual.png)
+*Table A.3: With vs. without residual connection around the MLP.*
+
+![](table_bias.png)
+*Table A.4: With vs. bias in the MLP.*
+
+![](table_activation.png)
+*Table A.5: GELU vs. ReLU.*
+
+
+
+
 
 # Appendix B: Best S (number neurons per label) for the hand-coded and hybrid models
 

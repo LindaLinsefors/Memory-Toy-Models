@@ -1,16 +1,16 @@
-\begin{tabular}{@{}lc|cccc|cccc|cccc@{}}
+\begin{tabular}{@{}lc|ccccc|ccccc|ccccc@{}}
 \toprule
- &  & \multicolumn{4}{|c}{\textbf{Any of 11}} & \multicolumn{4}{|c}{\textbf{Majority of 11}} & \multicolumn{4}{|c}{\textbf{All of 11}} \\
-\cmidrule(lr){3-6}\cmidrule(lr){7-10}\cmidrule(lr){11-14}
-\textbf{Attn} & \textbf{Norm} & \textbf{On} & \textbf{$=$} & \textbf{Off} & \textbf{Mean \%$\Delta$} & \textbf{On} & \textbf{$=$} & \textbf{Off} & \textbf{Mean \%$\Delta$} & \textbf{On} & \textbf{$=$} & \textbf{Off} & \textbf{Mean \%$\Delta$} \\
+ &  & \multicolumn{5}{|c}{\textbf{Any of 11}} & \multicolumn{5}{|c}{\textbf{Most of 11}} & \multicolumn{5}{|c}{\textbf{All of 11}} \\
+\cmidrule(lr){3-7}\cmidrule(lr){8-12}\cmidrule(lr){13-17}
+\textbf{Mixing} & \textbf{Norms} & \textbf{On} & \textbf{$=$} & \textbf{Off} & \textbf{Mean \%$\Delta$} & \textbf{$\Delta$} & \textbf{On} & \textbf{$=$} & \textbf{Off} & \textbf{Mean \%$\Delta$} & \textbf{$\Delta$} & \textbf{On} & \textbf{$=$} & \textbf{Off} & \textbf{Mean \%$\Delta$} & \textbf{$\Delta$} \\
 \midrule
-None & \xmark & \textbf{4} &  &  & \textcolor{green!55!black}{$+373.1\%$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+348.1\%$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+338.5\%$} \\
-None & \cmark & \textbf{4} &  &  & \textcolor{green!55!black}{$+79.7\%$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+90.4\%$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+108.4\%$} \\
+2Emb & \xmark & \textbf{4} &  &  & \textcolor{green!55!black}{$+373.1\%$} & \textcolor{green!55!black}{$+776$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+348.1\%$} & \textcolor{green!55!black}{$+724$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+338.5\%$} & \textcolor{green!55!black}{$+704$} \\
+2Emb & \cmark & \textbf{4} &  &  & \textcolor{green!55!black}{$+79.7\%$} & \textcolor{green!55!black}{$+454$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+90.4\%$} & \textcolor{green!55!black}{$+486$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+108.4\%$} & \textcolor{green!55!black}{$+528$} \\
 \hdashline[1pt/3pt]
-Unif & \xmark & \textbf{4} &  &  & \textcolor{green!55!black}{$+288.5\%$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+295.4\%$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+297.9\%$} \\
-Unif & \cmark & \textbf{4} &  &  & \textcolor{green!55!black}{$+128.8\%$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+135.6\%$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+159.1\%$} \\
+Unif Attn & \xmark & \textbf{4} &  &  & \textcolor{green!55!black}{$+288.5\%$} & \textcolor{green!55!black}{$+600$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+295.4\%$} & \textcolor{green!55!black}{$+584$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+297.9\%$} & \textcolor{green!55!black}{$+572$} \\
+Unif Attn & \cmark & \textbf{4} &  &  & \textcolor{green!55!black}{$+128.8\%$} & \textcolor{green!55!black}{$+528$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+135.6\%$} & \textcolor{green!55!black}{$+510$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+159.1\%$} & \textcolor{green!55!black}{$+508$} \\
 \hdashline[1pt/3pt]
-Full & \xmark & \textbf{4} &  &  & \textcolor{green!55!black}{$+194.6\%$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+195.7\%$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+333.3\%$} \\
-Full & \cmark & \textbf{4} &  &  & \textcolor{green!55!black}{$+133.4\%$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+314.2\%$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+389.6\%$} \\
+Lrn Attn & \xmark & \textbf{4} &  &  & \textcolor{green!55!black}{$+194.6\%$} & \textcolor{green!55!black}{$+384$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+195.7\%$} & \textcolor{green!55!black}{$+198$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+333.3\%$} & \textcolor{green!55!black}{$+64$} \\
+Lrn Attn & \cmark & \textbf{4} &  &  & \textcolor{green!55!black}{$+133.4\%$} & \textcolor{green!55!black}{$+462$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+314.2\%$} & \textcolor{green!55!black}{$+518$} & \textbf{4} &  &  & \textcolor{green!55!black}{$+389.6\%$} & \textcolor{green!55!black}{$+220$} \\
 \bottomrule
 \end{tabular}

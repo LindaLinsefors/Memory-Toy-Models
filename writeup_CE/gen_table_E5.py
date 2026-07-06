@@ -44,7 +44,7 @@ OUTLIER_FRAC = 0.20
 
 CM = r"\cmark"
 XM = r"\xmark"
-ATTLABEL = {"none": "None", "uni": "Unif", "full": "Full"}
+ATTLABEL = {"none": "2Emb", "uni": "Unif Attn", "full": "Lrn Attn"}
 CRIT_LABEL = {"any": "Any of 11", "most": "Most of 11", "all": "All of 11"}
 ATT_ORDER = ["none", "uni", "full"]
 
@@ -139,7 +139,7 @@ def cm(flag):
 
 def generate(col_values, groups):
     n_data = len(col_values)
-    n_fixed = 6  # Attn, FF, Norm, Res, Bias, Act
+    n_fixed = 6  # Mixing, MLP, Norms, Res, Bias, Act
 
     lines = []
     # A solid vertical rule before each data group separates Act from the first
@@ -165,7 +165,7 @@ def generate(col_values, groups):
     for _title, idxs, subs in groups:
         for i, s in zip(idxs, subs):
             sub_by_col[i] = s
-    header2 = [r"\textbf{Attn}", r"\textbf{MLP}", r"\textbf{Norm}",
+    header2 = [r"\textbf{Mixing}", r"\textbf{MLP}", r"\textbf{Norms}",
                r"\textbf{Res}", r"\textbf{Bias}", r"\textbf{Act}"] + sub_by_col
     lines.append(" & ".join(header2) + r" \\")
     lines.append(r"\midrule")

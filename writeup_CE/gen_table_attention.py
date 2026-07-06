@@ -1,18 +1,20 @@
 r"""Generate the attention-variant pairwise comparison table for E5.
 
-Attention has three values (None / Unif / Full). This table compares them
-pairwise. One row per architecture that has an attention choice; the ff=True
-block has 16 rows (2 norm x 2 res x 2 bias x 2 act) and the ff=False block adds
-2 rows (norm only, since the no-FF runs vary only norm). For each criterion
-(any / most / all) and each pair (None>Unif, Unif>Full, None>Full) the row gives:
+Token mixing has three values (2Emb / Unif Attn / Lrn Attn). This table
+compares them pairwise. One row per architecture that has a mixing choice; the
+ff=True block has 16 rows (2 norm x 2 res x 2 bias x 2 act) and the ff=False
+block adds 2 rows (norm only, since the no-FF runs vary only norm). For each
+criterion (any / most / all) and each pair (2E>U, U>L, 2E>L) the row gives:
 
   * the number of repeats (out of 4) in which the left variant beats the right
-    (paired by repeat index), and
-  * the mean signed percentage difference (left - right) / right.
+    (paired by repeat index),
+  * the mean signed percentage difference (left - right) / right, and
+  * the mean signed absolute difference left - right (in facts).
 
-Output is a LaTeX ``tabular`` written to OUT_FILE, pulled into ``writup.tex``
-with ``\input``. Data helpers come from gen_table_E5.py and the shared
-formatting from gen_table_activation.py.
+Output is three vertically stacked ``tabular`` blocks (one per criterion,
+wrapped in an outer one-column tabular) written to OUT_FILE, pulled into
+``writup.tex`` with ``\input``. Data helpers come from gen_table_E5.py and the
+shared formatting from gen_table_activation.py.
 
 Just run:
     python writeup_CE/gen_table_attention.py
@@ -22,24 +24,27 @@ from pathlib import Path
 
 from gen_table_E5 import (LOG_FILES, read_log, parse_column_label,
                           CRIT_LABEL, ATT_ORDER, CM, XM, ATTLABEL, cm)
-from gen_table_activation import CRIT_ORDER, fmt_pct, fmt_count
+from gen_table_activation import CRIT_ORDER, fmt_pct, fmt_abs, fmt_count
 
 HERE = Path(__file__).resolve().parent
 OUT_FILE = HERE / "table_attention.tex"
 
-# Pairwise comparisons (left vs right), following the None > Unif > Full order.
+# Pairwise comparisons (left vs right), following the 2Emb > Unif Attn >
+# Lrn Attn order.
 PAIRS = [("none", "uni"), ("uni", "full"), ("none", "full")]
-ABBR = {"none": "N", "uni": "U", "full": "F"}  # compact header labels
+ABBR = {"none": "2E", "uni": "U", "full": "L"}  # compact header labels
 
 # The ff=False runs in the logs carry these (leftover) res/bias/act settings.
 FFFALSE_RES, FFFALSE_BIAS, FFFALSE_ACT = True, True, "ReLU"
 
 
 def compare_pair(files, a, b, ff, norms, res, bias, act):
-    """Repeats where attention variant a beats b, and mean %diff (a-b)/b."""
+    """Repeats where mixing variant a beats b, mean %diff (a-b)/b, and mean
+    absolute diff a-b (in facts)."""
     wins = 0
     n = 0
     diffs = []
+    adiffs = []
     for f in files:
         va = f.get((a, ff, norms, res, bias, act))
         vb = f.get((b, ff, norms, res, bias, act))
@@ -48,45 +53,40 @@ def compare_pair(files, a, b, ff, norms, res, bias, act):
         n += 1
         if va > vb:
             wins += 1
+        adiffs.append(va - vb)
         if vb:
             diffs.append((va - vb) / vb * 100.0)
     mean_diff = sum(diffs) / len(diffs) if diffs else None
-    return wins, n, mean_diff
+    mean_abs = sum(adiffs) / len(adiffs) if adiffs else None
+    return wins, n, mean_diff, mean_abs
 
 
-def generate(cols):
-    files_by_crit = {crit: [cv for c, cv in cols if c == crit] for crit in CRIT_ORDER}
-    crits = [c for c in CRIT_ORDER if files_by_crit[c]]
-
-    n_fixed = 5            # Norm, FF, Res, Bias, Act
-    per_crit = 2 * len(PAIRS)  # (count, %diff) per pair
-    colspec = "@{}ccccc" + ("|" + "c" * per_crit) * len(crits) + "@{}"
+def one_table(crit, files):
+    """Build the tabular for a single criterion; returns its LaTeX source."""
+    n_fixed = 5                # Norms, MLP, Res, Bias, Act
+    per_crit = 3 * len(PAIRS)  # (count, %diff, abs diff) per pair
+    colspec = "@{}ccccc|" + "c" * per_crit + "@{}"
 
     lines = [r"\begin{tabular}{" + colspec + "}", r"\toprule"]
 
-    header1 = [""] * n_fixed
-    cmidrules = []
-    for j, crit in enumerate(crits):
-        header1.append(r"\multicolumn{%d}{|c}{\textbf{%s}}" % (per_crit, CRIT_LABEL[crit]))
-        first = n_fixed + per_crit * j + 1
-        cmidrules.append(r"\cmidrule(lr){%d-%d}" % (first, first + per_crit - 1))
+    header1 = [""] * n_fixed + \
+        [r"\multicolumn{%d}{|c}{\textbf{%s}}" % (per_crit, CRIT_LABEL[crit])]
     lines.append(" & ".join(header1) + r" \\")
-    lines.append("".join(cmidrules))
+    lines.append(r"\cmidrule(lr){%d-%d}" % (n_fixed + 1, n_fixed + per_crit))
 
-    header2 = [r"\textbf{Norm}", r"\textbf{FF}", r"\textbf{Res}", r"\textbf{Bias}", r"\textbf{Act}"]
-    for _crit in crits:
-        for a, b in PAIRS:
-            header2 += [r"\textbf{%s$>$%s}" % (ABBR[a], ABBR[b]), r"\textbf{$\Delta$}"]
+    header2 = [r"\textbf{Norms}", r"\textbf{MLP}", r"\textbf{Res}", r"\textbf{Bias}", r"\textbf{Act}"]
+    for a, b in PAIRS:
+        header2 += [r"\textbf{%s$>$%s}" % (ABBR[a], ABBR[b]),
+                    r"\textbf{\%$\Delta$}", r"\textbf{$\Delta$}"]
     lines.append(" & ".join(header2) + r" \\")
     lines.append(r"\midrule")
 
     def data_cells(ff, norms, res, bias, act):
         out = []
-        for crit in crits:
-            for a, b in PAIRS:
-                wins, n, mean_diff = compare_pair(
-                    files_by_crit[crit], a, b, ff, norms, res, bias, act)
-                out += [fmt_count(wins, n), fmt_pct(mean_diff)]
+        for a, b in PAIRS:
+            wins, n, mean_diff, mean_abs = compare_pair(
+                files, a, b, ff, norms, res, bias, act)
+            out += [fmt_count(wins, n), fmt_pct(mean_diff), fmt_abs(mean_abs)]
         return out
 
     # ff=True block: 16 rows over (norms, res, bias, act).
@@ -109,6 +109,21 @@ def generate(cols):
         lines.append(" & ".join(cells) + r" \\")
 
     lines.append(r"\bottomrule")
+    lines.append(r"\end{tabular}")
+    return "\n".join(lines)
+
+
+def generate(cols):
+    files_by_crit = {crit: [cv for c, cv in cols if c == crit] for crit in CRIT_ORDER}
+    crits = [c for c in CRIT_ORDER if files_by_crit[c]]
+
+    # One table per criterion, stacked vertically. Nesting them in a
+    # one-column tabular keeps the block a single unit for \input.
+    lines = [r"\begin{tabular}{@{}c@{}}"]
+    for i, crit in enumerate(crits):
+        lines.append(one_table(crit, files_by_crit[crit]))
+        if i < len(crits) - 1:
+            lines.append(r"\\[3ex]")
     lines.append(r"\end{tabular}")
     return "\n".join(lines) + "\n"
 

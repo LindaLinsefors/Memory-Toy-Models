@@ -1,10 +1,10 @@
-r"""Generate the Residual-on vs Residual-off per-architecture table for E5.
+r"""Generate the Bias-on vs Bias-off per-architecture table for E5.
 
-One row per architecture that has a residual choice (ff=True only:
-3 attn x 2 norm x 2 bias x 2 act = 24 rows). For each criterion (any / most /
+One row per architecture that has a bias choice (ff=True only:
+3 attn x 2 norm x 2 res x 2 act = 24 rows). For each criterion (any / most /
 all) the row reports, across that criterion's repeats (paired by repeat index):
 
-  * how often residual-on beats / equals / trails residual-off,
+  * how often bias-on beats / equals / trails bias-off,
   * the mean signed percentage difference (on - off) / off, and
   * the mean signed absolute difference on - off (in facts).
 
@@ -14,7 +14,7 @@ formatting (coloured %diff) from gen_table_activation.py, so editing LOG_FILES
 in gen_table_E5.py is enough to change the inputs.
 
 Just run:
-    python writeup_CE/gen_table_residual.py
+    python writeup_CE/gen_table_bias.py
 """
 
 from pathlib import Path
@@ -24,31 +24,31 @@ from gen_table_E5 import (LOG_FILES, read_log, parse_column_label,
 from gen_table_activation import CRIT_ORDER, fmt_pct, fmt_abs, fmt_count
 
 HERE = Path(__file__).resolve().parent
-OUT_FILE = HERE / "table_residual.tex"
+OUT_FILE = HERE / "table_bias.tex"
 
-# The compared axis: residual-on ("a") versus residual-off ("b").
+# The compared axis: bias-on ("a") versus bias-off ("b").
 LABEL_A, LABEL_B = "On", "Off"
 
 
 def architecture_rows():
-    """Yield (attn, norms, bias, act) for every ff=True architecture (24 of them)."""
+    """Yield (attn, norms, res, act) for every ff=True architecture (24 of them)."""
     for att in ATT_ORDER:
         for norms in [False, True]:
-            for bias in [False, True]:
+            for res in [False, True]:
                 for act in ["GELU", "ReLU"]:
-                    yield att, norms, bias, act
+                    yield att, norms, res, act
 
 
-def compare(files, att, norms, bias, act):
+def compare(files, att, norms, res, act):
     """For one architecture and one criterion's repeat files, return
     (on_better, equal, off_better, mean_pct_diff, mean_abs_diff), comparing
-    residual on vs off per repeat (paired by repeat index)."""
+    bias on vs off per repeat (paired by repeat index)."""
     on_better = equal = off_better = 0
     diffs = []
     adiffs = []
     for f in files:
-        on = f.get((att, True, norms, True, bias, act))    # ff_residual = True
-        off = f.get((att, True, norms, False, bias, act))  # ff_residual = False
+        on = f.get((att, True, norms, res, True, act))    # bias = True
+        off = f.get((att, True, norms, res, False, act))  # bias = False
         if on is None or off is None:
             continue
         if on > off:
@@ -69,7 +69,7 @@ def generate(cols):
     files_by_crit = {crit: [cv for c, cv in cols if c == crit] for crit in CRIT_ORDER}
     crits = [c for c in CRIT_ORDER if files_by_crit[c]]
 
-    n_fixed = 4    # Mixing, Norms, Bias, Act
+    n_fixed = 4    # Mixing, Norms, Res, Act
     per_crit = 5   # On better, equal, Off better, Mean %diff, Mean abs diff
     colspec = "@{}lccc" + ("|" + "c" * per_crit) * len(crits) + "@{}"
 
@@ -84,7 +84,7 @@ def generate(cols):
     lines.append(" & ".join(header1) + r" \\")
     lines.append("".join(cmidrules))
 
-    header2 = [r"\textbf{Mixing}", r"\textbf{Norms}", r"\textbf{Bias}", r"\textbf{Act}"]
+    header2 = [r"\textbf{Mixing}", r"\textbf{Norms}", r"\textbf{Res}", r"\textbf{Act}"]
     for _crit in crits:
         header2 += [r"\textbf{%s}" % LABEL_A, r"\textbf{$=$}",
                     r"\textbf{%s}" % LABEL_B, r"\textbf{Mean \%$\Delta$}",
@@ -95,13 +95,13 @@ def generate(cols):
     for ai, att in enumerate(ATT_ORDER):
         if ai > 0:
             lines.append(r"\midrule")
-        block = [(norms, bias, act) for norms in [False, True]
-                 for bias in [False, True] for act in ["GELU", "ReLU"]]
-        for ri, (norms, bias, act) in enumerate(block):
-            cells = [ATTLABEL[att], cm(norms), cm(bias), act]
+        block = [(norms, res, act) for norms in [False, True]
+                 for res in [False, True] for act in ["GELU", "ReLU"]]
+        for ri, (norms, res, act) in enumerate(block):
+            cells = [ATTLABEL[att], cm(norms), cm(res), act]
             for crit in crits:
                 on_better, equal, off_better, mean_diff, mean_abs = compare(
-                    files_by_crit[crit], att, norms, bias, act)
+                    files_by_crit[crit], att, norms, res, act)
                 total = on_better + equal + off_better
                 cells += [fmt_count(on_better, total), fmt_count(equal, total),
                           fmt_count(off_better, total), fmt_pct(mean_diff),
