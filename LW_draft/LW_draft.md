@@ -152,110 +152,44 @@ The norms can also be turned on and off. Each of the norms for the readin to the
 ## Results
 The following is just a summary of the results. To see the full results, including the details of the experimental setup, see [Appendix A](link_ot_appendix_blogpos)
 
-[Add summary of results]
+To find out which parts of the network matter for the memorization task, I trained every combination of the architectural variants described above, and measured the maximum number of facts each one could learn. All models in this experiment used the same size: $n_{input\_vocab} = 32$, $d_{residual} = 16$, $d_{MLP} = 16$, $n_{output\_vocab} = 16$.[^d16]
+
+[^d16]: Initially I used dimension 16 for all these values, too many networks maxed out the number of possible facts, so I doubbled $n_{input\_vocab}$
+
+The **MLP** is by far the most important part. 
+- Adding the MLP block lets the network learn **60% - 373%** more facts, a much larger effect than any other setting. 
+- The effect is ***largest*** when **Mixing** = **2Emb** or **Unif Attn**, combined with **Norms**=❌, I.e, when the MLP's ReLU or GELU neurons are the only non-linearity in the network.
+
+**Mixing** is the second most influential setting, if there is an MLP.[^no_mlp]
+- When **MLP**=❌ and **Norms**=❌ (nothing else in the netowrk than the mixing and the unembedding), then *all the mixing options does equally well*. 
+- For all other settings **2Emb** *beats* **Unif Attn** (**7.8% - 39%** more facts), which *beats* **Lrn Attn** (**5% - 39%** more facts)
+
+[^no_mlp]: In the absence of an MLP block, Norms is the second mores infuencial setting and Mixing beocomes the third. Although mixing only makes the third place becasue with no MLP there are no more settings.
+
+Uniform attention being better than learned attention, has to be due to learned attention having training difficulties, since learned attention is strictly more expressive. Consistent with this, the learned attention results are also by far the least stable across repeated runs. It's not surprising that dual embedding is doing better than uniform attention, since it's both strictly more expressive, and should be no harder to train.
+
+These results suggest that the attention probably isn't doing anything importantly different from just linearly adding together the embedding of the two tokens.[^att_do] 
+
+[^att_do]: With some rotation added to the first token embedding as to be able to tell apart inputs with the two tokes swapped. E.g. to differentiate the input "1,2" from the input "2,1"
+
+**Norms** is the third most influential setting, if there is an MLP.
+
+- When **MLP**=✅ then adding norms lets the network learn **2.2% - 42%** more facts
+- When **MLP**=❌ then adding norms lets the network learn **79% - 174%** more facts
+
+**The remaining settings** matter less. 
+ - **Res**=✅ is mostly better than **Res**=❌, with **-0.7%** to **34%** more facts
+ - **Bias**=✅ is mostly better than **Bias**=❌, with **-5.1%** to **22%** more facts
+ - **GELU** is mostly better than **ReLU**, with **-0.2%** to **13%** more facts
+
+Finally, there is one notable outlier: the combination **MLP**=✅, **Norms**=✅, **Res**=❌, **Bias**=❌, **ReLU** (combined with **any Mixing** option) does far worse than the individual settings would predict — almost as bad as having no MLP at all. I don't know why.[^bad]
+
+[^bad]: Just turning on the MLP bias or swiching from ReLU to GELU (changes that nomrally have small effects), is sufficien restore this architecutre to the normal capabilities range,
 
 
 
 
-# Results 1: Which parts of the network matters [Move all of this to appendix]
-The point of this experiment is to figure out what parts of the network is important for the sequence memorization task, so that I know what parts are safe to ignore or even remove, in order to make understanding the model easier.
 
-What I found was that having an MLP is the most important part (approximately responsible for learning half of the facts), and everything else matter a bit.
-
-I trained all different versions of the toy model, to see how many facts each of them could learn. There are some patterns, but unfortunately for most of them, I can't separate what is due to expressibility of the model and what is due to learnability.
-
-For this experiment, I used a single model size across all architectures:
-- $n_{input\_vocab} = 32$
-- $d_{residual} = 16$
-- $d_{MLP} = 16$
-- $n_{output\_vocab} = 16$ 
-
-
-I claim that a model has "learned a fact" if: When the model is given the first two tokens of this sequence, it correctly predicts the correct third token. And by "correctly predicts" I mean that argmaxing over the logits locates the correct output token.
-
-To find out the maximum number of facts a model can learn, I performed a binary search over number of facts, to find the highest number of facts such that the model learned all of them.
-
-For each number of facts I trained 11 models in parallel, with the exact same facts, but different random initialized weights. I used three different success criterions "Any", "Most" and "All", meaning that I said the model succeeded at learning all the facts, if it succeeded in any, most or all of the 11 trials.[^most]
-
-[^most]: "Most" mean that there are more successes than failure, i.e. at least 6 out of 10.
-
-For each architecture and each of Any/Most/All I ran a binary search to find the maximum number of facts it could learn. Furthermore, I repeated each such binary search 4 times, to check for stability. The "Any" setting had the highest stability (similar max number of fact over all 4 duplicate experiments), and "All" had the worst stability.[^4]
-
-[^4]: It's not surprising that "All" had bad stability, since it only takes one bad run to throw off the entire batch. But it was not a priori obvious to me that "Any" would be more stable than "Most".
-
-All the results for all the experiments are shown in the table below 
-
-![Maximum facts memorized per architectural configuration.](table_E5.png)
-
-*Table 1: Maximum facts memorized for each model architecture. Within each group the row-wise maximum is shown in bold and values more than 20% from the group's median are boxed as outliers. Note that 1024 is the dataset ceiling, so configurations reaching it have saturated the data rather than the model.*
-
-To see the effect of each of Mixing, Norms, Res, Bias and Act, we'll look at pairs (or triples for Mixing) of model architectures that are the same except for this variable. E.g. for Norms, we look at every pair that differ only in terms of it has norms or not, to see how much models with norms typically outperforms the ones without norms. We're doing this analysis on the Any runs since these have the most stable outcomes.
-
-However before doing all that, it's worth noting one major outlier.
-
-### MLP + Norms + No Residual around MLP + No Bias + ReLU
-
-For any form or attention (or dual embedding) networks with **MLP**=✅, **Norm**=✅, **Res**=❌, **Bias**=❌ and **Act**=**ReLU**, does really badly. Almost as bad (and in one case slightly worse) than removing the MLP.
-
-This combination is extra bad for some reason, that isn't just an effect of the sum of it's part. I don't know why. Specifically, I don't know if the limitation is due to training dynamics or due to what is possible for this architecture.
-
-Instead of writing "except for **MLP**=✅, **Norm**=✅, **Res**=❌, **Bias**=❌ **Act**=**ReLU**", in every subsection below. I'll just point out this here. Having pointed this out, this data will be excluded from the below triple or pairwise comparisons.
-
-
-## Triple or pairwise comparisons.
-Now back to triple and pairwise comparisons. I.e. we're compare outcomes (number of learned facts) for pairwise (or triples when varying Mixing) model architecture, where the only difference is a single setting o
-
-### Mixing 
-
-- When **Norms**=❌ and **MLP**=❌, i.e. there is nothing but embedding, possibly attention, and unembedding, in this case only, 2Emb, Unif Attn and Lrn Attn does equally well.[^M]
-
-[^M]: **2Emb** and **Unif Attn** learn **208** facts in each of the four repeated experiments. Lrn Attn learn **208** in two of the replications, slgtly more in one, and slightly less in one.
-
-- For all other settings **2Emb** does better than **Unif Attn** wich does better than **Lrn Attn**. 
-- Going from **2Emb** to **Unif Attn** lets the network learn **74 - 176 (7.8% - 23.9%)** more facts. 
-- Going from **Unif Attn** to **Lrn Attn** lets the network learn **46 - 222 (7.9% - 39%)** more facts.
-
-It is notable that when everything else is turned off, i.e. there is only embedding maybe attention and unembedding, is when Mixing (the setting that determine the embedding and attention) has the least effect.
-
-
-It's not surprising that dual embedding does the best, since this architect is (arguably) the more powerful. Because attention is non-linear, and the dual embedding is linear, there are things that the attention can express that the dual embedding can't. But on the other hand, the dual embedding gets to encode the input for each token position entirely separately, which gives the network more freedom. Additionally, this no attention setup should be easier to train, since it's simpler.
-
-More surprising is that uniform attention is outperforming learned attention, given that learned attention is strictly more powerful. Therefore, this has to be because of ease of training. This interpretation is also supported by the observation that the number of fact network with learned attention mange to learn, is unstable. You can see this in that in the number of outliers in the Table 1 and also how much number of facts drop from Any to Most to All.
-
-### MLP
-
-- Adding an **MLP** block lets the network learn **324 - 794 (60% - 373%)** more facts.
-- Adding an **MLP** block makes the **biggest** diffrence when **Mixing**={**2Emb, Unif Atten**} and **Norms**=❌. This is proabbly becasue in this setting the MLP's ReLU or GELU neruons are the only non-lineareties. 
-- Adding an MLP block makes the **smallest** diffreince when **Mixing**=**2Emb**, and **Norms**=✅.
-
-Not supprisingly, adding the MLP makes the biggest diffrence for number of learnable facts, out of any of the setting. 
-
-### Norms
-
-- When **MLP**=❌ then adding norms lets the network learn **162 - 362 (79% - 174%)** more facts. This effect is *largest* for **Mixing** = **2Emb**.
-- When **MLP**=✅, then adding norms makes the network able to learn **22-240 (2.2% - 42%)**. The effect is *largest* for **Mixing** = **Lrn Attn**.
-
-Norms are generally useful for learning more facts. Norms make a bigger difference if there is attention, and if there is no MLP. Possible this means that the norms in front of the attention and unembedding are helpful, while the norm in front of the MLP is anti-helpful. Or possible the MLP and norms overlap somewhat in function, such that the MLP makes the norms less useful. 
-
-The fact that MLP has the biggest effect when there are no other non-lineareties in the network, points to the overlaping function hypothesis. However the unsuall crappyness of **MLP**=✅, **Norms**=✅, **Res**=❌, **Bias**=❌, **Act**=**ReLU**" might be a sign that adding norms may be bad for the performance of the MLP.
-
-
-
-### Residual Connection around the MLP
-
-- Adding this residual connection lets the network learn **-8 to 244 (-0.7% to 34%)** more facts.
-- There only setting where adding this residual is bad for the network is **Mixing**=**Lrn Attn**, **Norms**=❌, **Bias**=✅, **Act**=**ReLU**. But the effect is tiny, **8 facts (0.7%)**, so it's probably just a fluke.
-
-### MLP Bias
-Adding a bias ought to be strictly helpful, but for some reason it's anti-helpful in a few cases.
-
-- Adding a bias to the MLP lets the network learn **-52 to 156 (-5.1% to 22%)** more facts.
-- Adding an MLP Bias performs at its worst when **Norms**=❌, **Res**=✅. Given this setting adding the bias lets the network learn **-52 to 14 (-5.1% to 1.4%)** more facts.
-
-### Activation Function
-
-**GELU** is typically better than **ReLU**, but difference is small. 
-- Changing from **ReLU** to **GELU** lets the network learn **-6 to 78 (-0.2% to +12.7%)** more facts.
 
 
 
