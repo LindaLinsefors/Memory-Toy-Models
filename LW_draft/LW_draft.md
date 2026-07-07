@@ -18,10 +18,10 @@ What is the task we are getting these models to perform
 - **Model architectures** \
 [section summary]
 
-- **Experimental Results 1: Which parts of the network matters** \
+- **Results 1: Which parts of the network matters** \
 [section summary]
 
-- **Experimental Results 2: Scaling** \
+- **Results 2: Scaling** \
 [section summary]
 
 - **Challenge: Benchmark for understanding** \
@@ -30,7 +30,7 @@ What is the task we are getting these models to perform
 - **My attempt**\
 My own attempt to solve the above challenge. 
 
-- **Experimental Results 3: Comparing trained, hand-coded and hybrid models**\
+- **Results 3: Comparing trained, hand-coded and hybrid models**\
 [section summary]
 
 
@@ -47,8 +47,6 @@ Hyperparameters for the data generation:
 In my experiments, the input token vocabulary size is always twice the size of the output token vocabulary.[^1]
 
 [^1]: I started out the experiments, having them the same size, but the network learned all the facts to easily, so I doubled the input vocabulary size in order to have more possible facts.
-
-## Generating the training data
 
 The code for generating the training data is not very long, and is quoted below if you prefer to read code
 
@@ -94,9 +92,11 @@ def generate_facts(n_facts: int, # of facts to generate,
     return {"inputs": inputs[sorted_indices], "targets": targets[sorted_indices]}
 ```
 
-# Model architectures
+# Testing Various Model Architectures
 
-The full toy model is a small one layer transformer. In addition to training the full model, I also try turning off various parts in various combination, to see what parts of the model is important for the sequence memorization task.
+I want to learn how these facts would be learned by a one layer transformer. However, that turned out to be hard. But if I know in what part of the model the main action is, then maybe I can simplify the toy model to only that part and start with understanding that. 
+
+To test what parts of the model are important for the sequence memorization task, I made a transformer model, where ever part of the model can be turned on or off. Then I trained all variants of this model and compared their performance.
 
 The full toy model consist of:
 
@@ -112,13 +112,17 @@ The full toy model consist of:
 
 *Figure 1: The full toy transformer model, with all the different parts present.*
 
+After the attention, we only care about the computation in the second token position. This follows from the fact that we're only trying to predict the third token, and not the second token.
+
 ## Model variations
 
 ### Mixing
-There are the variants when it comes to how information from the first token position gets added to the second token position. 
+I want to be able to simplify the model by removing the attention. However, the problem with doing so is that the information from the first token has to reach the second token position somehow. Therefore, I can't just remove the attention, but will have to replace it with something else.
+
+*Mixing* is the part of the model that combine the first token and second token information in to the same residual stream. I have three different variants for this.
 
 - **Learned Attention (Lrn Attn):**
-  Standard transformer architecture, using attention. 
+  Standard transformer attention. 
 
 - **Uniform Attention (Unif Attn):**
   Same as above except I remove the attention pattern $\mathrm{softmax}(QK^\top)$ and replace it with a uniform $\frac{1}{2}$.
@@ -127,17 +131,17 @@ There are the variants when it comes to how information from the first token pos
   There is no attention and no positional embedding. Instead, there is two different token embeddings, one for each position. These are simply added together to make the first residual stream activation.
 
 
-## MLP
+### MLP
 
 There are a number of variants regarding the MLP. Firstly the MLP can either be present or be missing. Secondly if there is an MLP layer, each of the following can be varied
 
-- **Activation Function** can be either GELU or ReLU
+- **Activation Function (Act)** can be either GELU or ReLU
 - **Bias** can exist or not.[^3]
-- **Residual connection** around the MLP can exist or not.
+- **Residual connection (Res)** around the MLP can exist or not.
 
 [^3]: If the bias is present that means both the linear readout and the linear projection from the ReLU or GELU neurons, have bias. (Making them actually not linear functions but affine function, in strict math terminology.) If there is no bias, this means neither of these have bias. All other linear connections in the rest of the network (e.g. embeddings, etc) are always bias free.
 
-## Norms
+### Norms
 
 The norms can also be turned on and off. Each of the norms for the readin to the attention and MLP only exist if both that part of the network is present (Unif Attn or Lrn Attn for the attention), and Norms are turned on. The last norm, just before the unembedding only depends on the norm setting, and are there if norms are turned on and not there if norms are turned off.
 
@@ -145,8 +149,18 @@ The norms can also be turned on and off. Each of the norms for the readin to the
 
 *Figure 2: A simplified version of the toy model. The MLP is present but everything else (attention, norms, residual connection around the MLP) is turned off.*
 
-# Experimental Results 1: Which parts of the network matters
+## Results
+The following is just a summary of the results. To see the full results, including the details of the experimental setup, see [Appendix A](link_ot_appendix_blogpos)
+
+[Add summary of results]
+
+
+
+
+# Results 1: Which parts of the network matters [Move all of this to appendix]
 The point of this experiment is to figure out what parts of the network is important for the sequence memorization task, so that I know what parts are safe to ignore or even remove, in order to make understanding the model easier.
+
+What I found was that having an MLP is the most important part (approximately responsible for learning half of the facts), and everything else matter a bit.
 
 I trained all different versions of the toy model, to see how many facts each of them could learn. There are some patterns, but unfortunately for most of them, I can't separate what is due to expressibility of the model and what is due to learnability.
 
@@ -161,7 +175,9 @@ I claim that a model has "learned a fact" if: When the model is given the first 
 
 To find out the maximum number of facts a model can learn, I performed a binary search over number of facts, to find the highest number of facts such that the model learned all of them.
 
-For each number of facts I trained 11 models in parallel, with the exact same facts, but different random initialized weights. I used three different success criterions "Any", "Most" and "All", meaning that I said the model succeeded at learning all the facts, if it succeeded in any, most or all of the 11 trials.
+For each number of facts I trained 11 models in parallel, with the exact same facts, but different random initialized weights. I used three different success criterions "Any", "Most" and "All", meaning that I said the model succeeded at learning all the facts, if it succeeded in any, most or all of the 11 trials.[^most]
+
+[^most]: "Most" mean that there are more successes than failure, i.e. at least 6 out of 10.
 
 For each architecture and each of Any/Most/All I ran a binary search to find the maximum number of facts it could learn. Furthermore, I repeated each such binary search 4 times, to check for stability. The "Any" setting had the highest stability (similar max number of fact over all 4 duplicate experiments), and "All" had the worst stability.[^4]
 
@@ -173,71 +189,93 @@ All the results for all the experiments are shown in the table below
 
 *Table 1: Maximum facts memorized for each model architecture. Within each group the row-wise maximum is shown in bold and values more than 20% from the group's median are boxed as outliers. Note that 1024 is the dataset ceiling, so configurations reaching it have saturated the data rather than the model.*
 
-To see the effect of each of Mixing, Norms, Res, Bias and Act, we'll look at pairs (or triples for Mixing) of model architectures that are the same except for this variable. E.g. for Norms, we look at every pair that differ only in terms of it has norms or not, to see how much models with norms typically outperforms the ones without norms. We're doing this analasys on the Any runs since these have the most stable outcomes.
+To see the effect of each of Mixing, Norms, Res, Bias and Act, we'll look at pairs (or triples for Mixing) of model architectures that are the same except for this variable. E.g. for Norms, we look at every pair that differ only in terms of it has norms or not, to see how much models with norms typically outperforms the ones without norms. We're doing this analysis on the Any runs since these have the most stable outcomes.
 
 However before doing all that, it's worth noting one major outlier.
 
 ### MLP + Norms + No Residual around MLP + No Bias + ReLU
 
-For any form or attention (or dual embedding) networks with MLP=✅, Norm=✅, Res=❌, Bias=❌ and Act=ReLU, does really badly. Almost as bad (and in one case slightly worse) than removing the MLP.
+For any form or attention (or dual embedding) networks with **MLP**=✅, **Norm**=✅, **Res**=❌, **Bias**=❌ and **Act**=**ReLU**, does really badly. Almost as bad (and in one case slightly worse) than removing the MLP.
 
 This combination is extra bad for some reason, that isn't just an effect of the sum of it's part. I don't know why. Specifically, I don't know if the limitation is due to training dynamics or due to what is possible for this architecture.
 
-Instead of writing "except for MLP=✅, Norm=✅, Res=❌, Bias=❌, Act=ReLU", in every subsection below. I'll just point out this here. Having pointed this out, this data will be excluded from the below triple or pairwise comparisons.
+Instead of writing "except for **MLP**=✅, **Norm**=✅, **Res**=❌, **Bias**=❌ **Act**=**ReLU**", in every subsection below. I'll just point out this here. Having pointed this out, this data will be excluded from the below triple or pairwise comparisons.
 
 
 ## Triple or pairwise comparisons.
-Now back to triple and pairwise comparisons.
+Now back to triple and pairwise comparisons. I.e. we're compare outcomes (number of learned facts) for pairwise (or triples when varying Mixing) model architecture, where the only difference is a single setting o
 
-### Mixing (needs re-writing)
-Dual embedding does better than uniform attention which does better than learned attention.
+### Mixing 
 
-Dual embedding has 
+- When **Norms**=❌ and **MLP**=❌, i.e. there is nothing but embedding, possibly attention, and unembedding, in this case only, 2Emb, Unif Attn and Lrn Attn does equally well.[^M]
 
-It's not surprising that no attention does the best, since the dual embedding that I use to replace attention is (arguably) more powerful. Because attention is non-linear, and the dual embedding is linear, there are thing that the attention can express that the dual embedding can't. But on the other hand, the dual embedding gets to encode the input for each token position entirely separately, which gives the network more freedom. Additionally, the no attention setup should be easier to train, since it's simpler.
+[^M]: **2Emb** and **Unif Attn** learn **208** facts in each of the four repeated experiments. Lrn Attn learn **208** in two of the replications, slgtly more in one, and slightly less in one.
 
-More surprising is that uniform attention is outperforming learned attention, given that learned attention is strictly more powerful. Therefore, this has to be because of ease of training. This interpretation is also supported by the fact that the number of fact these networks mange to learn is unstable. I can see this in that in the number of outliers in the table below and also how much number of facts drop from Any to Most to All.
+- For all other settings **2Emb** does better than **Unif Attn** wich does better than **Lrn Attn**. 
+- Going from **2Emb** to **Unif Attn** lets the network learn **74 - 176 (7.8% - 23.9%)** more facts. 
+- Going from **Unif Attn** to **Lrn Attn** lets the network learn **46 - 222 (7.9% - 39%)** more facts.
+
+It is notable that when everything else is turned off, i.e. there is only embedding maybe attention and unembedding, is when Mixing (the setting that determine the embedding and attention) has the least effect.
+
+
+It's not surprising that dual embedding does the best, since this architect is (arguably) the more powerful. Because attention is non-linear, and the dual embedding is linear, there are things that the attention can express that the dual embedding can't. But on the other hand, the dual embedding gets to encode the input for each token position entirely separately, which gives the network more freedom. Additionally, this no attention setup should be easier to train, since it's simpler.
+
+More surprising is that uniform attention is outperforming learned attention, given that learned attention is strictly more powerful. Therefore, this has to be because of ease of training. This interpretation is also supported by the observation that the number of fact network with learned attention mange to learn, is unstable. You can see this in that in the number of outliers in the Table 1 and also how much number of facts drop from Any to Most to All.
 
 ### MLP
 
-Not supprisingly, adding the MLP makes the biggest diffrence for number of learnable facts, out of any setting. 
+- Adding an **MLP** block lets the network learn **324 - 794 (60% - 373%)** more facts.
+- Adding an **MLP** block makes the **biggest** diffrence when **Mixing**={**2Emb, Unif Atten**} and **Norms**=❌. This is proabbly becasue in this setting the MLP's ReLU or GELU neruons are the only non-lineareties. 
+- Adding an MLP block makes the **smallest** diffreince when **Mixing**=**2Emb**, and **Norms**=✅.
 
-- Adding an MLP block make the network able to learn 324-794 more facts, which is 60%-373% more
-- Adding an MLP block makes the biggest diffrence when Mixing={2Emb, Unif Atten} and Norm=❌. This is proabbly becasue in this setting the MLP's ReLU or GELU neruons are the only non-lineareties. 
-- Adding an MLP block makes the smallest diffreince when Mixing=2Emb, and Noms=❌.
+Not supprisingly, adding the MLP makes the biggest diffrence for number of learnable facts, out of any of the setting. 
 
 ### Norms
 
+- When **MLP**=❌ then adding norms lets the network learn **162 - 362 (79% - 174%)** more facts. This effect is *largest* for **Mixing** = **2Emb**.
+- When **MLP**=✅, then adding norms makes the network able to learn **22-240 (2.2% - 42%)**. The effect is *largest* for **Mixing** = **Lrn Attn**.
+
 Norms are generally useful for learning more facts. Norms make a bigger difference if there is attention, and if there is no MLP. Possible this means that the norms in front of the attention and unembedding are helpful, while the norm in front of the MLP is anti-helpful. Or possible the MLP and norms overlap somewhat in function, such that the MLP makes the norms less useful. 
 
-- If there is no MLP then adding norms makes the network able to learn 162-362 more facts, which is 79% - 174& more. The effect is largest Mixing = 2Emb.
-- If there is an MLP, then adding norms makes the network able to learn 22-240 more facts, which is 2.2% - 42% more. The effect is largest for Mixing = Lrn Attn.
+The fact that MLP has the biggest effect when there are no other non-lineareties in the network, points to the overlaping function hypothesis. However the unsuall crappyness of **MLP**=✅, **Norms**=✅, **Res**=❌, **Bias**=❌, **Act**=**ReLU**" might be a sign that adding norms may be bad for the performance of the MLP.
+
+
 
 ### Residual Connection around the MLP
 
-- Adding this residual connection makes the network able to learn -8 to 244 more facts, which is -0.7% to 34% more.
-- There only setting where adding this residual is bad for the network, according to our data, is Mixing=Lrn Attn, Norms=❌, Bias=✅, Act=ReLU. But the effect is tiny (8 facts, 0.7%), so it's probably just a fluke.
+- Adding this residual connection lets the network learn **-8 to 244 (-0.7% to 34%)** more facts.
+- There only setting where adding this residual is bad for the network is **Mixing**=**Lrn Attn**, **Norms**=❌, **Bias**=✅, **Act**=**ReLU**. But the effect is tiny, **8 facts (0.7%)**, so it's probably just a fluke.
 
 ### MLP Bias
 Adding a bias ought to be strictly helpful, but for some reason it's anti-helpful in a few cases.
 
-- Adding a bias to the MLP makes the network able to learn -52 to 156 more facts, which is -5.1% to 22% more.
-- Adding an MLP Bias performs at its worst when Norms=❌, Res=✅. Given this setting adding the bias makes the network able to learn -52 to 14 more facts, which is -5.1% to 1.4% more.
+- Adding a bias to the MLP lets the network learn **-52 to 156 (-5.1% to 22%)** more facts.
+- Adding an MLP Bias performs at its worst when **Norms**=❌, **Res**=✅. Given this setting adding the bias lets the network learn **-52 to 14 (-5.1% to 1.4%)** more facts.
 
 ### Activation Function
 
-GELU is typically better than ReLU, but difference is small. 
-- Changing from ReLU to GELU makes the network able to learn -6 to 78 more facts, which is -0.2% to +12.7% more.
+**GELU** is typically better than **ReLU**, but difference is small. 
+- Changing from **ReLU** to **GELU** lets the network learn **-6 to 78 (-0.2% to +12.7%)** more facts.
 
 
 
 
-# Experimental result 2: Scaling
-How do the number of learnable facts grow with model size? To find this out, I picked two of the very many model architecute varieties and sclade them up. Specifically the modeld achitectures shown in Figure 1 and Figure 2.
+# Result 2: Scaling
+How do the number of learnable facts grow with model size? To find this out, I picked two of the very many model architecute varieties and sclade them up. 
+
+These models are:
+- ***Simple:*** See figure 1\
+ **Mixing**=***2Emb***, **MLP**=✅, **Norm**=❌, **Res**=❌, **Bias**=❌ **Act**=**ReLU**
+
+- ***Full:*** See Figure 2\
+**Mixing**=***Lrn Attn***, **MLP**=✅, **Norm**=✅, **Res**=✅, **Bias**=✅ **Act**=**GELU** 
 
 ![](scaling_only_trained.png)
-
 *Figure 3*
+
+As you can see, the number of fact scales almost linearly with the number of weights in the model. The number of model weighs is proporional to $d^2$, while number of fact a network can learn scales as approximatly $d^{1.9}$. 
+
+This is not surprising. ... something something log factor ... 
 
 
 # Challenge: Benchmark for understanding

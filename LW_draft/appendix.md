@@ -3,21 +3,29 @@ This post is an appendix to [main post]. This is for people who have read the ma
 
 
 # Appendix A: More on what parts of the model matter
+![Maximum facts memorized per architectural configuration.](table_E5.png)
+
+### Mixing
 ![](table_attention.png)
 *Table A.1: Dual embedding vs. uniform attention vs. full attention.*
 
+### MLP
 ![](table_ff.png)
 *Table A.2: MLP*
 
+### Norms
 ![](table_norm.png)
 *Table A.3: Norms vs. no norms.*
 
+### Residual connection around the MLP
 ![](table_residual.png)
 *Table A.4: With vs. without residual connection around the MLP.*
 
+### MLP Bias
 ![](table_bias.png)
 *Table A.5: With vs. Bias in the MLP.*
 
+### MLP Acctivation function
 ![](table_activation.png)
 *Table A.6: GELU vs. ReLU.*
 
