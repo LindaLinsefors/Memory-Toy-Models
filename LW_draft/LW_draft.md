@@ -15,13 +15,10 @@ In this post, I study sequence memorization as a toy model for any factual looku
 - **Training data** \
 What is the task we are getting these models to perform
 
-- **Model architectures** \
+- **Testing Various Model Architectures** \
 [section summary]
 
-- **Results 1: Which parts of the network matters** \
-[section summary]
-
-- **Results 2: Scaling** \
+- **Scaling** \
 [section summary]
 
 - **Challenge: Benchmark for understanding** \
@@ -30,8 +27,7 @@ What is the task we are getting these models to perform
 - **My attempt**\
 My own attempt to solve the above challenge. 
 
-- **Results 3: Comparing trained, hand-coded and hybrid models**\
-[section summary]
+
 
 
 
@@ -194,7 +190,7 @@ Finally, there is one notable outlier: the combination **MLP**=âœ…, **Norms**=âœ
 
 
 
-# Result 2: Scaling
+# Scaling
 How do the number of learnable facts grow with model size? To find this out, I picked two of the very many model architecute varieties and sclade them up. 
 
 These models are:
@@ -289,7 +285,7 @@ For the hand-coded models the winning $top\_fraction$ is typically in the range 
 
 See appendix B and C here [link] for details.
 
-# Experimental Results 3: Comparing trained, hand-coded and hybrid models
+## Results
 As to be expected, my hand-coded models are not as good as trained models, and it especially struggles to reach full accuracy. But if I accept 90% accuracy for the hand-coded model, it scales almost as well as the trained model, but with a worse pre-factor.
 
 The plot below shows my data from binary search to find maximum number of fact a model can learn. 
