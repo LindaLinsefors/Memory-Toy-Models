@@ -183,9 +183,6 @@ Finally, there is one notable outlier: the combination **MLP**=✅, **Norms**=�
 [^bad]: Just turning off the norms or turning on the MLP bias or swiching from ReLU to GELU (changes that nomrally have small effects), is sufficien restore this architecutre to the normal capabilities range,
 
 
-
-
-
 # Scaling
 In general, we expect the number of circuits a model to learn to scale as 
 
@@ -227,7 +224,7 @@ These models are:
 - ***Full:*** See Figure 2\
 **Mixing**=***Lrn Attn***, **MLP**=✅, **Norm**=✅, **Res**=✅, **Bias**=✅ **Act**=**GELU** 
 
-![](scaling_only_trained.png)
+![](scaling_only_trained_any.png)
 *Figure 3*
 
 As you can see, the number of fact scales almost linearly with the number of weights in the model. The number of model weighs is proporional to $d^2$, while number of fact a network can learn scales as approximatly $d^{1.9}$. 
@@ -262,7 +259,27 @@ If you want to give the challenge a go, feel free to use this architecture, or a
 
 # My attempt
 
-My algorithm has three steps
+## Summary
+First we assosiate each label with a uniqe set of neurons.[^neuron_set] These neurons will somehow ideintify facts with this label. 
+
+[^neuron_set]: To clarify: Typically each neron will be used by multiple labels, but no two labels shairs all their neurons.
+
+It would be great if, given a fact with label $l$ all the neurons assossiated with label $l$ where active, and no other neurons are active. However for most sets of facs, this will not be possible.[^xor]
+
+[^xor]: Given some set of facts (i.e. all the facts with label $l$, or all the facts assosiated with any label that is assosiated with neuron $n$), you typically can't decide that some neuron $n$ will be active (or inactive) for only that set of facts, and no others. That's only possible if the inputs to those facts are linearly separable, which is typically not the case. 
+
+An alternative, which is less ideal, but has the significant advantage of being possible, is to set up the emneding weighs such that, for any input fact with any label $l$, all neruons assosiated with $l$ will be active. Some additional neurons will also be active, but not all of them. With some skill and some luck, none of the wrong labels will have all their neurons activated.
+
+However, there is one more problem. "Active" isn't a single number. Even if the correct label has all it's neuron active, and non of the incorect labels has all of their neurons active, an incorrect label can still have higher over all activation, if that label's neurons activate more strongly. One way to solve this is to make sure all active neurons have the exact same value, but that would add an unessesary constraint. A better solution is to flipp the script, and make sure that all neruons assossiated with label $l$ are *in-active* for any fact with label $l$. Becasue of the shape of the ReLU, any negative pre-activation will be transfomed to the exact same value, i.e. zero.
+
+In summary:
+* Assign a uniqe set of neurons to each label.
+* Choose the embedding weights such that, for every label $l$, and every fact with label $l$, all pre-activation will be less or equal to zero, for every neuron assosiated with label $l$.
+* Under the above constraint, try to make as many pre-activations as possible be above zero.
+* For every label $l$, assign a constant negative weight between the logit for $l$ and every neuon assosiated with $l$. Let all otehr unembedding weights be zero. 
+
+## The acctual algoritm
+My algorithm for assigning weight matirx values, has these steps
 
 - Assign $S$ number ReLU neurons to each label. This means that each neuron will be assigned to several labels. These assignments should achieve both of: Each neuron should have approximately the same labels assigned to it as any other neuron; The max neuron overlap between any pair of labels, should be as small as possible.
 - Choose the embedding weights such that each ReLU neuron assigned to label $l$ will output zero for all facts with label $l$.
@@ -330,7 +347,7 @@ The plot below shows my data from binary search to find maximum number of fact a
 - model size, $d$ is the dimension of the model. $n_{input\_vocab}=2d$, $d_{MLP}=d$, $n_{output\_vocab}=d$
 
 
-![](scaling.png)
+![](scaling_any.png)
 *Figure 5*
 
 

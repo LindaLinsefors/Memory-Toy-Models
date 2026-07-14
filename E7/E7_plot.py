@@ -34,6 +34,7 @@ log_files = sorted(log_files, key=sort_key)
 
 results = {}
 group_points = defaultdict(list)  # group ("simple"/"full"/...) -> [(d, max_facts), ...]
+series_data = {}  # (group, category) -> (ds, max_facts), saved for the second plot below
 for log_file in log_files:
     results = load_results(os.path.join(experiment_dir, log_file))
     ds = []
@@ -44,6 +45,7 @@ for log_file in log_files:
 
     group = next((g for g in group_order if g in log_file), None)
     category = next((c for c in category_order if c in log_file), None)
+    series_data[(group, category)] = (ds, max_facts)
 
     plt.loglog(ds, max_facts, "-", marker=category_markers.get(category),
                markersize=5, color=group_colors.get(group),
@@ -80,6 +82,49 @@ y_ticks = [128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768]
 
 ax = plt.gca()
 # Remove the automatic (minor) log-scale ticks so only the ticks below remain
+ax.xaxis.set_minor_locator(plt.NullLocator())
+ax.yaxis.set_minor_locator(plt.NullLocator())
+plt.xticks(x_ticks, x_ticks)
+plt.yticks(y_ticks, y_ticks)
+
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# %%
+# Second plot: same as above but only the "simple, any" and "full, any" series,
+# with power-law fits computed from just that data.
+
+plt.figure(figsize=(5.5, 4))
+
+y_ticks = [512, 1024, 2048, 4096, 8192, 16384, 32768]
+
+for group in ["simple", "full"]:
+    if (group, "any") not in series_data:
+        continue
+    ds, max_facts = series_data[(group, "any")]
+    plt.loglog(ds, max_facts, linestyle="none", marker=category_markers["any"],
+               markersize=6, color=group_colors[group],
+               label=f"{group}")
+
+    pts = sorted((d, mf) for d, mf in zip(ds, max_facts) if mf and mf > 0)
+    if len(pts) < 2:
+        continue
+    fx = np.array([d for d, _ in pts], dtype=float)
+    fy = np.array([mf for _, mf in pts], dtype=float)
+    k, b = np.polyfit(np.log(fx), np.log(fy), 1)
+    C = np.exp(b)
+    xline = np.array([fx.min(), fx.max()])
+    plt.loglog(xline, C * xline ** k, color=group_colors[group], alpha=0.4,
+               linestyle="-", linewidth=4,
+               label=f"best fit: {C:.3g}·d^{k:.2f}")
+
+plt.xlabel("model size (d)")
+plt.ylabel("max facts")
+plt.title("Capacity vs model size")
+plt.legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
+
+ax = plt.gca()
 ax.xaxis.set_minor_locator(plt.NullLocator())
 ax.yaxis.set_minor_locator(plt.NullLocator())
 plt.xticks(x_ticks, x_ticks)

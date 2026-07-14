@@ -636,7 +636,8 @@ def plot_capacity_vs_d_all_models(thresholds=(0.9, 1.0),
                                   y_field="max_facts", models=None,
                                   ylabel=None, title=None, references=None,
                                   y_log=True, yticks=None, fit_type="power",
-                                  point_spread=0.0):
+                                  point_spread=0.0, connect_points=True,
+                                  thr_markers=None):
     """Overlay the capacity-vs-d curves of all four model variants on one log-log plot.
 
     Reads the four capacity-search JSONL logs (skipping any that don't exist yet,
@@ -667,7 +668,10 @@ def plot_capacity_vs_d_all_models(thresholds=(0.9, 1.0),
     variants to include, by name (default: all four). ylabel / title: override
     the default axis label and title. references: optional list of
     (func, label, color) hypothesis lines y = func(d), drawn across the data's
-    x range.
+    x range. connect_points=False draws the data as markers only (no lines
+    between the points; the fit lines stay). thr_markers: optional
+    {threshold: marker} dict that makes the marker encode the threshold
+    instead of any/most/all — useful when only one rule is drawn.
     """
     if results_dir is None:
         results_dir = RESULTS_DIR
@@ -732,9 +736,12 @@ def plot_capacity_vs_d_all_models(thresholds=(0.9, 1.0),
             thr_points[thr].extend(
                 (x, y) for x, y in zip(xs, ys)
                 if fit_type == "linlog" or y > 0)
+            marker = thr_markers.get(thr) if thr_markers \
+                else aam_marker.get(aam)
             draw_queue.append(("data", dict(
-                xs=xs, ys=ys, fmt=thr_style.get(thr, ":"),
-                marker=aam_marker.get(aam), color=color,
+                xs=xs, ys=ys,
+                fmt=thr_style.get(thr, ":") if connect_points else "none",
+                marker=marker, color=color,
                 label=f"{model_name}: {aam}, {thr_label(thr)}")))
 
         # One fit per threshold for this model, pooling any/most/all.
@@ -783,7 +790,7 @@ def plot_capacity_vs_d_all_models(thresholds=(0.9, 1.0),
 
     for kind, kw in draw_queue:
         if kind == "data":
-            ax.plot(kw.get("x_plot", kw["xs"]), kw["ys"], kw["fmt"],
+            ax.plot(kw.get("x_plot", kw["xs"]), kw["ys"], linestyle=kw["fmt"],
                     marker=kw["marker"], markersize=5, color=kw["color"],
                     label=kw["label"])
         else:
@@ -1461,6 +1468,12 @@ _ = plot_best_S_vs_output_vocab()
 _ = plot_best_S_grid()
 # %%
 _ = plot_capacity_vs_d_all_models(figsize=(9, 7))
+# %%
+# Same plot but with only the "any" data (fits use only these points too).
+# Markers only (no connecting lines); marker encodes the threshold here.
+_ = plot_capacity_vs_d_all_models(any_all_most=("any",), figsize=(8, 6),
+                                  connect_points=False,
+                                  thr_markers={1.0: "o", 0.9: "x"})
 
 # %%
 _ = plot_best_S_vs_d(figsize=(8, 5))

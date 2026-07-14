@@ -129,7 +129,9 @@ Adding a bias ought to be strictly helpful, but for some reason it's anti-helpfu
 **GELU** is typically better than **ReLU**, but difference is small. 
 - Changing from **ReLU** to **GELU** lets the network learn **-6 to 78 (-0.2% to +12.7%)** more facts.
 
-
+# Appendix B: More on Scaling
+![](scaling_only_trained.png)
+*Figure B.1: Same as Figure 3 in main post, but with "most" and "all" settings included. The fitted lines include all data points for each of "simple" or "full", aggregating over "any"/"most"/"all".*
 
 # Appendix B: Best S (number neurons per label) for the hand-coded and hybrid models
 
