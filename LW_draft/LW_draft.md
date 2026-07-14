@@ -13,16 +13,16 @@ In this post, I study sequence memorization as a toy model for any factual looku
 
 # Outline
 - **Training data** \
-What is the task we are getting these models to perform
+A big part of creating a good toy model is creating the right toy training task, i.e. choosing what the training data should be. In this section I describe exactly what the training data is for the sequence memorization task.
 
 - **Testing Various Model Architectures** \
-[section summary]
+In this section I test 
 
 - **Scaling** \
-[section summary]
+The number of facts these models cal learn scale as model dimension to the power of 1.9. I.e, just a bit worse than being proportional to the number of model parameters. 
 
 - **Challenge: Benchmark for understanding** \
-[section summary]
+
 
 - **My attempt**\
 My own attempt to solve the above challenge. 
@@ -168,7 +168,7 @@ These results suggest that the attention probably isn't doing anything important
 
 [^att_do]: With some rotation added to the first token embedding as to be able to tell apart inputs with the two tokes swapped. E.g. to differentiate the input "1,2" from the input "2,1"
 
-**Norms** is the third most influential setting, if there is an MLP.
+**Norms** is the third most influential setting, if there is an MLP.[^no_mlp]
 
 - When **MLP**=✅ then adding norms lets the network learn **2.2% - 42%** more facts
 - When **MLP**=❌ then adding norms lets the network learn **79% - 174%** more facts
@@ -178,19 +178,46 @@ These results suggest that the attention probably isn't doing anything important
  - **Bias**=✅ is mostly better than **Bias**=❌, with **-5.1%** to **22%** more facts
  - **GELU** is mostly better than **ReLU**, with **-0.2%** to **13%** more facts
 
-Finally, there is one notable outlier: the combination **MLP**=✅, **Norms**=✅, **Res**=❌, **Bias**=❌, **ReLU** (combined with **any Mixing** option) does far worse than the individual settings would predict — almost as bad as having no MLP at all. I don't know why.[^bad]
+Finally, there is one notable outlier: the combination **MLP**=✅, **Norms**=✅, **Res**=❌, **Bias**=❌, **ReLU** (combined with **any Mixing** option) does far worse than the individual settings would predict — almost as bad as having no MLP at all.[^bad] I don't know why.
 
-[^bad]: Just turning on the MLP bias or swiching from ReLU to GELU (changes that nomrally have small effects), is sufficien restore this architecutre to the normal capabilities range,
-
-
-
-
+[^bad]: Just turning off the norms or turning on the MLP bias or swiching from ReLU to GELU (changes that nomrally have small effects), is sufficien restore this architecutre to the normal capabilities range,
 
 
 
 
 
 # Scaling
+In general, we expect the number of circuits a model to learn to scale as 
+
+## Theory
+What's the theoretical limit for how many facts you can fit into the network?
+
+The fact is some amount of information, that has to be stored in the weights of the network. Naively this would suggest that the maximum number of facts that can be learned by the network would scale linearly with the number of weights. This is close, but not quite right. 
+
+There are permutations you can do to the network that leaves the calculation performed by the network unchanged. E.g, if you select two MLP neurons and swap their input and output weights, this will change these weights but nothing else. 
+
+The number of functionally different networks is 
+
+$$\frac{2^{B_W N}}{P}$$
+
+where
+* $B_W$ = Bits per weights
+* $N$ = Number of weights
+* $P$ = Number of permutations that leaves the network function unchanged.
+
+This means the number of bits for the entire network is 
+
+$$B = \log_2 \left( \frac{2^{B_W N}}{P} \right) = B_W N - \log_2(P) $$
+
+In the MLP only, $N=2d^2$, and $P=d!$. 
+
+[Using Stirling's approximation](https://en.wikipedia.org/wiki/Stirling%27s_approximation)
+
+$$\log_2 (d!) = d \log_2 (d) - d \log_2 (e) + \mathcal{O}(\log_2(d))
+$$
+
+
+## Experiment
 How do the number of learnable facts grow with model size? To find this out, I picked two of the very many model architecute varieties and sclade them up. 
 
 These models are:
