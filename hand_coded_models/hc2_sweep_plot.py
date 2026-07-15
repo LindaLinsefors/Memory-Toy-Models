@@ -839,6 +839,114 @@ def plot_capacity_vs_d_all_models(thresholds=(0.9, 1.0),
     return fig
 
 
+def plot_capacity_vs_d_any_only(thresholds=(0.9, 1.0), results_dir=None,
+                                figsize=(8, 6), models=None, error_bars=True):
+    """Capacity vs d for all model variants, "any" rule only (log-log).
+
+    Simplified variant of plot_capacity_vs_d_all_models, styled like the
+    "any"-only plot in E7_plot.py: data is drawn as markers only (no
+    connecting lines), the marker encodes the accuracy threshold
+    (acc=1 -> o, acc>=0.9 -> x) since only one rule is shown, and each
+    power-law fit ("best fit: C·d^k", fitted to just that series' points)
+    follows its data series in the legend — data, fit, data, fit, ...
+
+    error_bars=True gives each point a one-sided (upward) error bar of that
+    run's logged binary-search `precision`: the reported max_facts is a
+    confirmed success, and the true capacity can be up to ~precision higher.
+    The bars are drawn separately from the markers and stay out of the
+    legend, so they don't change the legend or the layout.
+    """
+    if results_dir is None:
+        results_dir = RESULTS_DIR
+
+    # Same four logs, colors and legend order as plot_capacity_vs_d_all_models.
+    model_files = [
+        ("trained", "capacity_search_results_fulltrain.json", "tab:blue"),
+        ("hybrid", "capacity_search_results_topfrac_hybrid.json", "tab:orange"),
+        ("hand-coded", "capacity_search_results_topfrac.json", "tab:green"),
+        ("rand-emb", "capacity_search_results_randomup.json", "tab:red"),
+    ]
+    if models is not None:
+        by_name = {mf[0]: mf for mf in model_files}
+        model_files = [by_name[m] for m in models if m in by_name]
+    thr_style = {1.0: "-", 0.9: "--"}
+    thr_marker = {1.0: "o", 0.9: "x"}
+
+    def thr_label(thr):
+        """Legend text for a threshold: 'acc=1' for 1.0, 'acc≥thr' otherwise."""
+        return "acc=1" if thr == 1.0 else fr"acc$\geq${thr}"
+
+    fig, ax = plt.subplots(figsize=figsize)
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+
+    all_xs, all_ys = [], []
+    for model_name, fname, color in model_files:
+        runs = load_capacity_results(os.path.join(results_dir, fname))
+        if not runs:
+            print(f"(skipping {model_name}: no results in {fname})")
+            continue
+        for thr in sorted(thresholds):
+            # Latest row per d wins; zeros can't show on the log axis.
+            by_d = {}
+            for r in runs:
+                if r.get("accuracy_threshold") == thr \
+                        and r.get("any_all_most") == "any":
+                    by_d[r["d"]] = (r.get("max_facts"), r.get("precision", 0))
+            pts = sorted((d, mf, p) for d, (mf, p) in by_d.items()
+                         if mf and mf > 0)
+            if not pts:
+                continue
+            xs = [d for d, _, _ in pts]
+            ys = [mf for _, mf, _ in pts]
+            all_xs.extend(xs)
+            all_ys.extend(ys)
+            ax.plot(xs, ys, linestyle="none", marker=thr_marker.get(thr, "o"),
+                    markersize=6, color=color,
+                    label=f"{model_name}: {thr_label(thr)}")
+            if error_bars:
+                # precision 1 means the search resolved max_facts exactly.
+                errs = [0 if p <= 1 else p for _, _, p in pts]
+                ax.errorbar(xs, ys, yerr=[np.zeros(len(ys)), errs],
+                            fmt="none", ecolor=color, capsize=3,
+                            label="_nolegend_")
+
+            # Power-law fit to just this series, right after it in the legend.
+            if len(set(xs)) < 2:
+                continue
+            fx = np.array(xs, dtype=float)
+            fy = np.array(ys, dtype=float)
+            k, b = np.polyfit(np.log(fx), np.log(fy), 1)
+            C = np.exp(b)
+            xline = np.array([fx.min(), fx.max()])
+            ax.plot(xline, C * xline ** k, color=color, alpha=0.4,
+                    linestyle=thr_style.get(thr, ":"), linewidth=3,
+                    label=f"best fit: {C:.3g}·d^{k:.2f}")
+
+    ax.set_xlabel("model size (d)")
+    ax.set_ylabel("max facts")
+    ax.set_title("Capacity vs model size\n"
+                 + " / ".join(name for name, _, _ in model_files))
+
+    xticks = [x for x in [16, 32, 64, 128, 256] if not all_xs or x <= max(all_xs)]
+    ax.set_xticks(xticks)
+    ax.set_xticks([], minor=True)
+    ax.set_xticklabels([str(x) for x in xticks])
+    if all_ys:
+        lo = int(np.floor(np.log2(min(all_ys))))
+        hi = int(np.ceil(np.log2(max(all_ys))))
+        yticks = [2 ** n for n in range(lo, hi + 1)]
+        ax.set_yticks(yticks)
+        ax.set_yticks([], minor=True)
+        ax.set_yticklabels([str(y) for y in yticks])
+
+    ax.grid(True, which="both", ls="--", linewidth=0.5)
+    ax.legend(fontsize=9, loc="center left", bbox_to_anchor=(1.0, 0.5))
+    fig.tight_layout()
+    plt.show()
+    return fig
+
+
 def plot_best_S_vs_d(thresholds=(0.9, 1.0), any_all_most=("any", "most", "all"),
                      results_dir=None, figsize=(11, 7), point_spread=0.008):
     """best_S vs model size d, hand-coded and hybrid only (log-log).
@@ -1470,10 +1578,8 @@ _ = plot_best_S_grid()
 _ = plot_capacity_vs_d_all_models(figsize=(9, 7))
 # %%
 # Same plot but with only the "any" data (fits use only these points too).
-# Markers only (no connecting lines); marker encodes the threshold here.
-_ = plot_capacity_vs_d_all_models(any_all_most=("any",), figsize=(8, 6),
-                                  connect_points=False,
-                                  thr_markers={1.0: "o", 0.9: "x"})
+# Markers only, marker encodes the threshold, legend interleaves data/fit.
+_ = plot_capacity_vs_d_any_only(figsize=(7, 5), error_bars=False)
 
 # %%
 _ = plot_best_S_vs_d(figsize=(8, 5))

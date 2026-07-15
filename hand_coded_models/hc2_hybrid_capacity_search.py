@@ -77,6 +77,16 @@ CONFIGS = [
 
 testing = False  # small/cheap end-to-end validation run
 
+# Refine mode: instead of running CONFIGS, rescan the capacity log and CONTINUE
+# every binary search whose logged precision is more than REFINE_FRACTION of its
+# max_facts, using precision = REFINE_FRACTION * that max_facts. The finer
+# search replays the cached grids (identical probes cost nothing) and only pays
+# for the new, finer probes; the refined result is appended to the log, where
+# the plots take the latest row per config. Idempotent: once everything is
+# refined, there is nothing left to run.
+refine = True
+REFINE_FRACTION = 0.05
+
 
 def S_sweep_for(d):
     """Which n_neurons_per_label values to sweep for a given model size d."""
@@ -499,9 +509,43 @@ def _append_capacity_result(d, max_facts, best_combo, accuracy_threshold,
     return CAPACITY_RESULTS_PATH
 
 
+def _refine_configs():
+    """Configs whose LATEST logged run has precision > REFINE_FRACTION*max_facts.
+
+    Each returned config carries the finer precision to continue its binary
+    search with. Refining can only raise max_facts (the finer search replays
+    the same cached probes, then keeps going), so a precision of
+    REFINE_FRACTION * the old max_facts is also <= that fraction of the final."""
+    latest = {}
+    if not os.path.exists(CAPACITY_RESULTS_PATH):
+        return []
+    with open(CAPACITY_RESULTS_PATH, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            r = json.loads(line)
+            latest[(r["d"], r["accuracy_threshold"], r["any_all_most"])] = r
+    configs = []
+    for (d, thr, aam), r in sorted(latest.items()):
+        mf = r.get("max_facts") or 0
+        if mf <= 0:
+            continue
+        # Largest precision STRICTLY below REFINE_FRACTION of max_facts, but
+        # never below 1 (precision 1 already resolves the search exactly).
+        target = int(REFINE_FRACTION * mf)
+        if target >= REFINE_FRACTION * mf:
+            target -= 1
+        target = max(1, target)
+        if r.get("precision", 0) > target:
+            configs.append(dict(d=d, accuracy_threshold=thr, any_all_most=aam,
+                                precision=target))
+    return configs
+
+
 @app.local_entrypoint()
 def main():
-    configs = CONFIGS
+    configs = _refine_configs() if refine else CONFIGS
     attempts = n_attempts
     if testing:
         # Cheap end-to-end validation: smallest d, few attempts, coarse precision.
@@ -514,7 +558,7 @@ def main():
         thr = cfg["accuracy_threshold"]
         aam = cfg["any_all_most"]
         S_sweep = S_sweep_for(d)
-        precision = 256 if testing else precision_for(d)
+        precision = 256 if testing else cfg.get("precision", precision_for(d))
 
         print(f"\n===== d={d}, accuracy_threshold={thr}, any_all_most={aam} =====")
         best, combo = find_max_facts(

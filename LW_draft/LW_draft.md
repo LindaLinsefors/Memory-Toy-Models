@@ -19,9 +19,10 @@ A big part of creating a good toy model is creating the right toy training task,
 In this section I test 
 
 - **Scaling** \
-The number of facts these models cal learn scale as model dimension to the power of 1.9. I.e, just a bit worse than being proportional to the number of model parameters. 
+In this section I scale up two model architecture variants, to see how number of learnable facts scales with model size. Turns out that the number of learnable facts scales slightly worse than proportional to number of model parameter, which is not surprising. 
 
 - **Challenge: Benchmark for understanding** \
+[Summary here]
 
 
 - **My attempt**\
@@ -49,7 +50,6 @@ The code for generating the training data is not very long, and is quoted below 
 The inputs are
 
 - `n_facts` -- Number of facts.
-- `input_len` -- Number of input tokens. *This value is always 2.*
 - `input_vocab_size`
 - `output_vocab_size`
 - `seed` -- Random seed. *This value is always 42.*[^2]
@@ -68,29 +68,28 @@ def generate_facts(n_facts: int, # of facts to generate,
                    seed: int = 42
                   ) -> dict[str, torch.Tensor]:
     
-    if n_facts > input_vocab_size ** input_len:
-        raise ValueError(f"Cannot generate {n_facts} unique facts with a vocabulary of size {input_vocab_size} and input length {input_len}. Maximum unique facts: {input_vocab_size ** input_len}")
+    if n_facts > input_vocab_size ** 2:
+        raise ValueError(f"Cannot generate {n_facts} unique facts with a vocabulary of size {input_vocab_size}. Maximum unique facts: {input_vocab_size ** 2}")
     
     device = torch.tensor(0).device  # respect default device
     generator = torch.Generator(device=device).manual_seed(seed)
 
+    all_possible_inputs = torch.cartesian_prod(torch.arange(input_vocab_size),
+                                               torch.arange(input_vocab_size))
+
+    inputs = all_possible_inputs[torch.randperm(all_possible_inputs.size(0),
+                                                generator=generator)[:n_facts]]
+    
     targets = torch.arange(n_facts) % output_vocab_size
-
-    if input_len == 1:
-        inputs = torch.randperm(input_vocab_size, generator=generator)[:n_facts].unsqueeze(1)
-    elif input_len == 2:
-        all_possible_inputs = torch.cartesian_prod(torch.arange(input_vocab_size), torch.arange(input_vocab_size))
-        inputs = all_possible_inputs[torch.randperm(all_possible_inputs.size(0), generator=generator)[:n_facts]]
-    else:
-        inputs = torch.randint(0, input_vocab_size, (n_facts, input_len), generator=generator)
-
     sorted_indices = torch.argsort(targets)    
-    return {"inputs": inputs[sorted_indices], "targets": targets[sorted_indices]}
+
+    return {"inputs": inputs[sorted_indices], 
+            "targets": targets[sorted_indices]}
 ```
 
 # Testing Various Model Architectures
 
-I want to learn how these facts would be learned by a one layer transformer. However, that turned out to be hard. But if I know in what part of the model the main action is, then maybe I can simplify the toy model to only that part and start with understanding that. 
+I want to find out how these facts can be encoded in a one layer transformer. However, that turned out to be hard. But if I know in what part of the model the main action is, then maybe I can simplify the toy model to only that part and start with understanding that. 
 
 To test what parts of the model are important for the sequence memorization task, I made a transformer model, where ever part of the model can be turned on or off. Then I trained all variants of this model and compared their performance.
 
@@ -152,6 +151,10 @@ To find out which parts of the network matter for the memorization task, I train
 
 [^d16]: Initially I used dimension 16 for all these values, too many networks maxed out the number of possible facts, so I doubbled $n_{input\_vocab}$
 
+The network are trained using gradient decent[^Adam], on a cross entropy loss. I say that they have successfully learned some number of facts, if at the end of training, taking argmax over the logits always give the correct label. In order to find the maximum learnable facts for a speficic arcitecture variant, I do a binary serach over number of facts.
+
+[^Adam]: Adam to be sepficic.
+
 The **MLP** is by far the most important part. 
 - Adding the MLP block lets the network learn **60% - 373%** more facts, a much larger effect than any other setting. 
 - The effect is ***largest*** when **Mixing** = **2Emb** or **Unif Attn**, combined with **Norms**=❌, I.e, when the MLP's ReLU or GELU neurons are the only non-linearity in the network.
@@ -184,37 +187,7 @@ Finally, there is one notable outlier: the combination **MLP**=✅, **Norms**=�
 
 
 # Scaling
-In general, we expect the number of circuits a model to learn to scale as 
 
-## Theory
-What's the theoretical limit for how many facts you can fit into the network?
-
-The fact is some amount of information, that has to be stored in the weights of the network. Naively this would suggest that the maximum number of facts that can be learned by the network would scale linearly with the number of weights. This is close, but not quite right. 
-
-There are permutations you can do to the network that leaves the calculation performed by the network unchanged. E.g, if you select two MLP neurons and swap their input and output weights, this will change these weights but nothing else. 
-
-The number of functionally different networks is 
-
-$$\frac{2^{B_W N}}{P}$$
-
-where
-* $B_W$ = Bits per weights
-* $N$ = Number of weights
-* $P$ = Number of permutations that leaves the network function unchanged.
-
-This means the number of bits for the entire network is 
-
-$$B = \log_2 \left( \frac{2^{B_W N}}{P} \right) = B_W N - \log_2(P) $$
-
-In the MLP only, $N=2d^2$, and $P=d!$. 
-
-[Using Stirling's approximation](https://en.wikipedia.org/wiki/Stirling%27s_approximation)
-
-$$\log_2 (d!) = d \log_2 (d) - d \log_2 (e) + \mathcal{O}(\log_2(d))
-$$
-
-
-## Experiment
 How do the number of learnable facts grow with model size? To find this out, I picked two of the very many model architecute varieties and sclade them up. 
 
 These models are:
@@ -222,15 +195,27 @@ These models are:
  **Mixing**=***2Emb***, **MLP**=✅, **Norm**=❌, **Res**=❌, **Bias**=❌ **Act**=**ReLU**
 
 - ***Full:*** See Figure 2\
-**Mixing**=***Lrn Attn***, **MLP**=✅, **Norm**=✅, **Res**=✅, **Bias**=✅ **Act**=**GELU** 
+**Mixing**=***Lrn Attn***, **MLP**=✅, **Norm**=✅, **Res**=✅, **Bias**=✅ **Act**=**GELU** y
 
-![](scaling_only_trained_any.png)
+I test how many facts each of these models can learn for a range of model dimensions $d$ with
+* $n_{input\_vocab} = 2d$, [^d16]
+* $d_{residual} = d$, 
+* $d_{MLP} = d$, 
+* $n_{output\_vocab} = d$.
+
+And the result is
+
+![](scaling_only_trained_any.png)\
 *Figure 3*
 
-As you can see, the number of fact scales almost linearly with the number of weights in the model. The number of model weighs is proporional to $d^2$, while number of fact a network can learn scales as approximatly $d^{1.9}$. 
+The number of facts each model can learn scales as $d^{1.78}$. Compare this to the number of model parameter which scales as $d^2$. We see that the scaling of learnable facts is close to the scaling of parameters, but a bit worse.
 
-This is not surprising. ... something something log factor ... 
+I don't have a precise theory of why this should be the case for this model and training data. But prior work on computation is superposition for different task and models have also found a slightly sub-linear scaling relative to model parameters.[^prior_work]
 
+[^prior_work]:
+  * [On the Complexity of Neural Computation in Superposition](https://arxiv.org/abs/2409.15318)
+  * [Circuits in Superposition 2: Now with Less Wrong Math](https://www.lesswrong.com/posts/FWkZYQceEzL84tNej/circuits-in-superposition-2-now-with-less-wrong-math)
+  * [Rotations in Superposition](https://www.lesswrong.com/posts/LZ7YMPJueB6qjL24n/rotations-in-superposition)
 
 # Challenge: Benchmark for understanding
 

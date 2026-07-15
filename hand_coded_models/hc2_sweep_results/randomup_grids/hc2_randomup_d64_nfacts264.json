@@ -1,0 +1,95 @@
+{
+  "settings": {
+    "d": 64,
+    "n_facts": 264,
+    "n_attempts": 11,
+    "input_vocab_size": 128,
+    "output_vocab_size": 64,
+    "d_ff": 64,
+    "seed": 42,
+    "metric": "best_guess_accuracy",
+    "model": "RandomUpModel2",
+    "n_epochs": 5000,
+    "lr": 0.01,
+    "patience": 100
+  },
+  "results": [
+    {
+      "n_facts": 264,
+      "attempt": 0,
+      "init_seed": 0,
+      "best_guess_accuracy": 0.9962121248245239,
+      "epochs_run": 951
+    },
+    {
+      "n_facts": 264,
+      "attempt": 1,
+      "init_seed": 1,
+      "best_guess_accuracy": 0.9962121248245239,
+      "epochs_run": 761
+    },
+    {
+      "n_facts": 264,
+      "attempt": 2,
+      "init_seed": 2,
+      "best_guess_accuracy": 0.9848484992980957,
+      "epochs_run": 675
+    },
+    {
+      "n_facts": 264,
+      "attempt": 3,
+      "init_seed": 3,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 788
+    },
+    {
+      "n_facts": 264,
+      "attempt": 4,
+      "init_seed": 4,
+      "best_guess_accuracy": 0.9886363744735718,
+      "epochs_run": 692
+    },
+    {
+      "n_facts": 264,
+      "attempt": 5,
+      "init_seed": 5,
+      "best_guess_accuracy": 0.9962121248245239,
+      "epochs_run": 678
+    },
+    {
+      "n_facts": 264,
+      "attempt": 6,
+      "init_seed": 6,
+      "best_guess_accuracy": 0.9924242496490479,
+      "epochs_run": 629
+    },
+    {
+      "n_facts": 264,
+      "attempt": 7,
+      "init_seed": 7,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 779
+    },
+    {
+      "n_facts": 264,
+      "attempt": 8,
+      "init_seed": 8,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 759
+    },
+    {
+      "n_facts": 264,
+      "attempt": 9,
+      "init_seed": 9,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 693
+    },
+    {
+      "n_facts": 264,
+      "attempt": 10,
+      "init_seed": 10,
+      "best_guess_accuracy": 0.9962121248245239,
+      "epochs_run": 816
+    }
+  ]
+}
