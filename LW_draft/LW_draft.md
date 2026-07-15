@@ -216,6 +216,7 @@ I don't have a precise theory of why this should be the case for this model and 
   * [On the Complexity of Neural Computation in Superposition](https://arxiv.org/abs/2409.15318)
   * [Circuits in Superposition 2: Now with Less Wrong Math](https://www.lesswrong.com/posts/FWkZYQceEzL84tNej/circuits-in-superposition-2-now-with-less-wrong-math)
   * [Rotations in Superposition](https://www.lesswrong.com/posts/LZ7YMPJueB6qjL24n/rotations-in-superposition)
+  [The above list should be in the footnote. If it dosn't work, I'll fix it on LW.]
 
 # Challenge: Benchmark for understanding
 
