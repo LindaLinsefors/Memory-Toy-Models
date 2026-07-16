@@ -122,8 +122,8 @@ I want to be able to simplify the model by removing the attention. However, the 
 
 There are a number of variants regarding the MLP. Firstly the MLP can either be present or be missing. Secondly if there is an MLP layer, each of the following can be varied
 
-- **Activation Function (Act)** can be either GELU or ReLU
-- **Bias** can exist or not.[^3]
+- **Activation Function (Act)** can be either GELU or ReLU.
+- **Bias** can be included or not.[^3]
 - **Residual connection (Res)** around the MLP can exist or not.
 
 [^3]: If the bias is present that means both the linear readout and the linear projection from the ReLU or GELU neurons, have bias. (Making them actually not linear functions but affine functions, in strict math terminology.) If there is no bias, this means neither of these have bias. All other linear connections in the rest of the network (e.g. embeddings, etc) are always bias free.
