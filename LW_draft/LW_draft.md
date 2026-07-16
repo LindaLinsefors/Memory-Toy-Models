@@ -7,7 +7,7 @@ I expect that a lot of the information stored in the weights of a LLM is memoriz
 
 The goal of mech-interp is to be able to take a model (possibly together with its training data), and pick it apart into different components that do human understandable tasks. Since I expect that many of these tasks are factual look-ups, it would be useful to know what we should expect look-up to look like in a transformer model.
 
-*Honorable mention:* One example of factual lookup (not studied in this post) is [bi-gram statistics, which is encoded in the embedding + unembedding matrices](https://transformer-circuits.pub/2021/framework/index.html#zero-layer-transformers). 
+*Honorable mention:* One example of factual lookup (not studied in this post) is [bi-gram statistics, which is (sometimes) encoded in the embedding + unembedding matrices](https://transformer-circuits.pub/2021/framework/index.html#zero-layer-transformers). 
 
 In this post, I study sequence memorization as a toy model for any factual lookup where some combination of multiple tokens carries a meaning that is substantially different from any linear combination of the individual tokens. 
 
@@ -16,7 +16,7 @@ In this post, I study sequence memorization as a toy model for any factual looku
 A big part of creating a good toy model is creating the right toy training task, i.e. choosing what the training data should be. In this section I describe exactly what the training data is for the sequence memorization task.
 
 - **Testing Various Model Architectures** \
-In this section I test 
+I want to know what parts of a one layer transformer is important for the sequence memorization task. To find this out, I remove or modify various parts, to see how this changes the maximum number of facts the model can learn. 
 
 - **Scaling** \
 In this section I scale up two model architecture variants, to see how number of learnable facts scales with model size. Turns out that the number of learnable facts scales slightly worse than proportional to number of model parameters, which is not surprising. 
@@ -26,7 +26,7 @@ In this section I scale up two model architecture variants, to see how number of
 
 
 - **My attempt**\
-My own attempt to solve the above challenge. 
+My own attempt to solve the above challenge. I make non-zero progress, but there is still room for improvement.
 
 
 
@@ -36,27 +36,19 @@ My own attempt to solve the above challenge.
 
 The training data are sequences of three tokens, two input tokens and one output token. Given an input of two tokens, the network is trained to predict the next token (i.e. the output token).
 
+The code for generating the training data is not very long, and is quoted below in full, if you prefer to read code.
+
 Hyperparameters for the data generation:
-
-- input token vocabulary size
-- output token vocabulary size
-
-In my experiments, the input token vocabulary size is always twice the size of the output token vocabulary.[^1]
-
-[^1]: I started out the experiments, having them the same size, but the network learned all the facts too easily, so I doubled the input vocabulary size in order to have more possible facts.
-
-The code for generating the training data is not very long, and is quoted below if you prefer to read code
-
-The inputs are
 
 - `n_facts` -- Number of facts.
 - `input_vocab_size`
 - `output_vocab_size`
 - `seed` -- Random seed. *This value is always 42.*[^2]
 
-[^2]: I used a fixed random seed to avoid some runs getting lucky and getting easier facts, and to specifically have the same facts for trained networks and hand-coded networks. However this last aim failed because torch random functions give different results when run on CPU vs GPU, even when the seed is the same. However, this probably isn't a significant concern.
+The code first generates a list of every possible input combination. Then this list is shuffled, and the first `n_fact` pairs from the shuffled list are used as the inputs for the `n_fact` facts. These facts are then divided as equally possible among the `output_vocab_size` target labels.
 
-The code first generates a list of every possible input combination. Then this list is shuffled, and the first `n_fact` pairs from the shuffled list are used as the inputs for the `n_fact` facts. These facts are then divided as equally as possible among the `output_vocab_size` target labels.
+
+[^2]: I used a fixed random seed to avoid some runs getting lucky and getting easier facts, and to specifically have the same facts for trained networks and hand-coded networks. However this last aim failed because torch random functions give different results when run on CPU vs GPU, even when the seed is the same. However, this probably isn't a significant concern.
 
 *[Make a collapsible box for the code below]*
 
@@ -107,7 +99,7 @@ The full toy model consists of:
 
 *Figure 1: The full toy transformer model, with all the different parts present.*
 
-After the attention, we only care about the computation in the second token position. This follows from the fact that we're only trying to predict the third token, and not the second token.
+After the attention, the model only continues its computation in the second token position. This is because the model is only trying to predict the third token, and not the second token.
 
 ## Model variations
 
@@ -123,7 +115,7 @@ I want to be able to simplify the model by removing the attention. However, the 
   Same as above except I remove the attention pattern $\mathrm{softmax}(QK^\top)$ and replace it with a uniform $\frac{1}{2}$.
 
 - **Dual Embedding (2Emb):**
-  There is no attention and no positional embedding. Instead, there are two different token embeddings, one for each position. These are simply added together to make the first residual stream activation.
+  There is no attention and no positional embedding. Instead, there are two different token embeddings, one for each position. These are simply added together to make the initial residual stream activation.
 
 
 ### MLP
@@ -138,7 +130,7 @@ There are a number of variants regarding the MLP. Firstly the MLP can either be 
 
 ### Norms
 
-The norms can also be turned on and off. Each of the norms for the readin to the attention and MLP only exist if both that part of the network is present (Unif Attn or Lrn Attn for the attention), and Norms are turned on. The last norm, just before the unembedding only depends on the norm setting, and is there if norms are turned on and not there if norms are turned off.
+The norms can also be turned on and off. Each of the norms for the read-in to the attention and MLP only exist if both that part of the network is present (Unif Attn or Lrn Attn for the attention), and Norms are turned on. The last norm, just before the unembedding only depends on the norm setting, and is there if norms are turned on and not there if norms are turned off.
 
 ![A simplified version of the toy model. The MLP is present but everything else (attention, norms, residual connection around the MLP) is turned off.](Memory%20Toy%20Model%20-%20Simple.png)
 
@@ -153,17 +145,17 @@ To find out which parts of the network matter for the memorization task, I train
 
 The networks are trained using gradient descent[^Adam], on a cross entropy loss. I say that they have successfully learned some number of facts, if at the end of training, taking argmax over the logits always gives the correct label. In order to find the maximum learnable facts for a specific architecture variant, I do a binary search over number of facts.
 
-[^Adam]: Adam to be specific.
+[^Adam]: Adam to be specific, with the following learnig rate schedule: I start out with lr=1e-2, and train for either 50000 epochs or untill accuracy [defined as $mean(argmax(logits)==labels)$] has not imporved for 5000 epochs. If at the end of this accucy is below 1 but above 0.95, I continue the training with lr dropped to 3e-3 and same stopping criterions, and finally repeat for lr=1e-3. Training also ends if the accuracy=1 is reached.
 
 The **MLP** is by far the most important part. 
 - Adding the MLP block lets the network learn **60% - 373%** more facts, a much larger effect than any other setting. 
 - The effect is ***largest*** when **Mixing** = **2Emb** or **Unif Attn**, combined with **Norms**=❌, I.e, when the MLP's ReLU or GELU neurons are the only non-linearity in the network.
 
-**Mixing** is the second most influential setting, if there is an MLP.[^no_mlp]
-- When **MLP**=❌ and **Norms**=❌ (nothing else in the network than the mixing and the unembedding), then *all the mixing options do equally well*. 
-- For all other settings **2Emb** *beats* **Unif Attn** (**7.8% - 39%** more facts), which *beats* **Lrn Attn** (**5% - 39%** more facts)
+**Mixing** is the second or third most influential setting.[^no_mlp]
+- For most settings **2Emb** *beats* **Unif Attn** (**7.8% - 39%** more facts), which *beats* **Lrn Attn** (**5% - 39%** more facts)
+- Except when **MLP**=❌ and **Norms**=❌ (nothing else in the network than the mixing and the unembedding), then *all the mixing options do equally well*. 
 
-[^no_mlp]: In the absence of an MLP block, Norms is the second most influential setting and Mixing becomes the third. Without MLP, the Mixing setting has very small effect, and only makes it as high as third place, becasue without MLP there are no more settings.
+[^no_mlp]: If there is an MLP block then Mixing is gneraly more important than norms, and the other way round without the MLP.  
 
 Uniform attention being better than learned attention, has to be due to learned attention having training difficulties, since learned attention is strictly more expressive. Consistent with this, the learned attention results are also by far the least stable across repeated runs. It's not surprising that dual embedding is doing better than uniform attention, since it's both strictly more expressive, and should be no harder to train.
 
@@ -171,7 +163,7 @@ These results suggest that the attention probably isn't doing anything important
 
 [^att_do]: With some rotation added to the first token embedding as to be able to tell apart inputs with the two tokens swapped. E.g. to differentiate the input "1,2" from the input "2,1"
 
-**Norms** is the third most influential setting, if there is an MLP.[^no_mlp]
+**Norms** is also the second or third most influential setting, if there is an MLP.[^no_mlp]
 
 - When **MLP**=✅ then adding norms lets the network learn **2.2% - 42%** more facts
 - When **MLP**=❌ then adding norms lets the network learn **79% - 174%** more facts
@@ -213,7 +205,7 @@ And the result is
 
 The number of facts each model can learn scales as $d^{1.78}$. Compare this to the number of model parameters which scales as $d^2$. We see that the scaling of learnable facts is close to the scaling of parameters, but a bit worse.
 
-I don't have a precise theory of why this should be the case for this model and training data. But prior work on computation in superposition for different tasks and models has also found a slightly sub-linear scaling relative to model parameters.[^prior_work]
+I don't have a precise theory of why this should be the case of this model and training data. But prior work on computation in superposition for different tasks and models has also found a slightly sub-linear scaling relative to model parameters.[^prior_work]
 
 [^prior_work]:
   * [On the Complexity of Neural Computation in Superposition](https://arxiv.org/abs/2409.15318)
@@ -224,32 +216,68 @@ I don't have a precise theory of why this should be the case for this model and 
 
 # Challenge: Benchmark for understanding
 
-Can you or I write down weights for the memory toy model, either by hand or some algorithm that isn't gradient descent, such that our resulting model match the performance of the learned model?
+Can you or I, write down weights for the sequence memorization toy model, either by hand or some algorithm that isn't gradient descent, such that our resulting model match the performance of a trained model?
 
 This challenge is a benchmark for how well we understand how the model stores the facts. There are two reasons why this is a useful framing.
 
 - If we understand how the facts are embedded, we should be able to replicate this, without gradient descent.
-- Thinking about "How would I do this?" can be a useful framing for mech-interp.
+- Thinking about "How would I do this?" can be a useful framing for figuring out what some trained model is doing.
 
 I think that my current best attempt (which is presented further down) is some non-zero progress on this challenge, but there is still far to go. I encourage all readers to give it a try yourself.
 
+## Rules
+* Use the model architecture described below. [^rule_one]
+* Use the code in section "Training data" to generate facts.
+* Come up with an algorithm that generates the model weights, if given a list of facts to encode. 
+* You can't use gradient decent. [^hybrid_rule]
+* You can do hyperparameter sweep over hyperparameters in your algorithm.
+* Evaluate your models using the evaluation criterions below.
+
+[^rule_one]: That is, if you want be able to compare your results with mine. But if you make progress on this chalange using some other architecture, I'd be instrested in that too. Just make sure to include something like an MLP layer, since there is where most of the sequence memorization capacity lives in the trained models. 
+
+[^hybrid_rule]: Except for the hybrid condition where you can use gradient decent for the embedding weights only. See "Evaluation Criterions".
+
 ## Model architecture
-
-Firstly, I'm not trying (yet) to produce weights for the full transformer model, but instead aiming to find functional weights for the simplified toy model shown in *Figure 2*.
-
-Secondly, the version shown in *Figure 2* has unnecessarily many weights, which is a legacy from being a cut down version of the full version shown in *Figure 1*. Because the MLP is sandwiched between two linear operations, I can skip the weight matrices of the MLP.
-
-I can simplify it further down to this: 
+Most of the sequence memorization capacity is in the MLP. I therefore propose focusing on a toy model with only this part and everything else cut out. This would be something like the *simple* model in the previous scaling experiment (Figure 2). However, this architecture one has unnecessarily many weights, which is a legacy from being a cut down version of the full version shown in *Figure 1*. Because the MLP is sandwiched between two linear operations, I can remove the weight matrices of the MLP, without any loss of expressionability. Doing so gives us this architecture.
 
 ![This model is equivalent to the toy model configuration with settings Mixing=2Emb, MLP=ON, Norms=OFF, Res=OFF, Bias=OFF, Act=ReLU.](Memory%20Toy%20Model%20-%20Hand%20Coded.png)
 
 *Figure 4: This model architecture is equivalent to the toy model configuration with settings Mixing=2Emb, MLP=✅, Norms=❌, Res=❌, Bias=❌, Act=ReLU.*
 
-If you want to give the challenge a go, feel free to use this architecture, or any other that you find easier to work with. The final goal is to be able to write down functional weights for the full transformer model, but I think it's ok to start with a simpler case.
+Use this architecture for the challenge if you want to be able to compare your results with mine. However, if you want to go for something slightly different, or even the full 1-layer transformer, I'd still be interested in what you can do.
+
+## Evaluation Criterions
+
+* **Max facts, acc=1** \
+What is the maximum number of facts you can give the model such that argmax of the output logits give the correct labels for every fact.
+
+* **Max facts, acc >= 0.9**\
+Same as above except argmax of the output logits only needs to give the correct logits on 90% of the facts.
+
+* **Hybrid**\
+Same evaluation criterion as either of the above. However, your algorithm only has to generate the embedding matrix, and the unembedding is trained. 
+
+For each of the four criterions above,[^four] see how the maximum number of facts scales with model size. 
+
+* Can you get the same scaling exponential as fully trained models?
+* Can you get the same pre-factor (or close to) as the fully trained models?
+* Can you do better than me on either of the above?
+
+[^four]: There are four combinations:
+ * acc = 1
+ * acc >= 0.9
+ * hybrid, acc = 1, 
+ * hybrid, acc >= 0.9
+ 
+ [The above list should be in the footnote. If it doesn't work here, I'll fix it on LW.]
 
 # My attempt
 
-## Summary
+This is my attempt at solving the challenge I proposed above. Below I present first my algorithm, and then how it performed relative to trained models.
+
+The results are that my models are about one order of magnitude worse than the trained models, in terms of how many facts they can encode. However, when requiring only 90% accuracy, they scale almost as well as the trained models (see Figure 5). 
+
+## My algorithm: Summary
 First we associate each label with a unique set of neurons.[^neuron_set] These neurons will somehow identify facts with this label. 
 
 [^neuron_set]: To clarify: Typically each neuron will be used by multiple labels, but no two labels share all their neurons.
@@ -268,7 +296,7 @@ In summary:
 * Under the above constraint, try to make as many pre-activations as possible be above zero.
 * For every label $l$, assign a constant negative weight between the logit for $l$ and every neuron associated with $l$. Let all other unembedding weights be zero. 
 
-## The actual algorithm
+## My algorithm: More details
 My algorithm for assigning weight matrix values, has these steps
 
 - Assign $S$ ReLU neurons to each label. This means that each neuron will be assigned to several labels. These assignments should achieve both of: Each neuron should have approximately the same labels assigned to it as any other neuron; The max neuron overlap between any pair of labels, should be as small as possible.
@@ -280,9 +308,10 @@ My algorithm for assigning weight matrix values, has these steps
 There are $d_{MLP}$ ReLU neurons, and $n_{output\_vocab}$ labels. Each label gets assigned $S\geq1$ neurons. In most of my experiments $d_{MLP}=n_{output\_vocab}$, which means for any $S>1$, the assignments will overlap.
 
 One problem my network needs to solve is that there will likely be some pattern of facts
-- $a,b$ -> $l$
-- $c,d$ -> $l$
-- $a,d$ -> not $l$
+- $x,z$ -> $l$
+- $p,q$ -> $l$
+- $x,q$ -> not $l$
+- $p,z$ -> not $l$
 
 Any weight allocation, on this model architecture, where the logit for some label only depends on a single ReLU neuron, will fail at encoding this pattern. Therefore, the network either needs more ReLU neurons than labels (not realistic) or the labels will have to somehow share neurons, i.e. some sort of superposition encoding. 
 
@@ -298,7 +327,7 @@ The algorithm in broad strokes:
 1. For each neuron, I list all facts with a label that is assigned to that neuron. 
 2. For the first input token, I count how many times each token appears in this list of facts, I then take $top\_fraction$ of these input tokens and assign them the $weight = -1$, to that neuron.
 3. Repeat step 2 for the second input token.
-4. Find any fact that is not covered by step 2 and 3, and assign $weight = 0$ to both first and second input tokens for all such facts.
+4. Find any fact where neither token got a weight of -1 in step 2 or 3, and assign $weight = 0$ to both first and second input tokens for all such facts.
 5. Assign $weight = 1$ to all remaining input tokens.
 
 
@@ -317,24 +346,22 @@ For the hand-coded models the winning $S$ is typically $S\approx\sqrt{d}$ where 
 
 For the hand-coded models the winning $top\_fraction$ is typically in the range $0-0.28$. For the hybrid models the number is a bit larger.
 
-See appendix B and C here [link] for details.
+See appendix C and D here [link] for details.
 
 ## Results
 As to be expected, my hand-coded models are not as good as trained models, and they especially struggle to reach full accuracy. But if I accept 90% accuracy for the hand-coded model, it scales almost as well as the trained model, but with a worse pre-factor.
 
-The plot below shows my data from binary search to find maximum number of facts a model can learn. 
+The plot below shows my data from binary search to find the maximum number of facts a model can learn. 
 - The model architecture is the one shown in Fig 3, for all models
 - **trained**: All weights are learned
 - **hybrid**: Embedding weights are selected according to my algorithm, and unembedding weights are trained.
 - **hand-coded**: All weights are selected according to my algorithm.
-- **rand-emb**: Embedding weights are randomly initialised and frozen. Unembedding weights are trained.
+- **rand-emb**: Embedding weights are randomly initialized and frozen. Unembedding weights are trained.
 - Training (when applicable) is done with Adam, lr=1e-2, up to 5000 epochs with early stopping if max 100% accuracy is reached, or if accuracy has not improved for 100 epochs. 
 - All models are evaluated on accuracy, by which I mean percentage of facts it correctly predicts. This is calculated as $mean(argmax(logits)==labels)$
 - **acc $\leq$ 0.9** means that the accuracy has to be at least 90% for the model to count as successful
 - **acc = 1** means that accuracy has to be 100% for the model to count as successful.
-- Each experiment is run 11 times with the same facts but different random initialisations (for the trained models) or different random shuffles of neuron allocations, and different shufflings as tiebreaker in step 2 Embedding weights (for the hand-coded models). **any**/**most**/**all** indicate if the success criteria is that any, most, or all of the runs needs to reach the desired accuracy.
-- Best fit lines are over aggregations of any/most/all.
-- model size, $d$ is the dimension of the model. $n_{input\_vocab}=2d$, $d_{MLP}=d$, $n_{output\_vocab}=d$
+
 
 
 ![](scaling_any.png)

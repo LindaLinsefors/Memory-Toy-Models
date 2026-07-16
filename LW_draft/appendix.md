@@ -133,7 +133,16 @@ Adding a bias ought to be strictly helpful, but for some reason it's anti-helpfu
 ![](scaling_only_trained.png)
 *Figure B.1: Same as Figure 3 in main post, but with "most" and "all" settings included. The fitted lines include all data points for each of "simple" or "full", aggregating over "any"/"most"/"all".*
 
-# Appendix B: Best S (number neurons per label) for the hand-coded and hybrid models
+
+My model scaling:
+
+
+- Each experiment is run 11 times with the same facts but different random initialisations (for the trained models) or different random shuffles of neuron allocations, and different shufflings as tiebreaker in step 2 Embedding weights (for the hand-coded models). **any**/**most**/**all** indicate if the success criteria is that any, most, or all of the runs needs to reach the desired accuracy.
+- Best fit lines are over aggregations of any/most/all.
+- model size, $d$ is the dimension of the model. $n_{input\_vocab}=2d$, $d_{MLP}=d$, $n_{output\_vocab}=d$
+![](scaling.png)
+
+# Appendix C: Best S (number neurons per label) for the hand-coded and hybrid models
 
 
 
@@ -172,13 +181,13 @@ As you can see, the picture is less clean when the diffrent model dimenstions ar
 
 In the hybrid model $n_{input\_vocab}$ also plays a role. 
 
-# Appendix C: Best "top_fraction" for the hand-coded and hybrid models 
+# Appendix D: Best "top_fraction" for the hand-coded and hybrid models 
 
-The other hyperparameter (other than $S$), used when creating the embedding matrix for the handcoded and hybrid models, is a variable that I dubbed $top\_fraction$. See main post for definition. 
+The other hyperparameter (other than $S$), used when creating the embedding matrix for the hand coded and hybrid models, is a variable that I dubbed $top\_fraction$. See main post for definition. 
 
-***I don't expect looking into this variable will tell you anything interesting. I don't recomend that you pay attention to this section unless you know something I don't.***
+***I don't expect looking into this variable will tell you anything interesting. I don't recommend that you pay attention to this section unless you know something I don't.***
 
-But for compleetion, and because it's cost me almost no extra work to add this, here are the same plot as in Appendix B, but for $top\_fraction$ instead of $S$.
+But for completion, and because it's cost me almost no extra work to add this, here are the same plot as in Appendix B, but for $top\_fraction$ instead of $S$.
 
 Note that I only sweped over $top\_fraction\in\{0.00, 0.02, 0.04 \dots 0.38\}$ some runs with the hybrid model seems to have hit the cealing, i.e the real best $top\_fraction$ is somethig above $0.38$.
 
