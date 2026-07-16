@@ -16,13 +16,13 @@ In this post, I study sequence memorization as a toy model for any factual looku
 A big part of creating a good toy model is creating the right toy training task, i.e. choosing what the training data should be. In this section I describe exactly what the training data is for the sequence memorization task.
 
 - **Testing Various Model Architectures** \
-I want to know what parts of a one layer transformer is important for the sequence memorization task. To find this out, I remove or modify various parts, to see how this changes the maximum number of facts the model can learn. 
+I want to know what parts of a one layer transformer are important for the sequence memorization task. To find this out, I remove or modify various parts, to see how this changes the maximum number of facts the model can learn. 
 
 - **Scaling** \
 In this section I scale up two model architecture variants, to see how number of learnable facts scales with model size. Turns out that the number of learnable facts scales slightly worse than proportional to number of model parameters, which is not surprising. 
 
 - **Challenge: Benchmark for understanding** \
-[Summary here]
+Can you write down weights for the toy model by hand, or with any algorithm that isn't gradient descent, such that it matches the performance of a trained model? Being able to do this is a benchmark for how well we understand how the model stores facts. In this section I lay out the rules and evaluation criteria, and invite you to give it a try.
 
 
 - **My attempt**\
@@ -45,7 +45,7 @@ Hyperparameters for the data generation:
 - `output_vocab_size`
 - `seed` -- Random seed. *This value is always 42.*[^2]
 
-The code first generates a list of every possible input combination. Then this list is shuffled, and the first `n_fact` pairs from the shuffled list are used as the inputs for the `n_fact` facts. These facts are then divided as equally possible among the `output_vocab_size` target labels.
+The code first generates a list of every possible input combination. Then this list is shuffled, and the first `n_fact` pairs from the shuffled list are used as the inputs for the `n_fact` facts. These facts are then divided as equally as possible among the `output_vocab_size` target labels.
 
 
 [^2]: I used a fixed random seed to avoid some runs getting lucky and getting easier facts, and to specifically have the same facts for trained networks and hand-coded networks. However this last aim failed because torch random functions give different results when run on CPU vs GPU, even when the seed is the same. However, this probably isn't a significant concern.
@@ -141,11 +141,11 @@ The following is just a summary of the results. To see the full results, includi
 
 To find out which parts of the network matter for the memorization task, I trained every combination of the architectural variants described above, and measured the maximum number of facts each one could learn. All models in this experiment used the same size: $n_{input\_vocab} = 32$, $d_{residual} = 16$, $d_{MLP} = 16$, $n_{output\_vocab} = 16$.[^d16]
 
-[^d16]: Initially $n_{input\_vocab}$ where the same as all the other values, but too many networks maxed out the number of possible facts, so I doubled $n_{input\_vocab}$
+[^d16]: Initially $n_{input\_vocab}$ were the same as all the other values, but too many networks maxed out the number of possible facts, so I doubled $n_{input\_vocab}$
 
 The networks are trained using gradient descent[^Adam], on a cross entropy loss. I say that they have successfully learned some number of facts, if at the end of training, taking argmax over the logits always gives the correct label. In order to find the maximum learnable facts for a specific architecture variant, I do a binary search over number of facts.
 
-[^Adam]: Adam to be specific, with the following learnig rate schedule: I start out with lr=1e-2, and train for either 50000 epochs or untill accuracy [defined as $mean(argmax(logits)==labels)$] has not imporved for 5000 epochs. If at the end of this accucy is below 1 but above 0.95, I continue the training with lr dropped to 3e-3 and same stopping criterions, and finally repeat for lr=1e-3. Training also ends if the accuracy=1 is reached.
+[^Adam]: Adam to be specific, with the following learning rate schedule: I start out with lr=1e-2, and train for either 50000 epochs or until accuracy [defined as $mean(argmax(logits)==labels)$] has not improved for 5000 epochs. If at the end of this accuracy is below 1 but above 0.95, I continue the training with lr dropped to 3e-3 and same stopping criterions, and finally repeat for lr=1e-3. Training also ends if the accuracy=1 is reached.
 
 The **MLP** is by far the most important part. 
 - Adding the MLP block lets the network learn **60% - 373%** more facts, a much larger effect than any other setting. 
@@ -155,7 +155,7 @@ The **MLP** is by far the most important part.
 - For most settings **2Emb** *beats* **Unif Attn** (**7.8% - 39%** more facts), which *beats* **Lrn Attn** (**5% - 39%** more facts)
 - Except when **MLP**=❌ and **Norms**=❌ (nothing else in the network than the mixing and the unembedding), then *all the mixing options do equally well*. 
 
-[^no_mlp]: If there is an MLP block then Mixing is gneraly more important than norms, and the other way round without the MLP.  
+[^no_mlp]: If there is an MLP block then Mixing is generally more important than norms, and the other way round without the MLP.  
 
 Uniform attention being better than learned attention, has to be due to learned attention having training difficulties, since learned attention is strictly more expressive. Consistent with this, the learned attention results are also by far the least stable across repeated runs. It's not surprising that dual embedding is doing better than uniform attention, since it's both strictly more expressive, and should be no harder to train.
 
@@ -201,11 +201,11 @@ I test how many facts each of these models can learn for a range of model dimens
 And the result is
 
 ![](scaling_only_trained_any.png)\
-*Figure 3: Maximum number a fact a network can learn vs model dimension.*
+*Figure 3: Maximum number of facts a network can learn vs model dimension.*
 
 The number of facts each model can learn scales as $d^{1.78}$. Compare this to the number of model parameters which scales as $d^2$. We see that the scaling of learnable facts is close to the scaling of parameters, but a bit worse.
 
-I don't have a precise theory of why this should be the case of this model and training data. But prior work on computation in superposition for different tasks and models has also found a slightly sub-linear scaling relative to model parameters.[^prior_work]
+I don't have a precise theory of why this should be the case for this model and training data. But prior work on computation in superposition for different tasks and models has also found a slightly sub-linear scaling relative to model parameters.[^prior_work]
 
 [^prior_work]:
   * [On the Complexity of Neural Computation in Superposition](https://arxiv.org/abs/2409.15318)
@@ -229,16 +229,16 @@ I think that my current best attempt (which is presented further down) is some n
 * Use the model architecture described below. [^rule_one]
 * Use the code in section "Training data" to generate facts.
 * Come up with an algorithm that generates the model weights, if given a list of facts to encode. 
-* You can't use gradient decent. [^hybrid_rule]
-* You can do hyperparameter sweep over hyperparameters in your algorithm.
+* You can't use gradient descent. [^hybrid_rule]
+* You can do a hyperparameter sweep over hyperparameters in your algorithm.
 * Evaluate your models using the evaluation criterions below.
 
-[^rule_one]: That is, if you want be able to compare your results with mine. But if you make progress on this chalange using some other architecture, I'd be instrested in that too. Just make sure to include something like an MLP layer, since there is where most of the sequence memorization capacity lives in the trained models. 
+[^rule_one]: That is, if you want to be able to compare your results with mine. But if you make progress on this challenge using some other architecture, I'd be interested in that too. Just make sure to include something like an MLP layer, since that is where most of the sequence memorization capacity lives in the trained models. 
 
-[^hybrid_rule]: Except for the hybrid condition where you can use gradient decent for the embedding weights only. See "Evaluation Criterions".
+[^hybrid_rule]: Except for the hybrid condition where you can use gradient descent for the embedding weights only. See "Evaluation Criterions".
 
 ## Model architecture
-Most of the sequence memorization capacity is in the MLP. I therefore propose focusing on a toy model with only this part and everything else cut out. This would be something like the *simple* model in the previous scaling experiment (Figure 2). However, this architecture one has unnecessarily many weights, which is a legacy from being a cut down version of the full version shown in *Figure 1*. Because the MLP is sandwiched between two linear operations, I can remove the weight matrices of the MLP, without any loss of expressionability. Doing so gives us this architecture.
+Most of the sequence memorization capacity is in the MLP. I therefore propose focusing on a toy model with only this part and everything else cut out. This would be something like the *simple* model in the previous scaling experiment (Figure 2). However, this architecture has unnecessarily many weights, which is a legacy from being a cut down version of the full version shown in *Figure 1*. Because the MLP is sandwiched between two linear operations, I can remove the weight matrices of the MLP, without any loss of expressivity. Doing so gives us this architecture.
 
 ![This model is equivalent to the toy model configuration with settings Mixing=2Emb, MLP=ON, Norms=OFF, Res=OFF, Bias=OFF, Act=ReLU.](Memory%20Toy%20Model%20-%20Hand%20Coded.png)
 
@@ -252,14 +252,14 @@ Use this architecture for the challenge if you want to be able to compare your r
 What is the maximum number of facts you can give the model such that argmax of the output logits give the correct labels for every fact.
 
 * **Max facts, acc >= 0.9**\
-Same as above except argmax of the output logits only needs to give the correct logits on 90% of the facts.
+Same as above except argmax of the output logits only needs to give the correct labels on 90% of the facts.
 
 * **Hybrid**\
 Same evaluation criterion as either of the above. However, your algorithm only has to generate the embedding matrix, and the unembedding is trained. 
 
 For each of the four criterions above,[^four] see how the maximum number of facts scales with model size. 
 
-* Can you get the same scaling exponential as fully trained models?
+* Can you get the same scaling exponent as fully trained models?
 * Can you get the same pre-factor (or close to) as the fully trained models?
 * Can you do better than me on either of the above?
 
@@ -352,7 +352,7 @@ See appendix C and D here [link] for details.
 As to be expected, my hand-coded models are not as good as trained models, and they especially struggle to reach full accuracy. But if I accept 90% accuracy for the hand-coded model, it scales almost as well as the trained model, but with a worse pre-factor.
 
 The plot below shows my data from binary search to find the maximum number of facts a model can learn. 
-- The model architecture is the one shown in Fig 3, for all models
+- The model architecture is the one shown in Fig 4, for all models
 - **trained**: All weights are learned
 - **hybrid**: Embedding weights are selected according to my algorithm, and unembedding weights are trained.
 - **hand-coded**: All weights are selected according to my algorithm.
