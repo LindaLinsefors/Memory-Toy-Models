@@ -56,21 +56,24 @@ for log_file in log_files:
         if mf and mf > 0:
             group_points[group].append((d, mf))
 
-# Power-law fits (straight lines in log-log space), one per group, pooling the
-# any/most/all points together. max_facts = C * d^k; formula shown in legend.
-# Broad translucent lines in the group's color, like the hc2 capacity plots.
+# Fits of fixed shape max_facts = C * d^2/log(d), one per group, pooling the
+# any/most/all points together. Only the coefficient C is fitted (least squares
+# in log space). Broad translucent lines in the group's color.
 for group in sorted(group_points, key=lambda g: group_order.get(g, 99)):
     pts = sorted(group_points[group])
     if len(pts) < 2:
         continue
     fx = np.array([d for d, _ in pts], dtype=float)
     fy = np.array([mf for _, mf in pts], dtype=float)
-    k, b = np.polyfit(np.log(fx), np.log(fy), 1)
-    C = np.exp(b)
-    xline = np.array([fx.min(), fx.max()])
-    plt.loglog(xline, C * xline ** k, color=group_colors.get(group), alpha=0.4,
+    # log(C) = mean(log(fy) - log(fx^2/log(fx))).
+    shape = fx ** 2 / np.log(fx)
+    C = np.exp(np.mean(np.log(fy) - np.log(shape)))
+    # d^2/log(d) is curved in log-log space, so sample the line densely.
+    xline = np.geomspace(fx.min(), fx.max(), 100)
+    plt.loglog(xline, C * xline ** 2 / np.log(xline),
+               color=group_colors.get(group), alpha=0.4,
                linestyle="-", linewidth=3,
-               label=f"fit {group}: {C:.3g}·d^{k:.2f}")
+               label=f"fit {group}: {C:.3g}·d²/log(d)")
 
 plt.xlabel("model size (d)")
 plt.ylabel("max facts")
@@ -134,4 +137,55 @@ plt.grid(True)
 plt.tight_layout()
 plt.show()
 
+
+# %%
+# Third plot: same as second plot,
+# but the fitted line should be best fit for
+# max_facts proportional to d^2/log(d), for each of simple and full.
+# The shape d^2/log(d) is fixed; only the coefficient is fitted (least squares
+# in log space).
+
+plt.figure(figsize=(5.5, 4))
+
+y_ticks = [512, 1024, 2048, 4096, 8192, 16384, 32768]
+
+for group in ["simple", "full"]:
+    if (group, "any") not in series_data:
+        continue
+    ds, max_facts = series_data[(group, "any")]
+    plt.loglog(ds, max_facts, linestyle="none", marker=category_markers["any"],
+               markersize=6, color=group_colors[group],
+               label=f"{group}")
+
+    pts = sorted((d, mf) for d, mf in zip(ds, max_facts) if mf and mf > 0)
+    if len(pts) < 2:
+        continue
+    fx = np.array([d for d, _ in pts], dtype=float)
+    fy = np.array([mf for _, mf in pts], dtype=float)
+    # Fit only the coefficient C for max_facts = C * d^2/log(d) (fixed shape).
+    # Least squares in log space: log(fy) = log(C) + log(d^2/log(d)), so
+    # log(C) = mean(log(fy) - log(fx^2/log(fx))).
+    shape = fx ** 2 / np.log(fx)
+    C = np.exp(np.mean(np.log(fy) - np.log(shape)))
+    # d^2/log(d) is curved in log-log space, so sample the line densely.
+    xline = np.geomspace(fx.min(), fx.max(), 100)
+    plt.loglog(xline, C * xline ** 2 / np.log(xline),
+               color=group_colors[group], alpha=0.4,
+               linestyle="-", linewidth=4,
+               label=f"best fit: {C:.3g}·d²/log(d)")
+
+plt.xlabel("model size (d)")
+plt.ylabel("max facts")
+plt.title("Capacity vs model size")
+plt.legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
+
+ax = plt.gca()
+ax.xaxis.set_minor_locator(plt.NullLocator())
+ax.yaxis.set_minor_locator(plt.NullLocator())
+plt.xticks(x_ticks, x_ticks)
+plt.yticks(y_ticks, y_ticks)
+
+plt.grid(True)
+plt.tight_layout()
+plt.show()
 # %%

@@ -760,11 +760,13 @@ def plot_capacity_vs_d_all_models(thresholds=(0.9, 1.0),
                 yline = a * np.log2(xline) + b
                 fit_label = (f"fit {model_name} {thr_label(thr)}: "
                              f"{a:.3g}·log2(d) {b:+.3g}")
-            else:  # power law: y = C * d^k
-                k, b = np.polyfit(np.log(fx), np.log(fy), 1)
+            else:  # power law over log: y = C * d^k / log(d)
+                # ln(y) + ln(ln(d)) = ln(C) + k·ln(d), a plain linear fit of
+                # (ln y + ln ln d) against ln d.
+                k, b = np.polyfit(np.log(fx), np.log(fy) + np.log(np.log(fx)), 1)
                 C = np.exp(b)
-                yline = C * xline ** k
-                fit_label = f"fit {model_name} {thr_label(thr)}: {C:.3g}·d^{k:.2f}"
+                yline = C * xline ** k / np.log(xline)
+                fit_label = f"fit {model_name} {thr_label(thr)}: {C:.3g}·d^{k:.2f}/log(d)"
             draw_queue.append(("fit", dict(
                 xline=xline, yline=yline, color=color,
                 ls=thr_style.get(thr, ":"), label=fit_label)))
@@ -911,17 +913,19 @@ def plot_capacity_vs_d_any_only(thresholds=(0.9, 1.0), results_dir=None,
                             fmt="none", ecolor=color, capsize=3,
                             label="_nolegend_")
 
-            # Power-law fit to just this series, right after it in the legend.
+            # Fit a·d^b/log(d) to just this series, after it in the legend.
+            # Taking logs: ln(y) + ln(ln(d)) = ln(a) + b·ln(d), a plain
+            # linear fit of (ln y + ln ln d) against ln d.
             if len(set(xs)) < 2:
                 continue
             fx = np.array(xs, dtype=float)
             fy = np.array(ys, dtype=float)
-            k, b = np.polyfit(np.log(fx), np.log(fy), 1)
-            C = np.exp(b)
-            xline = np.array([fx.min(), fx.max()])
-            ax.plot(xline, C * xline ** k, color=color, alpha=0.4,
-                    linestyle=thr_style.get(thr, ":"), linewidth=3,
-                    label=f"best fit: {C:.3g}·d^{k:.2f}")
+            b, loga = np.polyfit(np.log(fx), np.log(fy) + np.log(np.log(fx)), 1)
+            a = np.exp(loga)
+            xline = np.linspace(fx.min(), fx.max(), 100)
+            ax.plot(xline, a * xline ** b / np.log(xline), color=color,
+                    alpha=0.4, linestyle=thr_style.get(thr, ":"), linewidth=3,
+                    label=f"best fit: {a:.3g}·d^{b:.2f}/log(d)")
 
     ax.set_xlabel("model size (d)")
     ax.set_ylabel("max facts")

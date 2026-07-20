@@ -34,12 +34,19 @@ def train_full_network(
     lr: float = 1e-2,
     patience: int = 100,
     verbose: bool = False,
+    early_stopping: bool = True,
 ) -> tuple:
     """Train up_matrix + down_matrix + down_bias on the model's facts with CE loss.
 
     Mirrors hc2_hybrid.train_down_matrix (plain Adam, full batch, same early
     stopping), but backpropagates through the whole network, so the hidden
     activations are recomputed every epoch.
+
+    early_stopping (default True) keeps the historical behaviour: stop as soon as
+    best_guess_accuracy hits 1.0, or when it has not improved for `patience`
+    epochs. Set it False to always run the full `n_epochs` (no stopping at all) —
+    e.g. when you want the fully-converged final weights rather than the earliest
+    passing ones.
 
     Returns (best_accuracy, epochs_run) where best_accuracy is the highest
     best_guess_accuracy observed during training.
@@ -77,15 +84,16 @@ def train_full_network(
         else:
             epochs_since_improvement += 1
 
-        if best_accuracy == 1.0:
-            if verbose:
-                print(f"Early stopping at epoch {epoch}: perfect accuracy.")
-            break
-        if epochs_since_improvement >= patience:
-            if verbose:
-                print(f"Early stopping at epoch {epoch}: no improvement for "
-                      f"{patience} epochs (best {best_accuracy:.2%}).")
-            break
+        if early_stopping:
+            if best_accuracy == 1.0:
+                if verbose:
+                    print(f"Early stopping at epoch {epoch}: perfect accuracy.")
+                break
+            if epochs_since_improvement >= patience:
+                if verbose:
+                    print(f"Early stopping at epoch {epoch}: no improvement for "
+                          f"{patience} epochs (best {best_accuracy:.2%}).")
+                break
 
     if verbose and epoch == n_epochs:
         print(f"Finished {n_epochs} epochs. Best accuracy: {best_accuracy:.2%}")
