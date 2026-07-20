@@ -223,7 +223,7 @@ def _train_attempt(cell):
             seed=cell["seed"],
             d_ff=d_ff,
             n_neurons_per_label=S,
-            use_top_no_top_fraction="top_fraction",
+            use_top_n_or_top_fraction="top_fraction",
             top_fraction=tf,
         )
         model = HybridModel2(settings, precomputed_conn=conn,

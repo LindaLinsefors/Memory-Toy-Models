@@ -94,7 +94,7 @@ def _run_one(args: dict) -> dict:
         seed=args["seed"],
         d_ff=args["d_ff"],
         n_neurons_per_label=S,
-        use_top_no_top_fraction="top_fraction",
+        use_top_n_or_top_fraction="top_fraction",
         top_fraction=args["top_fraction"],
         add_possitive_down_connections=args["add_possitive_down_connections"],
     )

@@ -1,20 +1,49 @@
 #%%
 """
-Generate binary connection matrices between D neurons and T features.
+Hand-coded weights for the sequence-memorisation toy model.
 
-Each column has exactly S ones (each feature connects to S neurons).
-Row sums are balanced (~S*T/D per neuron).
-Any two columns share at most 1 row (ideally).
+Companion code for the "My attempt" section of the post: it sets the toy
+model's weights analytically (no gradient descent) so that a given fact set --
+pairs of input tokens mapped to output labels -- is memorised directly. The
+post explains the construction and why it works; the comments in this file only
+map that construction onto the code.
 
-The "at most 1 shared neuron" property is a combinatorial design constraint.
-It is achievable only when T <= D*(D-1) / (S*(S-1)). Beyond that bound,
-some feature pairs must share >= 2 neurons; the algorithm minimises violations.
+The model is the one in Figure 4 of the post. It has two weight matrices:
+
+    up_matrix    -- the embedding    : shape (d_ff, 2 * input_vocab)
+    down_matrix  -- the unembedding  : shape (n_labels, d_ff)
+
+Naming bridge to the post: d_ff is d_MLP; n_neurons_per_label is S. The neurons
+assigned to a label are the rows set to 1 in that label's column of the
+connection matrix. The concrete weight values are documented where each matrix
+is filled in, in HandCodedModel2.__init__.
+
+File layout
+-----------
+    1. make_connection_matrix / evaluate_connection_matrix
+         assign S neurons to each label   (post: "Assigning neurons to labels")
+    2. HandCodedModel2 (+ Settings)
+         build up_matrix and down_matrix from a fact set
+         (post: "Embedding weights" and "Unembedding weights")
 """
 
 import numpy as np
 from itertools import combinations
 from typing import Optional
 import warnings
+
+
+# ── 1. Assigning neurons to labels: the connection matrix ─────────────────────
+# A connection matrix is a D x T binary matrix; conn[i, j] = 1 means neuron i is
+# assigned to label j. (In the connection-matrix code below the columns are
+# called "features"; in the model they are the labels.) We want:
+#   * exactly S ones per column     -- every label is assigned S neurons,
+#   * balanced row sums (~S*T/D)    -- every neuron is assigned to roughly equally many labels,
+#   * pairwise column overlap <= 1  -- no two labels share more than one neuron.
+# The last property is a combinatorial-design constraint, achievable only when
+#   T <= D*(D-1) / (S*(S-1)).
+# Beyond that bound some label pairs must share >= 2 neurons, and the
+# construction merely minimises the number of such overlaps.
 
 
 def make_connection_matrix(
@@ -270,9 +299,10 @@ def _total_score(m: np.ndarray) -> float:
     return violations * 1_000.0 + float(np.var(row_sums))
 
 
-# ── HandCodedModel2 ───────────────────────────────────────────────────────────
-# A generalised hand-coded MLP that works for any (hidden_dim, n_labels, n_facts)
-# and uses make_connection_matrix instead of hard-coded lookup tables.
+# ── 2. Building the model from a fact set ─────────────────────────────────────
+# Given a fact set and a connection matrix, build up_matrix (the embedding) and
+# down_matrix (the unembedding). See the post's "Embedding weights" and
+# "Unembedding weights" sections.
 
 import torch
 import torch.nn.functional as F
@@ -280,12 +310,8 @@ from models import generate_facts
 
 
 class HandCodedModel2Settings:
-    """Settings for HandCodedModel2.
-
-    Differences from HandCodedModelSettings in hc_models.py:
-    - n_facts may be any positive integer, not just a multiple of output_vocab_size.
-    - No 'adjustments' flag (that post-hoc step did not consistently help).
-    - Fixed spelling: n_neurons_per_label (was n_neruons_per_label).
+    """
+    An object with all the settings needed to create the hand coded model
     """
 
     def __init__(
@@ -296,51 +322,43 @@ class HandCodedModel2Settings:
         seed: int = 42,
         d_ff: int = 16,
         n_neurons_per_label: int = 3,
-        use_top_no_top_fraction: str = 'top_n',
+        use_top_n_or_top_fraction: str = 'top_fraction',
         top_n: int = 0,
         top_fraction: float = 0.2,
-        add_possitive_down_connections = False
     ):
         self.seq_len = 2                   # each fact has exactly two input tokens (fixed)
         self.input_vocab_size = input_vocab_size
-        self.output_vocab_size = output_vocab_size
-        self.n_facts = n_facts
-        self.seed = seed
-        self.d_ff = d_ff
-        self.n_neurons_per_label = n_neurons_per_label
-        self.use_top_no_top_fraction = use_top_no_top_fraction  # 'top_n' or 'top_fraction'
-        self.top_n = top_n
-        self.top_fraction = top_fraction
-        self.add_possitive_down_connections = add_possitive_down_connections
+        self.output_vocab_size = output_vocab_size      # number of labels
+        self.n_facts = n_facts                          # number of facts
+        self.seed = seed                                # random seed
+        self.d_ff = d_ff                                # number of ReLU neurons (d_MLP in the post)
+        self.n_neurons_per_label = n_neurons_per_label  # S: number of neurons assigned to each label
+
+        # top_n and top_fraction is two diffren way of expressing the same setting. 
+        # Either can be used, but not both. The experiments in the post uses top_fraction.
+        self.use_top_n_or_top_fraction = use_top_n_or_top_fraction  # 'top_n' or 'top_fraction'
+        self.top_n = top_n                # int -- only used if 'top_n'
+        self.top_fraction = top_fraction  # float -- only used if 'top_fraction'
 
 
 class HandCodedModel2:
-    """Analytically constructed two-layer MLP for memorising (input, label) facts.
+    """Analytically constructed toy model for memorising (input, label) facts.
 
-    Architecture (forward pass):
+    Forward pass:
         x_enc  = [one_hot(x[:,0]), one_hot(x[:,1])]   # (batch, n_vocab*2)
-        hidden = relu(x_enc @ up_matrix.T)             # (batch, hidden_dim)
-        logits = hidden @ down_matrix.T + down_bias    # (batch, n_labels)
+        hidden = relu(x_enc @ up_matrix.T)            # (batch, hidden_dim)
+        logits = hidden @ down_matrix.T + down_bias   # (batch, n_labels)
 
-    How the weights encode the facts:
-    - Each output label l is assigned S "guard" neurons via make_connection_matrix.
-    - A guard neuron for label l must fire only when the input does NOT belong to l,
-      so its firing drives logit[l] from +1 (the bias) to a negative value.
-    - Logit[l] is thus positive (predicting l) only when none of l's guard neurons fire,
-      which happens exactly when the input is one of l's own facts.
-    - The up_matrix starts at 1 everywhere (all neurons fire on all inputs).
-      Per-neuron, token weights are lowered to -1 (for the most common tokens among
-      guarded inputs) or 0 (for the remaining ones) to silence the neuron on those inputs.
+    __init__ fills in up_matrix and down_matrix from the fact set and the
+    connection matrix; the concrete weight values are explained at each matrix's
+    construction there.
 
-    Improvements over HandCodedModel in hc_models.py:
-    1. Any n_facts is valid. generate_facts assigns labels as arange(n_facts) % output_vocab_size,
-       so the number of facts per label can differ by at most 1.
-    2. Uses make_connection_matrix for arbitrary (hidden_dim, n_labels, S) instead of a
-       small set of hard-coded assignment tables.
-    3. No post-hoc adjustment step.
+    Any n_facts is supported: generate_facts assigns labels as
+    arange(n_facts) % output_vocab_size, so facts-per-label differ by at most 1.
     """
 
-    def __init__(self, settings: HandCodedModel2Settings, precomputed_conn: Optional[np.ndarray] = None):
+    def __init__(self, settings: HandCodedModel2Settings, 
+                 precomputed_conn: Optional[np.ndarray] = None):
         self.settings = settings
 
         # generate_facts supports any n_facts; labels = arange(n_facts) % output_vocab_size
@@ -362,10 +380,10 @@ class HandCodedModel2:
         n_vocab    = settings.input_vocab_size
 
         # --- Connection matrix: shape (hidden_dim, n_labels) ---
-        # conn[neuron, label] = 1  ↔  neuron guards label.
+        # conn[neuron, label] = 1  ↔  neuron is assigned to label.
         # make_connection_matrix guarantees exactly S ones per column (label), balanced
         # row sums, and minimal pairwise overlap between columns.
-        # Use a pre-built matrix if supplied (avoids re-running SA inside search loops).
+        # Use a pre-built matrix if supplied (can save a lot of runtime for repeated experiments).
         if precomputed_conn is not None:
             conn_np = precomputed_conn
         else:
@@ -375,23 +393,23 @@ class HandCodedModel2:
         # --- Up matrix: shape (hidden_dim, n_vocab * 2) ---
         # Weights from the flattened one-hot input [first_token | second_token] to each neuron.
         # Initial value 1: relu(1 + 1) = 2, so every neuron fires on every input by default.
-        # We will selectively lower weights so each neuron is silent on its guarded inputs.
+        # We will selectively lower weights so each neuron is silent on the inputs of its assigned labels.
         mlp_up = torch.ones(hidden_dim, n_vocab * 2, device=device)
 
         for neuron in range(hidden_dim):
             # Identify which facts this neuron must stay silent on.
-            # conn[neuron] is a (n_labels,) vector of 0/1; True positions are guarded labels.
+            # conn[neuron] is a (n_labels,) vector of 0/1; True positions are its assigned labels.
             neuron_guards  = conn[neuron].bool()    # (n_labels,) bool
-            guarded_mask   = neuron_guards[labels]  # (n_facts,) bool — True for guarded facts
+            guarded_mask   = neuron_guards[labels]  # (n_facts,) bool — True for facts of assigned labels
             guarded_inputs = inputs[guarded_mask]   # (k, 2) — neuron must NOT fire for these
 
             if guarded_inputs.shape[0] == 0:
-                # No current facts fall under this neuron's guarded labels; leave at 1.
+                # No current facts fall under this neuron's assigned labels; leave at 1.
                 continue
 
-            # Count how often each token appears at each position among guarded inputs.
+            # Count how often each token appears at each position among these inputs.
             # High-frequency tokens are good candidates for suppression: setting one token to -1
-            # silences the neuron on every guarded input that contains it (relu(-1+1)=0).
+            # silences the neuron on every such input that contains it (relu(-1+1)=0).
             unique_f, counts_f = torch.unique(guarded_inputs[:, 0], return_counts=True)
             unique_s, counts_s = torch.unique(guarded_inputs[:, 1], return_counts=True)
 
@@ -401,8 +419,8 @@ class HandCodedModel2:
             perm_s = torch.randperm(unique_s.shape[0], device=device)
             unique_s, counts_s = unique_s[perm_s], counts_s[perm_s]
 
-            # How many top tokens to suppress per position.
-            if settings.use_top_no_top_fraction == 'top_fraction':
+            # How many top tokens are given weight -1 in each token possition.
+            if settings.use_top_n_or_top_fraction == 'top_fraction':
                 k_f = max(1, int(len(unique_f) * settings.top_fraction))
                 k_s = max(1, int(len(unique_s) * settings.top_fraction))
             else:  # 'top_n'
@@ -417,7 +435,7 @@ class HandCodedModel2:
             if top_s.numel() > 0:
                 mlp_up[neuron, top_s + n_vocab] = -1
 
-            # Remaining guarded inputs: not covered by any -1 token in position 0 OR position 1.
+            # Remaining inputs: not covered by any -1 token in position 0 OR position 1.
             # Without further action these inputs still activate the neuron (relu(1+1)=2).
             # Zero both weights so relu(0+0)=0 — neuron is silenced.
             if top_f.numel() > 0:
@@ -437,18 +455,15 @@ class HandCodedModel2:
                 mlp_up[neuron, remaining[:, 1] + n_vocab] = 0
 
         # --- Down matrix: shape (n_labels, hidden_dim) ---
-        # down[l, n] = -2 if neuron n guards label l, else 0.
+        # down[l, n] = -2 if neuron n is assigned to label l, else 0.
         #
         # logit[b, l] = sum_n (hidden[b,n] * down[l,n]) + bias[l]
-        #             = -2 * (sum of firing guard-neurons for l) + 1
+        #             = -2 * (number of firing neurons assigned to l) + 1
         #
-        # If a guard neuron fires (wrong input for l): logit[l] ≤ -1  → correctly negative.
-        # If NO guard neuron fires (input IS a fact for l): logit[l] = +1 → correctly positive.
+        # If an assigned neuron fires (wrong input for l): logit[l] ≤ -1  → correctly negative.
+        # If NO assigned neuron fires (input IS a fact for l): logit[l] = +1 → correctly positive.
         self.up_matrix   = mlp_up
-        if settings.add_possitive_down_connections:
-            self.down_matrix = -2.0 * hidden_dim * conn.T + 1.0 * (1-conn.T)
-        else:
-            self.down_matrix = -2.0 * conn.T                      # (n_labels, hidden_dim)
+        self.down_matrix = -2.0 * conn.T                          # (n_labels, hidden_dim)
         self.down_bias   = torch.ones(n_labels, device=device)
 
     def forward(self, x):
@@ -492,7 +507,7 @@ class HandCodedModel2:
 _conn_cache: dict = {}
 
 
-def _get_conn_matrix(D: int, T: int, S: int, seed: int) -> np.ndarray:
+def get_conn_matrix(D: int, T: int, S: int, seed: int) -> np.ndarray:
     """Return a cached connection matrix, building it on first call."""
     key = (D, T, S, seed)
     if key not in _conn_cache:
@@ -503,214 +518,6 @@ def _get_conn_matrix(D: int, T: int, S: int, seed: int) -> np.ndarray:
             warnings.simplefilter("ignore")
             _conn_cache[key] = make_connection_matrix(D=D, T=T, S=S, seed=seed)
     return _conn_cache[key]
-
-
-# ── Search functions for HandCodedModel2 ─────────────────────────────────────
-
-def search_best_top_n2(
-    d: int,
-    n_facts: int,
-    S: int,
-    retries: int = 2,
-    metric: str = 'best_guess_accuracy',
-    precomputed_conn: Optional[np.ndarray] = None,
-    seed: int = 42,
-    verbose: bool = True,
-) -> tuple:
-    """Search over top_n for HandCodedModel2 with fixed n_neurons_per_label S.
-
-    Mirrors search_best_top_n in hc_models.py, but operates on HandCodedModel2
-    and takes an extra S argument.
-
-    For each top_n (starting at 0 and incrementing), the model is built `retries`
-    times — torch.randperm inside the constructor provides different random
-    tie-breaking on each call — and the best score is kept.  The loop stops once
-    accuracy reaches 1.0 or after two consecutive drops in accuracy.
-
-    precomputed_conn: a (D × D) numpy array from _get_conn_matrix(d, d, S, seed).
-        If None, it is fetched/built automatically.  Passing it in avoids
-        rebuilding the expensive SA matrix on every call.
-
-    Returns (best_top_n, best_accuracy).
-    """
-    if metric not in ('accuracy', 'best_guess_accuracy'):
-        raise ValueError("metric must be 'accuracy' or 'best_guess_accuracy'")
-
-    # Build settings once and mutate only top_n inside the loop.
-    settings = HandCodedModel2Settings(
-        input_vocab_size=2 * d,
-        output_vocab_size=d,
-        n_facts=n_facts,
-        seed=seed,
-        d_ff=d,
-        n_neurons_per_label=S,
-        use_top_no_top_fraction='top_n',
-        top_n=0,
-    )
-
-    # Ensure the connection matrix is available — fetched from cache if possible.
-    if precomputed_conn is None:
-        precomputed_conn = _get_conn_matrix(d, d, S, seed)
-
-    best_top_n         = 0
-    best_accuracy      = 0.0
-    prev_accuracy      = -1.0
-    decreases_in_a_row = 0
-    top_n              = 0
-
-    while True:
-        settings.top_n = top_n
-
-        # Try several random initialisations; keep the best score for this top_n.
-        accuracy_for_top_n = 0.0
-        for _ in range(retries):
-            model = HandCodedModel2(settings, precomputed_conn=precomputed_conn)
-            acc, bga, _, _ = model.evaluate()
-            score = acc if metric == 'accuracy' else bga
-            accuracy_for_top_n = max(accuracy_for_top_n, score)
-            if accuracy_for_top_n == 1.0:
-                break  # perfect score — no need for more retries
-
-        if verbose:
-            print(f"    top_n={top_n}: {metric}={accuracy_for_top_n:.4f}")
-
-        if accuracy_for_top_n > best_accuracy:
-            best_accuracy = accuracy_for_top_n
-            best_top_n    = top_n
-
-        if best_accuracy == 1.0:
-            break  # can't improve further
-
-        if accuracy_for_top_n < prev_accuracy:
-            decreases_in_a_row += 1
-            if decreases_in_a_row >= 2:
-                break  # two consecutive drops → further increases likely unhelpful
-        else:
-            decreases_in_a_row = 0
-
-        prev_accuracy = accuracy_for_top_n
-        top_n += 1
-
-    return best_top_n, best_accuracy
-
-
-def search_max_facts2(
-    d: int,
-    accuracy_threshold: float,
-    retries: int = 2,
-    metric: str = 'best_guess_accuracy',
-    max_S: Optional[int] = None,
-    seed: int = 42,
-    verbose: bool = True,
-) -> tuple:
-    """Find the largest n_facts that HandCodedModel2 can store above a threshold.
-
-    Searches over both n_neurons_per_label (S = 1 … max_S) and top_n.  For
-    each S value:
-      1. The connection matrix is built once (SA is expensive) and cached.
-      2. An exponential search finds a passing multiplier lo and a failing
-         multiplier hi (n_facts = k * d, k = lo or hi).
-      3. Binary search narrows the boundary between lo and hi.
-      4. search_best_top_n2 is called at each candidate k to find the optimal
-         top_n for that (n_facts, S) combination.
-
-    n_facts is kept as a multiple of d (= output_vocab_size) so that label
-    frequencies are perfectly balanced.
-
-    Speed notes
-    -----------
-    - Connection matrices are cached in _conn_cache: the SA step runs at most
-      once per (d, S) across the entire Python session.
-    - Passing precomputed_conn into each model construction means the SA step
-      is not re-run inside search_best_top_n2.
-    - Early exits (accuracy == 1.0, two consecutive top_n drops) minimise the
-      number of model builds.
-
-    Returns (best_n_facts, best_S, best_top_n, best_accuracy), or
-    (0, None, None, None) if even n_facts=d fails for every S tried.
-    """
-    if max_S is None:
-        # Values above ~10 rarely help and S must be <= d.
-        max_S = min(10, d)
-
-    overall_best_n_facts = 0
-    overall_best_S       = None
-    overall_best_top_n   = None
-    overall_best_acc     = None
-
-    for S in range(1, max_S + 1):
-        if verbose:
-            print(f"\n[S={S}] Searching with n_neurons_per_label={S}")
-
-        # Build (and cache) the connection matrix for this S once.
-        # All n_facts / top_n evaluations below will reuse the same matrix.
-        conn = _get_conn_matrix(d, d, S, seed)
-
-        def passes(k, conn=conn):
-            """Return (ok, best_top_n, best_acc) for n_facts = k * d."""
-            best_top_n_k, acc = search_best_top_n2(
-                d, k * d, S,
-                retries=retries, metric=metric,
-                precomputed_conn=conn, seed=seed,
-                verbose=verbose,
-            )
-            return acc >= accuracy_threshold, best_top_n_k, acc
-
-        # --- Phase 1: exponential growth to bracket the failure point ---
-        # Grow k as 1, 2, 4, 8, … until the model fails the threshold.
-        # After the loop: lo passes, hi fails.
-        lo        = 0
-        lo_result = (None, None)
-        hi        = 1
-
-        while True:
-            if verbose:
-                print(f"  [S={S}] Trying n_facts={hi * d} ...")
-            ok, top_n, acc = passes(hi)
-            if verbose:
-                print(f"  [S={S}] n_facts={hi * d}: {metric}={acc:.4f}, best_top_n={top_n} {'✓' if ok else '✗'}")
-            if not ok:
-                break
-            lo        = hi
-            lo_result = (top_n, acc)
-            hi       *= 2
-
-        if lo == 0:
-            # Even n_facts = d (k=1) fails for this S — try next S value.
-            if verbose:
-                print(f"  [S={S}] Failed at n_facts={d}, skipping.")
-            continue
-
-        # --- Phase 2: binary search between lo (passes) and hi (fails) ---
-        while hi - lo > 1:
-            mid = (lo + hi) // 2
-            if verbose:
-                print(f"  [S={S}] Trying n_facts={mid * d} (binary search) ...")
-            ok, top_n, acc = passes(mid)
-            if verbose:
-                print(f"  [S={S}] n_facts={mid * d}: {metric}={acc:.4f}, best_top_n={top_n} {'✓' if ok else '✗'}")
-            if ok:
-                lo        = mid
-                lo_result = (top_n, acc)
-            else:
-                hi = mid
-
-        max_facts_for_S          = lo * d
-        best_top_n_for_S, best_acc_for_S = lo_result
-
-        if verbose:
-            print(f"  [S={S}] max_facts={max_facts_for_S}, best_top_n={best_top_n_for_S}, {metric}={best_acc_for_S:.4f}")
-
-        if max_facts_for_S > overall_best_n_facts:
-            overall_best_n_facts = max_facts_for_S
-            overall_best_S       = S
-            overall_best_top_n   = best_top_n_for_S
-            overall_best_acc     = best_acc_for_S
-
-    if verbose:
-        print(f"\nBest overall: n_facts={overall_best_n_facts}, S={overall_best_S}, "
-              f"top_n={overall_best_top_n}, {metric}={overall_best_acc:.4f}")
-    return overall_best_n_facts, overall_best_S, overall_best_top_n, overall_best_acc
 
 
 # %%

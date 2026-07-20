@@ -12,8 +12,8 @@ from hand_coded_models.neuron_assigments import generate_neuron_assignments
 
 class HandCodedModelSettings:
     def __init__(self, input_vocab_size=32, output_vocab_size=16, n_facts=16, seed=42,
-                 d_ff=16, n_neruons_per_label=3, 
-                 use_top_no_top_fraction='top_n', top_n=0, top_fraction=0.2):
+                 d_ff=16, n_neurons_per_label=3, 
+                 use_top_n_or_top_fraction='top_n', top_n=0, top_fraction=0.2):
         
         # Data dimensions
         self.seq_len = 2  # Fixed for this model
@@ -24,8 +24,8 @@ class HandCodedModelSettings:
 
         # Internal model settings
         self.d_ff = d_ff
-        self.n_neruons_per_label = n_neruons_per_label
-        self.use_top_no_top_fraction = use_top_no_top_fraction  # 'top_n' or 'top_fraction'
+        self.n_neurons_per_label = n_neurons_per_label
+        self.use_top_n_or_top_fraction = use_top_n_or_top_fraction  # 'top_n' or 'top_fraction'
         self.top_n = top_n
         self.top_fraction = top_fraction
         self.adjustments = True
@@ -56,7 +56,7 @@ def search_best_top_n(d, n_facts, retries=2, metric='accuracy', adjustments=True
 
     settings = generate_settings(d)
     settings.n_facts = n_facts
-    settings.use_top_no_top_fraction = 'top_n'
+    settings.use_top_n_or_top_fraction = 'top_n'
     settings.adjustments = adjustments
 
     best_top_n = 0
@@ -160,7 +160,7 @@ class HandCodedModel:
         # from other places and I don't want to change it right now. I might clean this up later.
         inputs = self.facts['inputs']
         labels = self.facts['targets']
-        S = settings.n_neruons_per_label
+        S = settings.n_neurons_per_label
         n_labels = settings.output_vocab_size
         hidden_dim = settings.d_ff
         n_vocab = settings.input_vocab_size
@@ -201,11 +201,11 @@ class HandCodedModel:
             perm = torch.randperm(unique_s.shape[0])
             unique_s = unique_s[perm]; counts_s = counts_s[perm]
 
-            if settings.use_top_no_top_fraction == 'top_fraction':
+            if settings.use_top_n_or_top_fraction == 'top_fraction':
                 top_first_inputs = unique_f[torch.argsort(counts_f, descending=True)[:int(len(unique_f)*settings.top_fraction)]]
                 top_second_inputs = unique_s[torch.argsort(counts_s, descending=True)[:int(len(unique_s)*settings.top_fraction)]]
 
-            if settings.use_top_no_top_fraction == 'top_n':
+            if settings.use_top_n_or_top_fraction == 'top_n':
                 top_first_inputs = unique_f[torch.argsort(counts_f, descending=True)[:settings.top_n]]
                 top_second_inputs = unique_s[torch.argsort(counts_s, descending=True)[:settings.top_n]]
 
@@ -323,7 +323,7 @@ for d_model in [128, 256, 512, 1024]:
                                       output_vocab_size=d_model, 
                                       d_ff=d_model,
                                       n_facts=0,
-                                      use_top_no_top_fraction='top_n', top_n=0)
+                                      use_top_n_or_top_fraction='top_n', top_n=0)
     
     max_facts = 0
     success = True

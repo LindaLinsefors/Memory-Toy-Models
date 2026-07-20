@@ -228,7 +228,7 @@ def _run_one(cell):
         seed=cell["seed"],
         d_ff=cell["d_ff"],
         n_neurons_per_label=S,
-        use_top_no_top_fraction=mode,
+        use_top_n_or_top_fraction=mode,
         top_n=top_n_arg,
         top_fraction=top_fraction_arg,
     )
