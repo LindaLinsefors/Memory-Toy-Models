@@ -1,5 +1,5 @@
 
-# [Challenge: Hand coding weights for efficient sequence memorisation]
+# [Challenge: Hand coding efficient weights fo sequence memorisation]
 
 
 We hand-coded weights for a one layer MLP that memorises labels for input token sequences of length two. The number of facts our hand-coded model can memorise with 90% accuracy[^90percent] scales roughly linearly with the model's parameter count[^log], just like trained models for the same architecture. However, our hand-coded model's scaling prefactor still falls short of the trained model's by a factor of $9.7$. A hybrid solution in which we handcode the MLP input weights and learn the MLP output weights, which amounts to a linear classification problem[^softmax], falls short by a factor of $3.5$.
@@ -130,7 +130,7 @@ The full toy model consists of:
 - Token unembedding to create the logits for the target tokens.
 - Three RMS Norms, one applied to the input to the attention, one to the input to the MLP and one to the input to the unembedding.
 
-![The full toy transformer model, with all the different parts present.](https://hackmd.io/_uploads/SyzBj3LVzg.png)
+![The full toy transformer model, with all the different parts present.](Memory%20Toy%20Model%20-%20Full.png)
 
 
 *Figure 1: The full toy transformer model, with all the different parts present.*
@@ -169,7 +169,7 @@ There are a number of variants regarding the MLP. Firstly the MLP can either be 
 
 The norms can also be turned on and off. Each of the norms for the read-in to the attention and MLP only exists if both that part of the network is present (Unif Attn or Lrn Attn for the attention), and Norms are turned on. The last norm, just before the unembedding only depends on the norm setting, and is there if norms are turned on and not there if norms are turned off.
 
-![A simplified version of the toy model. The MLP is present but everything else (attention, norms, residual connection around the MLP) is turned off.](https://hackmd.io/_uploads/B1X5ihI4zl.png)
+![A simplified version of the toy model. The MLP is present but everything else (attention, norms, residual connection around the MLP) is turned off.](Memory%20Toy%20Model%20-%20Simple.png)
 
 
 *Figure 2: A simplified version of the toy model. The MLP is present but everything else (attention, norms, residual connection around the MLP) is turned off.*
@@ -283,7 +283,7 @@ We think that our current best attempt (which is presented further down) is some
 ## Model architecture
 Most of the sequence memorization capacity is in the MLP. We therefore propose focusing on a toy model with only this part and everything else cut out. This would be something like the *simple* model in the previous scaling experiment (Figure 2). However, that architecture still has unnecessarily many weights, a legacy of being a cut-down version of the full model in Figure 1: the MLP's input matrix sits directly after the embeddings, and its output matrix directly before the unembedding. Two consecutive linear maps can always be folded into one, so we absorb $W_{in}$ into the two embedding matrices and $W_{out}$ into the unembedding, with no loss of expressivity. Doing so gives us this architecture:
 
-![This model is equivalent to the toy model configuration with settings Mixing=2Emb, MLP=ON, Norms=OFF, Res=OFF, Bias=OFF, Act=ReLU.](https://hackmd.io/_uploads/rJeRi2IEfx.png)
+![This model is equivalent to the toy model configuration with settings Mixing=2Emb, MLP=ON, Norms=OFF, Res=OFF, Bias=OFF, Act=ReLU.](Memory%20Toy%20Model%20-%20Hand%20Coded.png)
 
 *Figure 4: This model architecture is equivalent to the toy model configuration with settings Mixing=2Emb, MLP=✅, Norms=❌, Res=❌, Bias=❌, Act=ReLU.*
 
@@ -435,8 +435,7 @@ The plot below shows our data from binary search to find the maximum number of f
 
 [^rand-emb]: The embedding matrix weights are drawn from a uniform distribution centered on zero. Specifically it's uniform over $[-\frac{1}{\sqrt{n_{input\_vocab}}} , \frac{1}{\sqrt{n_{input\_vocab}}}]$. However, the scale should not matter, since that can be compensated for by the unembedding weights.
 
-![scaling_any_log](https://hackmd.io/_uploads/H1bSb_Jrfx.png)
-
+![scaling_any_log](scaling_any_log.png)
 *Figure 5*
 
 The best-fit lines from Figure 5:[^not_serious]
@@ -461,15 +460,17 @@ The best-fit lines from Figure 5:[^not_serious]
 
 There might be multiple different algorithms to achieve high memorisation capacity, so even if we match the trained model's performance that doesn't necessarily mean we understand how the trained model works yet, though we think it'd be a good intermediate result. That said, how close do the weight matrices our algorithm constructs look to the trained weight matrices?
 
-![weights_d16_handcoded_S4_tf0.1](https://hackmd.io/_uploads/Sysr_C24zl.png)
+![weights_d16_handcoded_S4_tf0.1](../hand_coded_models/weight_viz/weights_d16_handcoded_S4_tf0.1.png)
 
 The first row shows our hand coded weights. The second and third rows are weights for models trained on the same number of facts as the hand-coded ones, and as many as they can fit respectively.
-![weight_hist_d16_handcoded_S4_tf0.1](https://hackmd.io/_uploads/SyL2AwyHfe.png)
+
+![weight_hist_d16_handcoded_S4_tf0.1](../hand_coded_models/weight_viz/weight_hist_d16_handcoded_S4_tf0.1.png)
+
 Some surface-level observations: Our embedding weights only take three different values, 1, 0 or -1. The network's weights are more smeared out, though the ones in the second row are quite trimodal, with one narrow cluster at zero and two broader clusters of positive and negative weights. The weights in the third row are much more spread out. They could maybe be three broad peaks grown together?[^scale]
 
 The unembedding is pretty different even in the second row, with our hand-coded weights being bimodal whereas the trained weights are trimodal again, with a small peak at zero and big positive and negative peaks. 
 
-![activations_d16_handcoded_S4_tf0.1](https://hackmd.io/_uploads/HyE_dC24zg.png)
+![activations_d16_handcoded_S4_tf0.1](../hand_coded_models/weight_viz/activations_d16_handcoded_S4_tf0.1.png)
 
 For the neurons, while our hand-coded algorithm stores facts as patterns of inactive neurons, trained models seem to use patterns of active neurons instead. Maybe as a result of that, the proportions of positive vs. zero activations appear to be somewhat flipped. The trained models' neuron activations are also more smeared out and gradual than ours, as one would expect from their more smeared out embedding weights.
 

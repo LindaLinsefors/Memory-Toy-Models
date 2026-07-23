@@ -760,6 +760,13 @@ def plot_capacity_vs_d_all_models(thresholds=(0.9, 1.0),
                 yline = a * np.log2(xline) + b
                 fit_label = (f"fit {model_name} {thr_label(thr)}: "
                              f"{a:.3g}·log2(d) {b:+.3g}")
+            elif fit_type == "purepower":
+                # Plain power law y = C * d^k (a straight line in log-log
+                # space, no log factor). Needs log(y), so only positive points.
+                k, b = np.polyfit(np.log(fx), np.log(fy), 1)
+                C = np.exp(b)
+                yline = C * xline ** k
+                fit_label = f"fit {model_name} {thr_label(thr)}: {C:.3g}·d^{k:.2f}"
             else:  # power law over log: y = C * d^k / log(d)
                 # ln(y) + ln(ln(d)) = ln(C) + k·ln(d), a plain linear fit of
                 # (ln y + ln ln d) against ln d.
@@ -1069,6 +1076,8 @@ def plot_best_S_vs_d(thresholds=(0.9, 1.0), any_all_most=("any", "most", "all"),
         results_dir=results_dir, figsize=figsize,
         y_field="best_S", models=("hand-coded", "hybrid"),
         ylabel="best S",
+        # Fit a plain power law y = a*d^b (no log factor).
+        fit_type="purepower",
         # Several lines often pick the same (d, S); fan those points out
         # slightly in x so the coinciding lines stay visible (0 turns it off).
         point_spread=point_spread,
@@ -1097,8 +1106,9 @@ def plot_best_top_fraction_vs_d(thresholds=(0.9, 1.0),
         ylabel="best top_fraction", y_log=False,
         # Horizontal gridlines at exactly the swept top_fraction values.
         yticks=[round(0.02 * i, 2) for i in range(20)],
-        # Fit y = a*log2(d) + b: unlike a power law it can use the tf=0 points.
-        fit_type="linlog",
+        # Fit a plain power law y = a*d^b (no log factor). It needs log(y), so
+        # any tf=0 points are shown but excluded from the fit.
+        fit_type="purepower",
         # Several lines often pick the same (d, top_fraction); fan those points
         # out slightly in x so the coinciding lines stay visible (0 turns it off).
         point_spread=point_spread,
