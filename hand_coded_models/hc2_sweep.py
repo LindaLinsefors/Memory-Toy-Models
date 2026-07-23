@@ -110,14 +110,14 @@ def _run_one(args: dict) -> dict:
         top_fraction=args["top_fraction"],
     )
     model = HandCodedModel2(settings, precomputed_conn=conn)
-    _, best_guess_accuracy, _, _ = model.evaluate()
+    accuracy, _, _ = model.evaluate()
     return {
         "n_facts": args["n_facts"],
         "S": S,
         "top_fraction": args["top_fraction"],
         "attempt": args["attempt"],
         "conn_seed": conn_seed,
-        "best_guess_accuracy": best_guess_accuracy,
+        "accuracy": accuracy,
     }
 
 
@@ -186,7 +186,7 @@ def main():
                 "output_vocab_size": output_vocab_size,
                 "d_ff": d_ff,
                 "seed": seed,
-                "metric": "best_guess_accuracy",
+                "metric": "accuracy",
             },
             "timestamp": timestamp,
             "results": nf_results,

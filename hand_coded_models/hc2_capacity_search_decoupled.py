@@ -77,10 +77,6 @@ n_attempts = 11
 # so we search exactly. Raise it if you want to trade resolution for speed.
 PRECISION = 1
 
-# Pass-through to HandCodedModel2 (the note in hc2.py says it changes nothing for
-# the default down-connections; kept False here for the standard model).
-add_possitive_down_connections = False
-
 testing = False  # small/cheap end-to-end validation run
 
 
@@ -255,17 +251,16 @@ def _run_model_setting(cfg):
                         n_neurons_per_label=S,
                         use_top_n_or_top_fraction="top_fraction",
                         top_fraction=tf,
-                        add_possitive_down_connections=add_possitive_down_connections,
                     )
                     model = HandCodedModel2(settings, precomputed_conn=conn)
-                    _, best_guess_accuracy, _, _ = model.evaluate()
+                    accuracy, _, _ = model.evaluate()
                     records.append({
                         "n_facts": n_facts,
                         "S": S,
                         "top_fraction": tf,
                         "attempt": attempt,
                         "tie_seed": tie_seed,
-                        "best_guess_accuracy": best_guess_accuracy,
+                        "accuracy": accuracy,
                     })
         return records
 
@@ -280,9 +275,8 @@ def _run_model_setting(cfg):
                 "S_sweep": eff_S_sweep,
                 "top_frac_sweep": top_frac_sweep,
                 "seed": seed,
-                "metric": "best_guess_accuracy",
+                "metric": "accuracy",
                 "search_mode": "top_fraction",
-                "add_possitive_down_connections": add_possitive_down_connections,
             },
             "results": records,
         }
@@ -315,7 +309,7 @@ def _run_model_setting(cfg):
         for r in records:
             key = (r["S"], r["top_fraction"])
             if key in wanted:
-                cells[key].append(r["best_guess_accuracy"])
+                cells[key].append(r.get("accuracy", r.get("best_guess_accuracy")))
         # any -> max over runs ; all -> min ; most -> median
         reduce_fn = {"any": np.max, "all": np.min, "most": np.median}[any_all_most]
         best_score, best_combo = -1.0, None
@@ -363,7 +357,6 @@ def _run_model_setting(cfg):
                 "S_sweep": eff_S_sweep,
                 "top_frac_sweep": top_frac_sweep,
                 "search_mode": "top_fraction",
-                "add_possitive_down_connections": add_possitive_down_connections,
             })
     return results
 

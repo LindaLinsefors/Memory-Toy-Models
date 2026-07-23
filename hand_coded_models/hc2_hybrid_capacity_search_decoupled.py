@@ -4,9 +4,9 @@ Mirror of hc2_capacity_search_decoupled.py, with the model swapped for
 HybridModel2: the up matrix is generated exactly like HandCodedModel2's (and
 frozen), while the down matrix + bias are randomly initialised and trained with
 full-batch CE loss (plain Adam, lr=1e-2, up to 5000 epochs, early stopping —
-see hc2_hybrid.py). A cell's score is the best best_guess_accuracy observed
-during training. The knob is `top_fraction` (a fixed grid for every S), as in
-the original.
+see hc2_hybrid.py). A cell's score is the best accuracy observed during
+training. The knob is `top_fraction` (a fixed grid for every S), as in the
+original.
 
 Parallelism structure (one change from the original)
 -----------------------------------------------------
@@ -228,7 +228,7 @@ def _train_attempt(cell):
         )
         model = HybridModel2(settings, precomputed_conn=conn,
                              init_seed=tie_seed + tf_index)
-        best_guess_accuracy, epochs_run = train_down_matrix(
+        accuracy, epochs_run = train_down_matrix(
             model, n_epochs=N_EPOCHS, lr=LR, patience=PATIENCE)
         records.append({
             "n_facts": n_facts,
@@ -236,7 +236,7 @@ def _train_attempt(cell):
             "top_fraction": tf,
             "attempt": attempt,
             "tie_seed": tie_seed,
-            "best_guess_accuracy": best_guess_accuracy,
+            "accuracy": accuracy,
             "epochs_run": epochs_run,
         })
     return records
@@ -329,7 +329,7 @@ def _run_model_setting(cfg):
                 "S_sweep": eff_S_sweep,
                 "top_frac_sweep": top_frac_sweep,
                 "seed": seed,
-                "metric": "best_guess_accuracy",
+                "metric": "accuracy",
                 "search_mode": "top_fraction",
                 "model": "HybridModel2",
                 "n_epochs": N_EPOCHS,
@@ -367,7 +367,7 @@ def _run_model_setting(cfg):
         for r in records:
             key = (r["S"], r["top_fraction"])
             if key in wanted:
-                cells[key].append(r["best_guess_accuracy"])
+                cells[key].append(r.get("accuracy", r.get("best_guess_accuracy")))
         # any -> max over runs ; all -> min ; most -> median
         reduce_fn = {"any": np.max, "all": np.min, "most": np.median}[any_all_most]
         best_score, best_combo = -1.0, None

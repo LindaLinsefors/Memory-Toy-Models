@@ -1,0 +1,95 @@
+{
+  "settings": {
+    "d": 128,
+    "n_facts": 2432,
+    "n_attempts": 11,
+    "input_vocab_size": 256,
+    "output_vocab_size": 128,
+    "d_ff": 128,
+    "seed": 42,
+    "metric": "best_guess_accuracy",
+    "model": "RandomUpModel2",
+    "n_epochs": 5000,
+    "lr": 0.01,
+    "patience": 100
+  },
+  "results": [
+    {
+      "n_facts": 2432,
+      "attempt": 0,
+      "init_seed": 0,
+      "best_guess_accuracy": 0.9695723652839661,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 2432,
+      "attempt": 1,
+      "init_seed": 1,
+      "best_guess_accuracy": 0.9555920958518982,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 2432,
+      "attempt": 2,
+      "init_seed": 2,
+      "best_guess_accuracy": 0.9708059430122375,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 2432,
+      "attempt": 3,
+      "init_seed": 3,
+      "best_guess_accuracy": 0.9551809430122375,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 2432,
+      "attempt": 4,
+      "init_seed": 4,
+      "best_guess_accuracy": 0.9753289818763733,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 2432,
+      "attempt": 5,
+      "init_seed": 5,
+      "best_guess_accuracy": 0.9666940569877625,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 2432,
+      "attempt": 6,
+      "init_seed": 6,
+      "best_guess_accuracy": 0.9814966917037964,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 2432,
+      "attempt": 7,
+      "init_seed": 7,
+      "best_guess_accuracy": 0.9469572305679321,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 2432,
+      "attempt": 8,
+      "init_seed": 8,
+      "best_guess_accuracy": 0.9642269611358643,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 2432,
+      "attempt": 9,
+      "init_seed": 9,
+      "best_guess_accuracy": 0.9761513471603394,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 2432,
+      "attempt": 10,
+      "init_seed": 10,
+      "best_guess_accuracy": 0.9650493264198303,
+      "epochs_run": 5000
+    }
+  ]
+}

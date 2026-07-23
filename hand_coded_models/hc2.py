@@ -347,7 +347,7 @@ class HandCodedModel2:
     Forward pass:
         x_enc  = [one_hot(x[:,0]), one_hot(x[:,1])]   # (batch, n_vocab*2)
         hidden = relu(x_enc @ up_matrix.T)            # (batch, hidden_dim)
-        logits = hidden @ down_matrix.T + down_bias   # (batch, n_labels)
+        logits = hidden @ down_matrix.T               # (batch, n_labels)
 
     __init__ fills in up_matrix and down_matrix from the fact set and the
     connection matrix; the concrete weight values are explained at each matrix's
@@ -457,14 +457,14 @@ class HandCodedModel2:
         # --- Down matrix: shape (n_labels, hidden_dim) ---
         # down[l, n] = -2 if neuron n is assigned to label l, else 0.
         #
-        # logit[b, l] = sum_n (hidden[b,n] * down[l,n]) + bias[l]
-        #             = -2 * (number of firing neurons assigned to l) + 1
+        # logit[b, l] = sum_n (hidden[b,n] * down[l,n])
+        #             = -2 * (number of firing neurons assigned to l)
         #
-        # If an assigned neuron fires (wrong input for l): logit[l] ≤ -1  → correctly negative.
-        # If NO assigned neuron fires (input IS a fact for l): logit[l] = +1 → correctly positive.
+        # If an assigned neuron fires (wrong input for l): logit[l] ≤ -2  → strictly negative.
+        # If NO assigned neuron fires (input IS a fact for l): logit[l] = 0, above every
+        # other label's logit, so the argmax picks l.
         self.up_matrix   = mlp_up
         self.down_matrix = -2.0 * conn.T                          # (n_labels, hidden_dim)
-        self.down_bias   = torch.ones(n_labels, device=device)
 
     def forward(self, x):
         """Run the model on input pairs x of shape (batch, 2).
@@ -475,24 +475,20 @@ class HandCodedModel2:
         second = F.one_hot(x[:, 1], num_classes=self.settings.input_vocab_size).float()
         x_enc  = torch.cat([first, second], dim=-1)               # (batch, n_vocab*2)
         hidden = torch.relu(x_enc @ self.up_matrix.T)             # (batch, hidden_dim)
-        logits = hidden @ self.down_matrix.T + self.down_bias     # (batch, n_labels)
+        logits = hidden @ self.down_matrix.T                      # (batch, n_labels)
         return logits, hidden
 
     def evaluate(self):
         """Evaluate the model on all stored facts.
 
         Returns:
-            accuracy:            fraction of (fact, label) pairs where logit sign is correct
-            best_guess_accuracy: fraction of facts where argmax label matches target
-            logits:              (n_facts, n_labels) float tensor
-            hidden:              (n_facts, hidden_dim) float tensor
+            accuracy: fraction of facts where the argmax label matches the target
+            logits:   (n_facts, n_labels) float tensor
+            hidden:   (n_facts, hidden_dim) float tensor
         """
         logits, hidden = self.forward(self.facts['inputs'])
-        one_hot_targets = F.one_hot(self.facts['targets'], self.settings.output_vocab_size)
-        # Correct sign means: true-label logit > 0, all other logits < 0
-        accuracy = (one_hot_targets.bool() == (logits > 0)).float().mean().item()
-        best_guess_accuracy = self.facts['targets'].eq(logits.argmax(dim=1)).float().mean().item()
-        return accuracy, best_guess_accuracy, logits, hidden
+        accuracy = self.facts['targets'].eq(logits.argmax(dim=1)).float().mean().item()
+        return accuracy, logits, hidden
 
 
 

@@ -1,0 +1,95 @@
+{
+  "settings": {
+    "d": 16,
+    "n_facts": 512,
+    "n_attempts": 11,
+    "input_vocab_size": 32,
+    "output_vocab_size": 16,
+    "d_ff": 16,
+    "seed": 42,
+    "metric": "best_guess_accuracy",
+    "model": "RandomUpModel2",
+    "n_epochs": 5000,
+    "lr": 0.01,
+    "patience": 100
+  },
+  "results": [
+    {
+      "n_facts": 512,
+      "attempt": 0,
+      "init_seed": 0,
+      "best_guess_accuracy": 0.171875,
+      "epochs_run": 319
+    },
+    {
+      "n_facts": 512,
+      "attempt": 1,
+      "init_seed": 1,
+      "best_guess_accuracy": 0.201171875,
+      "epochs_run": 403
+    },
+    {
+      "n_facts": 512,
+      "attempt": 2,
+      "init_seed": 2,
+      "best_guess_accuracy": 0.201171875,
+      "epochs_run": 541
+    },
+    {
+      "n_facts": 512,
+      "attempt": 3,
+      "init_seed": 3,
+      "best_guess_accuracy": 0.16796875,
+      "epochs_run": 298
+    },
+    {
+      "n_facts": 512,
+      "attempt": 4,
+      "init_seed": 4,
+      "best_guess_accuracy": 0.1796875,
+      "epochs_run": 200
+    },
+    {
+      "n_facts": 512,
+      "attempt": 5,
+      "init_seed": 5,
+      "best_guess_accuracy": 0.162109375,
+      "epochs_run": 219
+    },
+    {
+      "n_facts": 512,
+      "attempt": 6,
+      "init_seed": 6,
+      "best_guess_accuracy": 0.1796875,
+      "epochs_run": 151
+    },
+    {
+      "n_facts": 512,
+      "attempt": 7,
+      "init_seed": 7,
+      "best_guess_accuracy": 0.173828125,
+      "epochs_run": 230
+    },
+    {
+      "n_facts": 512,
+      "attempt": 8,
+      "init_seed": 8,
+      "best_guess_accuracy": 0.181640625,
+      "epochs_run": 344
+    },
+    {
+      "n_facts": 512,
+      "attempt": 9,
+      "init_seed": 9,
+      "best_guess_accuracy": 0.185546875,
+      "epochs_run": 244
+    },
+    {
+      "n_facts": 512,
+      "attempt": 10,
+      "init_seed": 10,
+      "best_guess_accuracy": 0.173828125,
+      "epochs_run": 164
+    }
+  ]
+}

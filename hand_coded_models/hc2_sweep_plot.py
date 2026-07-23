@@ -2,7 +2,7 @@
 """Plots for the HandCodedModel2 top_fraction x S sweep.
 
 Reads the JSON result files written by hc2_sweep.py (under
-hand_coded_models/hc2_sweep_results/) and visualises best_guess_accuracy as a
+hand_coded_models/hc2_sweep_results/) and visualises accuracy as a
 function of top_fraction and n_neurons_per_label (S).
 """
 
@@ -94,7 +94,7 @@ def _aggregate(records):
     """Aggregate records into per-(S, top_fraction) grids.
 
     Returns a dict with sorted axis values and 2-D arrays (rows = S, cols =
-    top_fraction) of the mean, variance, count and max of best_guess_accuracy.
+    top_fraction) of the mean, variance, count and max of accuracy.
     """
     S_values = sorted({r["S"] for r in records})
     tf_values = sorted({r["top_fraction"] for r in records})
@@ -105,7 +105,7 @@ def _aggregate(records):
     buckets = {(i, j): [] for i in range(len(S_values)) for j in range(len(tf_values))}
     for r in records:
         buckets[(s_index[r["S"]], tf_index[r["top_fraction"]])].append(
-            r["best_guess_accuracy"]
+            r.get("accuracy", r.get("best_guess_accuracy"))
         )
 
     shape = (len(S_values), len(tf_values))
@@ -135,11 +135,11 @@ def show_grid(d, n_facts):
     """
     Finds all data for the given d and n_facts in hc2_sweep_results and
     plots a grid where the y axis is S and the x axis is top_fraction,
-    with the color of each cell representing the average best_guess_accuracy
+    with the color of each cell representing the average accuracy
     for all attempts for that (S, top_fraction) pair, and the correct d and n_facts.
 
-    In each cell, write the average best_guess_accuracy and
-    the variance of best_guess_accuracy across all attempts for that (S, top_fraction) pair.
+    In each cell, write the average accuracy and
+    the variance of accuracy across all attempts for that (S, top_fraction) pair.
     """
     records, _ = _load_records(d, n_facts)
     agg = _aggregate(records)
@@ -191,21 +191,21 @@ def show_grid(d, n_facts):
               fontsize=9, framealpha=0.9)
 
     ax.set_title(
-        f"HandCodedModel2 best_guess_accuracy\n"
+        f"HandCodedModel2 accuracy\n"
         f"d={d}, n_facts={n_facts}, attempts={n_attempts}  |  "
         f"best: S={S_values[best_i]}, top_fraction={tf_values[best_j]:.1f} "
         f"({mean[best_i, best_j]:.3f})  |  {n_perfect} cell(s) with a 100% run"
     )
 
     cbar = fig.colorbar(im, ax=ax)
-    cbar.set_label("mean best_guess_accuracy")
+    cbar.set_label("mean accuracy")
     fig.tight_layout()
     plt.show()
     return fig
 
 
 def plot_accuracy_vs_top_fraction(d, n_facts):
-    """Line plot: mean best_guess_accuracy vs top_fraction, one line per S.
+    """Line plot: mean accuracy vs top_fraction, one line per S.
 
     Shaded band shows ± one standard deviation across attempts. Makes the optimal
     top_fraction for each S easy to read off.
@@ -225,7 +225,7 @@ def plot_accuracy_vs_top_fraction(d, n_facts):
                         color=colors[i], alpha=0.12)
 
     ax.set_xlabel("top_fraction")
-    ax.set_ylabel("mean best_guess_accuracy")
+    ax.set_ylabel("mean accuracy")
     ax.set_title(f"Accuracy vs top_fraction (d={d}, n_facts={n_facts})")
     ax.set_ylim(0, 1.02)
     ax.grid(True, ls="--", linewidth=0.5)
@@ -260,7 +260,7 @@ def plot_best_vs_S(d, n_facts):
                     xytext=(0, -12), ha="center", fontsize=7)
 
     ax.set_xlabel("S (n_neurons_per_label)")
-    ax.set_ylabel("best_guess_accuracy at best top_fraction")
+    ax.set_ylabel("accuracy at best top_fraction")
     ax.set_title(f"Best accuracy vs S (d={d}, n_facts={n_facts})")
     ax.set_ylim(0, 1.02)
     ax.set_xticks(S_values)
@@ -903,8 +903,9 @@ def plot_capacity_vs_d_any_only(thresholds=(0.9, 1.0), results_dir=None,
             ys = [mf for _, mf, _ in pts]
             all_xs.extend(xs)
             all_ys.extend(ys)
-            ax.plot(xs, ys, linestyle="none", marker=thr_marker.get(thr, "o"),
-                    markersize=6, color=color,
+            marker = thr_marker.get(thr, "o")
+            ax.plot(xs, ys, linestyle="none", marker=marker,
+                    markersize=8 if marker == "x" else 6, color=color,
                     label=f"{model_name}: {thr_label(thr)}")
             if error_bars:
                 # precision 1 means the search resolved max_facts exactly.
@@ -926,6 +927,109 @@ def plot_capacity_vs_d_any_only(thresholds=(0.9, 1.0), results_dir=None,
             ax.plot(xline, a * xline ** b / np.log(xline), color=color,
                     alpha=0.4, linestyle=thr_style.get(thr, ":"), linewidth=3,
                     label=f"best fit: {a:.3g}·d^{b:.2f}/log(d)")
+
+    ax.set_xlabel("model size (d)")
+    ax.set_ylabel("max facts")
+    ax.set_title("Capacity vs model size\n"
+                 + " / ".join(name for name, _, _ in model_files))
+
+    xticks = [x for x in [16, 32, 64, 128, 256] if not all_xs or x <= max(all_xs)]
+    ax.set_xticks(xticks)
+    ax.set_xticks([], minor=True)
+    ax.set_xticklabels([str(x) for x in xticks])
+    if all_ys:
+        lo = int(np.floor(np.log2(min(all_ys))))
+        hi = int(np.ceil(np.log2(max(all_ys))))
+        yticks = [2 ** n for n in range(lo, hi + 1)]
+        ax.set_yticks(yticks)
+        ax.set_yticks([], minor=True)
+        ax.set_yticklabels([str(y) for y in yticks])
+
+    ax.grid(True, which="both", ls="--", linewidth=0.5)
+    ax.legend(fontsize=9, loc="center left", bbox_to_anchor=(1.0, 0.5))
+    fig.tight_layout()
+    plt.show()
+    return fig
+
+
+def plot_capacity_vs_d_any_only_no_randemb(thresholds=(0.9,), results_dir=None,
+                                           figsize=(8, 6), models=None,
+                                           error_bars=True):
+    """Like plot_capacity_vs_d_any_only, but without rand-emb or acc=1.
+
+    Same "any"-only, markers-only log-log layout, but restricted to the
+    trained / hybrid / hand-coded variants (rand-emb dropped) and to the
+    acc>=0.9 threshold (acc=1 dropped). Each per-series fit uses the fixed
+    form a·d^2/log(d) (only a is solved for) and follows its data series in
+    the legend, like plot_capacity_vs_d_any_only.
+    """
+    if results_dir is None:
+        results_dir = RESULTS_DIR
+
+    # Same colors and legend order as plot_capacity_vs_d_any_only, minus rand-emb.
+    model_files = [
+        ("trained", "capacity_search_results_fulltrain.json", "tab:blue"),
+        ("hybrid", "capacity_search_results_topfrac_hybrid.json", "tab:orange"),
+        ("hand-coded", "capacity_search_results_topfrac.json", "tab:green"),
+    ]
+    if models is not None:
+        by_name = {mf[0]: mf for mf in model_files}
+        model_files = [by_name[m] for m in models if m in by_name]
+    thr_style = {1.0: "-", 0.9: "--"}
+    thr_marker = {1.0: "o", 0.9: "x"}
+
+    fig, ax = plt.subplots(figsize=figsize)
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+
+    all_xs, all_ys = [], []
+    for model_name, fname, color in model_files:
+        runs = load_capacity_results(os.path.join(results_dir, fname))
+        if not runs:
+            print(f"(skipping {model_name}: no results in {fname})")
+            continue
+        for thr in sorted(thresholds):
+            # Latest row per d wins; zeros can't show on the log axis.
+            by_d = {}
+            for r in runs:
+                if r.get("accuracy_threshold") == thr \
+                        and r.get("any_all_most") == "any":
+                    by_d[r["d"]] = (r.get("max_facts"), r.get("precision", 0))
+            pts = sorted((d, mf, p) for d, (mf, p) in by_d.items()
+                         if mf and mf > 0)
+            if not pts:
+                continue
+            xs = [d for d, _, _ in pts]
+            ys = [mf for _, mf, _ in pts]
+            all_xs.extend(xs)
+            all_ys.extend(ys)
+            marker = thr_marker.get(thr, "o")
+            # Only one threshold is shown, so the legend uses just the model
+            # name (no "acc>=0.9" suffix).
+            ax.plot(xs, ys, linestyle="none", marker=marker,
+                    markersize=8 if marker == "x" else 6, color=color,
+                    label=model_name)
+            if error_bars:
+                # precision 1 means the search resolved max_facts exactly.
+                errs = [0 if p <= 1 else p for _, _, p in pts]
+                ax.errorbar(xs, ys, yerr=[np.zeros(len(ys)), errs],
+                            fmt="none", ecolor=color, capsize=3,
+                            label="_nolegend_")
+
+            # Fit a·d^2/log(d) to just this series, with the exponent fixed at
+            # 2 and only a solved for (best fit in log space is the geometric
+            # mean of the per-point a_i = y_i·log(d_i)/d_i^2). The fit follows
+            # its data series in the legend, like plot_capacity_vs_d_any_only.
+            if len(set(xs)) < 2:
+                continue
+            fx = np.array(xs, dtype=float)
+            fy = np.array(ys, dtype=float)
+            loga = np.mean(np.log(fy) + np.log(np.log(fx)) - 2 * np.log(fx))
+            a = np.exp(loga)
+            xline = np.linspace(fx.min(), fx.max(), 100)
+            ax.plot(xline, a * xline ** 2 / np.log(xline), color=color,
+                    alpha=0.4, linestyle=thr_style.get(thr, ":"), linewidth=3,
+                    label=f"best fit: {a:.3g}·d²/log(d)")
 
     ax.set_xlabel("model size (d)")
     ax.set_ylabel("max facts")
@@ -1584,7 +1688,8 @@ _ = plot_capacity_vs_d_all_models(figsize=(9, 7))
 # Same plot but with only the "any" data (fits use only these points too).
 # Markers only, marker encodes the threshold, legend interleaves data/fit.
 _ = plot_capacity_vs_d_any_only(figsize=(7, 5), error_bars=False)
-
+# %%
+_ = plot_capacity_vs_d_any_only_no_randemb(figsize=(7, 5), error_bars=False)
 # %%
 _ = plot_best_S_vs_d(figsize=(8, 5))
 # %%

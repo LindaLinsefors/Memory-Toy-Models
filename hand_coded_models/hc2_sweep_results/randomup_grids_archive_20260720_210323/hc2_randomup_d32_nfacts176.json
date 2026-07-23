@@ -1,0 +1,95 @@
+{
+  "settings": {
+    "d": 32,
+    "n_facts": 176,
+    "n_attempts": 11,
+    "input_vocab_size": 64,
+    "output_vocab_size": 32,
+    "d_ff": 32,
+    "seed": 42,
+    "metric": "best_guess_accuracy",
+    "model": "RandomUpModel2",
+    "n_epochs": 5000,
+    "lr": 0.01,
+    "patience": 100
+  },
+  "results": [
+    {
+      "n_facts": 176,
+      "attempt": 0,
+      "init_seed": 0,
+      "best_guess_accuracy": 0.7954545617103577,
+      "epochs_run": 1090
+    },
+    {
+      "n_facts": 176,
+      "attempt": 1,
+      "init_seed": 1,
+      "best_guess_accuracy": 0.9204545617103577,
+      "epochs_run": 1567
+    },
+    {
+      "n_facts": 176,
+      "attempt": 2,
+      "init_seed": 2,
+      "best_guess_accuracy": 0.9147727489471436,
+      "epochs_run": 1737
+    },
+    {
+      "n_facts": 176,
+      "attempt": 3,
+      "init_seed": 3,
+      "best_guess_accuracy": 0.761363685131073,
+      "epochs_run": 1021
+    },
+    {
+      "n_facts": 176,
+      "attempt": 4,
+      "init_seed": 4,
+      "best_guess_accuracy": 0.875,
+      "epochs_run": 1397
+    },
+    {
+      "n_facts": 176,
+      "attempt": 5,
+      "init_seed": 5,
+      "best_guess_accuracy": 0.9318181872367859,
+      "epochs_run": 1787
+    },
+    {
+      "n_facts": 176,
+      "attempt": 6,
+      "init_seed": 6,
+      "best_guess_accuracy": 0.8636363744735718,
+      "epochs_run": 1267
+    },
+    {
+      "n_facts": 176,
+      "attempt": 7,
+      "init_seed": 7,
+      "best_guess_accuracy": 0.9602273106575012,
+      "epochs_run": 1735
+    },
+    {
+      "n_facts": 176,
+      "attempt": 8,
+      "init_seed": 8,
+      "best_guess_accuracy": 0.8181818723678589,
+      "epochs_run": 1384
+    },
+    {
+      "n_facts": 176,
+      "attempt": 9,
+      "init_seed": 9,
+      "best_guess_accuracy": 0.9318181872367859,
+      "epochs_run": 1537
+    },
+    {
+      "n_facts": 176,
+      "attempt": 10,
+      "init_seed": 10,
+      "best_guess_accuracy": 0.9034091234207153,
+      "epochs_run": 1793
+    }
+  ]
+}

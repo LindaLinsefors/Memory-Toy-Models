@@ -1,0 +1,95 @@
+{
+  "settings": {
+    "d": 16,
+    "n_facts": 320,
+    "n_attempts": 11,
+    "input_vocab_size": 32,
+    "output_vocab_size": 16,
+    "d_ff": 16,
+    "seed": 42,
+    "metric": "best_guess_accuracy",
+    "model": "FullyTrainedModel2",
+    "n_epochs": 5000,
+    "lr": 0.01,
+    "patience": 100
+  },
+  "results": [
+    {
+      "n_facts": 320,
+      "attempt": 0,
+      "init_seed": 0,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 230
+    },
+    {
+      "n_facts": 320,
+      "attempt": 1,
+      "init_seed": 1,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 233
+    },
+    {
+      "n_facts": 320,
+      "attempt": 2,
+      "init_seed": 2,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 226
+    },
+    {
+      "n_facts": 320,
+      "attempt": 3,
+      "init_seed": 3,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 222
+    },
+    {
+      "n_facts": 320,
+      "attempt": 4,
+      "init_seed": 4,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 215
+    },
+    {
+      "n_facts": 320,
+      "attempt": 5,
+      "init_seed": 5,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 236
+    },
+    {
+      "n_facts": 320,
+      "attempt": 6,
+      "init_seed": 6,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 196
+    },
+    {
+      "n_facts": 320,
+      "attempt": 7,
+      "init_seed": 7,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 195
+    },
+    {
+      "n_facts": 320,
+      "attempt": 8,
+      "init_seed": 8,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 226
+    },
+    {
+      "n_facts": 320,
+      "attempt": 9,
+      "init_seed": 9,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 228
+    },
+    {
+      "n_facts": 320,
+      "attempt": 10,
+      "init_seed": 10,
+      "best_guess_accuracy": 1.0,
+      "epochs_run": 226
+    }
+  ]
+}

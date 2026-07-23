@@ -7,7 +7,7 @@
     "output_vocab_size": 128,
     "d_ff": 128,
     "seed": 42,
-    "metric": "best_guess_accuracy",
+    "metric": "accuracy",
     "model": "RandomUpModel2",
     "n_epochs": 5000,
     "lr": 0.01,
@@ -18,77 +18,77 @@
       "n_facts": 2304,
       "attempt": 0,
       "init_seed": 0,
-      "best_guess_accuracy": 0.9921875,
-      "epochs_run": 4954
+      "accuracy": 0.9917534589767456,
+      "epochs_run": 5000
     },
     {
       "n_facts": 2304,
       "attempt": 1,
       "init_seed": 1,
-      "best_guess_accuracy": 0.9887152910232544,
+      "accuracy": 0.984375,
       "epochs_run": 5000
     },
     {
       "n_facts": 2304,
       "attempt": 2,
       "init_seed": 2,
-      "best_guess_accuracy": 0.9943576455116272,
+      "accuracy": 0.9926215410232544,
       "epochs_run": 5000
     },
     {
       "n_facts": 2304,
       "attempt": 3,
       "init_seed": 3,
-      "best_guess_accuracy": 0.9891493320465088,
+      "accuracy": 0.9856770634651184,
       "epochs_run": 5000
     },
     {
       "n_facts": 2304,
       "attempt": 4,
       "init_seed": 4,
-      "best_guess_accuracy": 0.9956597089767456,
+      "accuracy": 0.9934895634651184,
       "epochs_run": 5000
     },
     {
       "n_facts": 2304,
       "attempt": 5,
       "init_seed": 5,
-      "best_guess_accuracy": 0.9930555820465088,
+      "accuracy": 0.9908854365348816,
       "epochs_run": 5000
     },
     {
       "n_facts": 2304,
       "attempt": 6,
       "init_seed": 6,
-      "best_guess_accuracy": 0.99609375,
-      "epochs_run": 4841
+      "accuracy": 0.991319477558136,
+      "epochs_run": 4682
     },
     {
       "n_facts": 2304,
       "attempt": 7,
       "init_seed": 7,
-      "best_guess_accuracy": 0.9869791865348816,
+      "accuracy": 0.9830729365348816,
       "epochs_run": 5000
     },
     {
       "n_facts": 2304,
       "attempt": 8,
       "init_seed": 8,
-      "best_guess_accuracy": 0.9869791865348816,
+      "accuracy": 0.9848090410232544,
       "epochs_run": 5000
     },
     {
       "n_facts": 2304,
       "attempt": 9,
       "init_seed": 9,
-      "best_guess_accuracy": 0.9956597089767456,
+      "accuracy": 0.9947916865348816,
       "epochs_run": 5000
     },
     {
       "n_facts": 2304,
       "attempt": 10,
       "init_seed": 10,
-      "best_guess_accuracy": 0.9934895634651184,
+      "accuracy": 0.9926215410232544,
       "epochs_run": 5000
     }
   ]

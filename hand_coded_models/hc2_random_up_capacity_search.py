@@ -5,7 +5,7 @@ by a random one (see hc2_random_up.py): the up matrix is drawn once per attempt
 (nn.Linear-style uniform init, frozen) and the down matrix + bias are trained
 with full-batch CE loss — the same recipe as the hybrid search (plain Adam,
 lr=1e-2, up to 5000 epochs, early stopping; see hc2_hybrid.train_down_matrix).
-A cell's score is the best best_guess_accuracy observed during training.
+A cell's score is the best accuracy observed during training.
 
 Because nothing about the up matrix is hand-coded, there is no S, top_n, or
 top_fraction to sweep — and no connection matrices to build. A "grid" for one
@@ -13,7 +13,8 @@ n_facts is therefore just the n_attempts training runs, each with a different
 init_seed (drawing a fresh random up matrix and down init). Everything else
 mirrors the hybrid search: the same 11 attempts, the same any/all/most
 reduction over them, the same (d, accuracy_threshold, any_all_most) configs,
-and the same binary search over n_facts with precision d//2.
+and the same binary search over n_facts with a 2%-relative stop
+(hi - lo < 0.02 * hi).
 
 Outputs go to their own locations so they never mix with other runs: grids in
 hc2_sweep_results/randomup_grids/ and the capacity log in
@@ -68,20 +69,9 @@ CONFIGS = [
 
 testing = False  # small/cheap end-to-end validation run
 
-# Refine mode: instead of running CONFIGS, rescan the capacity log and CONTINUE
-# every binary search whose logged precision is more than REFINE_FRACTION of its
-# max_facts, using precision = REFINE_FRACTION * that max_facts. The finer
-# search replays the cached grids (identical probes cost nothing) and only pays
-# for the new, finer probes; the refined result is appended to the log, where
-# the plots take the latest row per config. Idempotent: once everything is
-# refined, there is nothing left to run.
-refine = True
-REFINE_FRACTION = 0.05
-
-
-def precision_for(d):
-    """Binary-search stopping precision (stop when hi - lo < precision)."""
-    return d // 2
+# Binary search stops when the bracket is within this fraction of its top end
+# (hi - lo < PRECISION_FRACTION * hi), giving ~2% relative resolution on max_facts.
+PRECISION_FRACTION = 0.02
 
 
 def _init_seed(attempt):
@@ -110,7 +100,7 @@ def _run_one(cell):
     """Train + evaluate one attempt for a given n_facts.
 
     Builds a RandomUpModel2 (fresh random frozen up matrix per attempt) and
-    trains the down matrix with CE loss; returns the best best_guess_accuracy
+    trains the down matrix with CE loss; returns the best accuracy
     seen during training."""
     import sys
     if "/root" not in sys.path:
@@ -126,13 +116,13 @@ def _run_one(cell):
         seed=cell["seed"],
         init_seed=cell["init_seed"],
     )
-    best_guess_accuracy, epochs_run = train_down_matrix(
+    accuracy, epochs_run = train_down_matrix(
         model, n_epochs=N_EPOCHS, lr=LR, patience=PATIENCE)
     return {
         "n_facts": cell["n_facts"],
         "attempt": cell["attempt"],
         "init_seed": cell["init_seed"],
-        "best_guess_accuracy": best_guess_accuracy,
+        "accuracy": accuracy,
         "epochs_run": epochs_run,
     }
 
@@ -189,7 +179,7 @@ def _save_records(d, n_facts, records, n_attempts):
             "output_vocab_size": d,
             "d_ff": d,
             "seed": seed,
-            "metric": "best_guess_accuracy",
+            "metric": "accuracy",
             "model": "RandomUpModel2",
             "n_epochs": N_EPOCHS,
             "lr": LR,
@@ -241,7 +231,7 @@ def _evaluate_n_facts(d, n_attempts, n_facts,
         if verbose:
             print(f"    n_facts={n_facts}: wrote {len(records)} records to {path}")
 
-    accs = [r["best_guess_accuracy"] for r in records]
+    accs = [r.get("accuracy", r.get("best_guess_accuracy")) for r in records]
 
     # Reduce the runs to one score matching the rule, so success <=> score >= threshold.
     #   any -> max over runs ; all -> min over runs ; most -> median over runs
@@ -258,12 +248,13 @@ def _evaluate_n_facts(d, n_attempts, n_facts,
 
 # ── Binary search over n_facts ────────────────────────────────────────────────
 
-def find_max_facts(d, n_attempts, precision=1,
+def find_max_facts(d, n_attempts,
                    accuracy_threshold=1.0, any_all_most="any", verbose=False):
     """Binary-search the maximum storable n_facts. max_possible = (2*d)^2 = 4*d**2.
 
-    Returns (best_n_facts, best_score) with best_score the any/all/most score
-    at the largest passing n_facts.
+    Stops when the bracket is within PRECISION_FRACTION of its top end
+    (hi - lo < PRECISION_FRACTION * hi). Returns (best_n_facts, best_score) with
+    best_score the any/all/most score at the largest passing n_facts.
     """
     max_possible = 4 * d ** 2
     lo, hi = 1, max_possible
@@ -273,7 +264,7 @@ def find_max_facts(d, n_attempts, precision=1,
     if verbose:
         print(f"Searching for max storable facts in [{lo}, {hi}]  (d={d})\n")
 
-    while hi - lo >= precision:
+    while hi - lo >= PRECISION_FRACTION * hi:
         mid = (lo + hi) // 2
         if verbose:
             print(f"Trying n_facts = {mid} ...")
@@ -313,7 +304,7 @@ CAPACITY_RESULTS_PATH = os.path.join(RESULTS_DIR, "capacity_search_results_rando
 
 
 def _append_capacity_result(d, max_facts, best_score, accuracy_threshold,
-                            any_all_most, n_attempts, precision):
+                            any_all_most, n_attempts):
     """Append one JSON line summarising a run; never touches previous lines."""
     os.makedirs(RESULTS_DIR, exist_ok=True)
     record = {
@@ -324,7 +315,7 @@ def _append_capacity_result(d, max_facts, best_score, accuracy_threshold,
         "accuracy_threshold": accuracy_threshold,
         "any_all_most": any_all_most,
         "n_attempts": n_attempts,
-        "precision": precision,
+        "precision_fraction": PRECISION_FRACTION,
         "model": "RandomUpModel2",
         "n_epochs": N_EPOCHS,
         "lr": LR,
@@ -335,49 +326,12 @@ def _append_capacity_result(d, max_facts, best_score, accuracy_threshold,
     return CAPACITY_RESULTS_PATH
 
 
-def _refine_configs():
-    """Configs whose LATEST logged run has precision > REFINE_FRACTION*max_facts,
-    plus any CONFIGS entry that has never been logged (run at its normal
-    starting precision; a second refine pass then takes it under the fraction).
-
-    Each refined config carries the finer precision to continue its binary
-    search with. Refining can only raise max_facts (the finer search replays
-    the same cached probes, then keeps going), so a precision of
-    REFINE_FRACTION * the old max_facts is also <= that fraction of the final."""
-    latest = {}
-    if os.path.exists(CAPACITY_RESULTS_PATH):
-        with open(CAPACITY_RESULTS_PATH, "r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                r = json.loads(line)
-                latest[(r["d"], r["accuracy_threshold"], r["any_all_most"])] = r
-    configs = [dict(cfg) for cfg in CONFIGS
-               if (cfg["d"], cfg["accuracy_threshold"], cfg["any_all_most"])
-               not in latest]
-    for (d, thr, aam), r in sorted(latest.items()):
-        mf = r.get("max_facts") or 0
-        if mf <= 0:
-            continue
-        # Largest precision STRICTLY below REFINE_FRACTION of max_facts, but
-        # never below 1 (precision 1 already resolves the search exactly).
-        target = int(REFINE_FRACTION * mf)
-        if target >= REFINE_FRACTION * mf:
-            target -= 1
-        target = max(1, target)
-        if r.get("precision", 0) > target:
-            configs.append(dict(d=d, accuracy_threshold=thr, any_all_most=aam,
-                                precision=target))
-    return configs
-
-
 @app.local_entrypoint()
 def main():
-    configs = _refine_configs() if refine else CONFIGS
+    configs = CONFIGS
     attempts = n_attempts
     if testing:
-        # Cheap end-to-end validation: smallest d, few attempts, coarse precision.
+        # Cheap end-to-end validation: smallest d, few attempts.
         configs = [dict(d=16, accuracy_threshold=1.0, any_all_most="any")]
         attempts = 2
 
@@ -386,14 +340,13 @@ def main():
         d = cfg["d"]
         thr = cfg["accuracy_threshold"]
         aam = cfg["any_all_most"]
-        precision = 256 if testing else cfg.get("precision", precision_for(d))
 
         print(f"\n===== d={d}, accuracy_threshold={thr}, any_all_most={aam} =====")
         best, score = find_max_facts(
-            d, attempts, precision=precision,
+            d, attempts,
             accuracy_threshold=thr, any_all_most=aam, verbose=False,
         )
         print(f"d={d}: max_facts={best}, score={score}")
         path = _append_capacity_result(
-            d, best, score, thr, aam, attempts, precision)
+            d, best, score, thr, aam, attempts)
         print(f"Appended result to {path}")

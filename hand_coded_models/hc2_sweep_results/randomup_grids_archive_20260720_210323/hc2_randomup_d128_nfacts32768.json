@@ -1,0 +1,95 @@
+{
+  "settings": {
+    "d": 128,
+    "n_facts": 32768,
+    "n_attempts": 11,
+    "input_vocab_size": 256,
+    "output_vocab_size": 128,
+    "d_ff": 128,
+    "seed": 42,
+    "metric": "best_guess_accuracy",
+    "model": "RandomUpModel2",
+    "n_epochs": 5000,
+    "lr": 0.01,
+    "patience": 100
+  },
+  "results": [
+    {
+      "n_facts": 32768,
+      "attempt": 0,
+      "init_seed": 0,
+      "best_guess_accuracy": 0.0380859375,
+      "epochs_run": 1024
+    },
+    {
+      "n_facts": 32768,
+      "attempt": 1,
+      "init_seed": 1,
+      "best_guess_accuracy": 0.0382080078125,
+      "epochs_run": 691
+    },
+    {
+      "n_facts": 32768,
+      "attempt": 2,
+      "init_seed": 2,
+      "best_guess_accuracy": 0.03692626953125,
+      "epochs_run": 541
+    },
+    {
+      "n_facts": 32768,
+      "attempt": 3,
+      "init_seed": 3,
+      "best_guess_accuracy": 0.0390625,
+      "epochs_run": 564
+    },
+    {
+      "n_facts": 32768,
+      "attempt": 4,
+      "init_seed": 4,
+      "best_guess_accuracy": 0.03790283203125,
+      "epochs_run": 724
+    },
+    {
+      "n_facts": 32768,
+      "attempt": 5,
+      "init_seed": 5,
+      "best_guess_accuracy": 0.03802490234375,
+      "epochs_run": 960
+    },
+    {
+      "n_facts": 32768,
+      "attempt": 6,
+      "init_seed": 6,
+      "best_guess_accuracy": 0.0389404296875,
+      "epochs_run": 805
+    },
+    {
+      "n_facts": 32768,
+      "attempt": 7,
+      "init_seed": 7,
+      "best_guess_accuracy": 0.037689208984375,
+      "epochs_run": 945
+    },
+    {
+      "n_facts": 32768,
+      "attempt": 8,
+      "init_seed": 8,
+      "best_guess_accuracy": 0.0384521484375,
+      "epochs_run": 1172
+    },
+    {
+      "n_facts": 32768,
+      "attempt": 9,
+      "init_seed": 9,
+      "best_guess_accuracy": 0.039093017578125,
+      "epochs_run": 925
+    },
+    {
+      "n_facts": 32768,
+      "attempt": 10,
+      "init_seed": 10,
+      "best_guess_accuracy": 0.039093017578125,
+      "epochs_run": 887
+    }
+  ]
+}

@@ -7,7 +7,7 @@
     "output_vocab_size": 64,
     "d_ff": 64,
     "seed": 42,
-    "metric": "best_guess_accuracy",
+    "metric": "accuracy",
     "model": "RandomUpModel2",
     "n_epochs": 5000,
     "lr": 0.01,
@@ -18,78 +18,78 @@
       "n_facts": 704,
       "attempt": 0,
       "init_seed": 0,
-      "best_guess_accuracy": 0.9232954978942871,
-      "epochs_run": 3993
+      "accuracy": 0.9289773106575012,
+      "epochs_run": 4210
     },
     {
       "n_facts": 704,
       "attempt": 1,
       "init_seed": 1,
-      "best_guess_accuracy": 0.9715909361839294,
-      "epochs_run": 4415
+      "accuracy": 0.9630681872367859,
+      "epochs_run": 4457
     },
     {
       "n_facts": 704,
       "attempt": 2,
       "init_seed": 2,
-      "best_guess_accuracy": 0.980113685131073,
-      "epochs_run": 3906
+      "accuracy": 0.8835227489471436,
+      "epochs_run": 2862
     },
     {
       "n_facts": 704,
       "attempt": 3,
       "init_seed": 3,
-      "best_guess_accuracy": 0.9232954978942871,
-      "epochs_run": 3446
+      "accuracy": 0.9261363744735718,
+      "epochs_run": 3745
     },
     {
       "n_facts": 704,
       "attempt": 4,
       "init_seed": 4,
-      "best_guess_accuracy": 0.9403409361839294,
-      "epochs_run": 3590
+      "accuracy": 0.9545454978942871,
+      "epochs_run": 4065
     },
     {
       "n_facts": 704,
       "attempt": 5,
       "init_seed": 5,
-      "best_guess_accuracy": 0.9815341234207153,
-      "epochs_run": 4301
+      "accuracy": 0.9730113744735718,
+      "epochs_run": 4265
     },
     {
       "n_facts": 704,
       "attempt": 6,
       "init_seed": 6,
-      "best_guess_accuracy": 0.9701704978942871,
-      "epochs_run": 4229
+      "accuracy": 0.9417613744735718,
+      "epochs_run": 3711
     },
     {
       "n_facts": 704,
       "attempt": 7,
       "init_seed": 7,
-      "best_guess_accuracy": 0.9659091234207153,
-      "epochs_run": 4416
+      "accuracy": 0.8579545617103577,
+      "epochs_run": 3123
     },
     {
       "n_facts": 704,
       "attempt": 8,
       "init_seed": 8,
-      "best_guess_accuracy": 0.9318181872367859,
-      "epochs_run": 3619
+      "accuracy": 0.9744318723678589,
+      "epochs_run": 4709
     },
     {
       "n_facts": 704,
       "attempt": 9,
       "init_seed": 9,
-      "best_guess_accuracy": 0.9232954978942871,
-      "epochs_run": 3453
+      "accuracy": 0.921875,
+      "epochs_run": 3650
     },
     {
       "n_facts": 704,
       "attempt": 10,
       "init_seed": 10,
-      "best_guess_accuracy": 0.980113685131073,
-      "epochs_run": 4907
+      "accuracy": 0.9786931872367859,
+      "epochs_run": 4898
     }
   ]
 }

@@ -3,14 +3,14 @@
 RandomUpModel2 has the same architecture as HandCodedModel2 / HybridModel2:
 
     hidden = relu(one_hot_pair @ up_matrix.T)      # (batch, d_ff)
-    logits = hidden @ down_matrix.T + down_bias    # (batch, n_labels)
+    logits = hidden @ down_matrix.T                # (batch, n_labels)
 
 but the up matrix is NOT hand-coded — it is random (nn.Linear-style uniform
 init, U(+-1/sqrt(fan_in)) with fan_in = 2*input_vocab_size, no bias, matching
-the up layer's shape in HandCodedModel2) and frozen. The down matrix + bias
-are randomly initialised and trainable, exactly as in HybridModel2; train them
+the up layer's shape in HandCodedModel2) and frozen. The down matrix is
+randomly initialised and trainable, exactly as in HybridModel2; train it
 with hc2_hybrid.train_down_matrix (it only touches up_matrix / down_matrix /
-down_bias / facts, all of which this class provides).
+facts, all of which this class provides).
 
 Because nothing about the up matrix is hand-coded, there is no S, top_n, or
 top_fraction — the only randomness knob is init_seed, which draws both the up
@@ -70,13 +70,10 @@ class RandomUpModel2:
             (torch.rand(d_ff, in_dim, generator=gen, device=device) * 2 - 1) * up_bound
         )
 
-        # Trainable down matrix + bias, initialised exactly as in HybridModel2.
+        # Trainable down matrix, initialised exactly as in HybridModel2.
         down_bound = 1.0 / (d_ff ** 0.5)
         self.down_matrix = (
             (torch.rand(output_vocab_size, d_ff, generator=gen, device=device) * 2 - 1) * down_bound
-        ).requires_grad_(True)
-        self.down_bias = (
-            (torch.rand(output_vocab_size, generator=gen, device=device) * 2 - 1) * down_bound
         ).requires_grad_(True)
 
     def forward(self, x):
@@ -85,13 +82,11 @@ class RandomUpModel2:
         second = F.one_hot(x[:, 1], num_classes=self.settings.input_vocab_size).float()
         x_enc = torch.cat([first, second], dim=-1)
         hidden = torch.relu(x_enc @ self.up_matrix.T)
-        logits = hidden @ self.down_matrix.T + self.down_bias
+        logits = hidden @ self.down_matrix.T
         return logits, hidden
 
     def evaluate(self):
-        """Same metrics as HandCodedModel2.evaluate()."""
+        """Same metric as HandCodedModel2.evaluate()."""
         logits, hidden = self.forward(self.facts["inputs"])
-        one_hot_targets = F.one_hot(self.facts["targets"], self.settings.output_vocab_size)
-        accuracy = (one_hot_targets.bool() == (logits > 0)).float().mean().item()
-        best_guess_accuracy = self.facts["targets"].eq(logits.argmax(dim=1)).float().mean().item()
-        return accuracy, best_guess_accuracy, logits, hidden
+        accuracy = self.facts["targets"].eq(logits.argmax(dim=1)).float().mean().item()
+        return accuracy, logits, hidden

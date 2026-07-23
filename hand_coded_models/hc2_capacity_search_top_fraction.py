@@ -31,15 +31,10 @@ d = 32
 accuracy_threshold = 0.9
 any_all_most = "all"
 
-# Use the positive-down-connection variant of HandCodedModel2 (see its
-# add_possitive_down_connections option). When True, sweep grids and the capacity
-# log are written to SEPARATE, _posdown-suffixed locations so they never mix with
-# the default runs.
-add_possitive_down_connections = True
-
-
 n_attempts = 11
-precision = 8 if d == 16 else 8 * 4 if d == 32 else 8 * 4 * 4 if d == 64 else 8 * 4 * 4 * 4
+# Binary search stops when the bracket is within this fraction of its top end
+# (hi - lo < PRECISION_FRACTION * hi), giving ~2% relative resolution on max_facts.
+PRECISION_FRACTION = 0.02
 
 if d == 16:
     S_sweep = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -96,27 +91,23 @@ def _run_one(args: dict) -> dict:
         n_neurons_per_label=S,
         use_top_n_or_top_fraction="top_fraction",
         top_fraction=args["top_fraction"],
-        add_possitive_down_connections=args["add_possitive_down_connections"],
     )
     model = HandCodedModel2(settings, precomputed_conn=conn)
-    _, best_guess_accuracy, _, _ = model.evaluate()
+    accuracy, _, _ = model.evaluate()
     return {
         "n_facts": args["n_facts"],
         "S": S,
         "top_fraction": args["top_fraction"],
         "attempt": args["attempt"],
         "conn_seed": conn_seed,
-        "best_guess_accuracy": best_guess_accuracy,
+        "accuracy": accuracy,
     }
 
 
 RESULTS_DIR = os.path.join(_HERE, "hc2_sweep_results")
 # top_fraction grid files live in their own subfolder; capacity_search_results_*
 # logs sit directly in RESULTS_DIR. See hc2_sweep_results/README.md.
-# The positive-down-connection variant gets its own _posdown-suffixed grid folder
-# and log so its results stay separate from the default model's.
-_variant = "_posdown" if add_possitive_down_connections else ""
-GRIDS_DIR = os.path.join(RESULTS_DIR, f"top_fraction_grids{_variant}")
+GRIDS_DIR = os.path.join(RESULTS_DIR, "top_fraction_grids")
 
 
 def _load_cached_records(d, n_facts):
@@ -161,7 +152,6 @@ def _build_cells_for_n_facts(d, n_facts, n_attempts, top_fraction_sweep, S_sweep
                     "seed": seed,
                     "input_vocab_size": 2 * d,
                     "output_vocab_size": d,
-                    "add_possitive_down_connections": add_possitive_down_connections,
                 })
                 idx += 1
     return cells
@@ -181,8 +171,7 @@ def _save_records(d, n_facts, records, n_attempts, top_fraction_sweep, S_sweep):
             "output_vocab_size": d,
             "d_ff": d,
             "seed": seed,
-            "metric": "best_guess_accuracy",
-            "add_possitive_down_connections": add_possitive_down_connections,
+            "metric": "accuracy",
         },
         "results": records,
     }
@@ -221,7 +210,7 @@ def _evaluate_n_facts(d, n_attempts, n_facts, top_fraction_sweep, S_sweep,
     cells = defaultdict(list)
     for r in records:
         if r["S"] in wanted_S and r["top_fraction"] in wanted_tf:
-            cells[(r["S"], r["top_fraction"])].append(r["best_guess_accuracy"])
+            cells[(r["S"], r["top_fraction"])].append(r.get("accuracy", r.get("best_guess_accuracy")))
 
     if any_all_most == "any":
         reduce_fn = np.max
@@ -247,9 +236,12 @@ def _evaluate_n_facts(d, n_attempts, n_facts, top_fraction_sweep, S_sweep,
     return success, best_combination
 
 
-def find_max_facts(d, n_attempts, top_fraction_sweep, S_sweep, precision=1,
+def find_max_facts(d, n_attempts, top_fraction_sweep, S_sweep,
                    accuracy_threshold=1.0, any_all_most="any", verbose=True):
-    """Binary-search the maximum storable n_facts. max_possible = 4*d**2."""
+    """Binary-search the maximum storable n_facts. max_possible = 4*d**2.
+
+    Stops when the bracket is within PRECISION_FRACTION of its top end
+    (hi - lo < PRECISION_FRACTION * hi)."""
     max_possible = 4 * d ** 2
     lo, hi = 1, max_possible
     best = 0
@@ -258,7 +250,7 @@ def find_max_facts(d, n_attempts, top_fraction_sweep, S_sweep, precision=1,
     if verbose:
         print(f"Searching for max storable facts in [{lo}, {hi}]  (d={d})\n")
 
-    while hi - lo >= precision:
+    while hi - lo >= PRECISION_FRACTION * hi:
         mid = (lo + hi) // 2
         if verbose:
             print(f"Trying n_facts = {mid} ...")
@@ -293,7 +285,7 @@ def find_max_facts(d, n_attempts, top_fraction_sweep, S_sweep, precision=1,
     return best, best_combo
 
 
-CAPACITY_RESULTS_PATH = os.path.join(RESULTS_DIR, f"capacity_search_results{_variant}.json")
+CAPACITY_RESULTS_PATH = os.path.join(RESULTS_DIR, "capacity_search_results.json")
 
 
 def _append_capacity_result(max_facts, best_combo):
@@ -309,10 +301,9 @@ def _append_capacity_result(max_facts, best_combo):
         "accuracy_threshold": accuracy_threshold,
         "any_all_most": any_all_most,
         "n_attempts": n_attempts,
-        "precision": precision,
+        "precision_fraction": PRECISION_FRACTION,
         "S_sweep": S_sweep,
         "top_fraction_sweep": top_fraction_sweep,
-        "add_possitive_down_connections": add_possitive_down_connections,
     }
     with open(CAPACITY_RESULTS_PATH, "a", encoding="utf-8") as f:
         f.write(json.dumps(record) + "\n")
@@ -326,7 +317,6 @@ def main():
         n_attempts=n_attempts,
         top_fraction_sweep=top_fraction_sweep,
         S_sweep=S_sweep,
-        precision=precision,
         accuracy_threshold=accuracy_threshold,
         any_all_most=any_all_most,
         verbose=True,

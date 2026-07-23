@@ -5,13 +5,14 @@ FullyTrainedModel2 (see hc2_full_train.py): same architecture and random
 nn.Linear-style init, but the up matrix is trained together with the down
 matrix + bias instead of being frozen — full-batch CE, plain Adam, lr=1e-2, up
 to 5000 epochs, the same early stopping. A cell's score is the best
-best_guess_accuracy observed during training.
+accuracy observed during training.
 
 As in the random-up search there is no S, top_n, or top_fraction to sweep: a
 "grid" for one n_facts is just the n_attempts training runs, each with a
 different init_seed. Everything else is identical too: the same 11 attempts,
 any/all/most reduction, (d, accuracy_threshold, any_all_most) configs, binary
-search with precision d//2, and the GPU-per-cell pattern via .with_options.
+search with a 2%-relative stop (hi - lo < 0.02 * hi), and the GPU-per-cell
+pattern via .with_options.
 
 Outputs go to their own locations so they never mix with other runs: grids in
 hc2_sweep_results/fulltrain_grids/ and the capacity log in
@@ -59,7 +60,7 @@ MODAL_GPU = "T4"   # GPU type used when device == "gpu"
 # Each capacity search runs one (d, accuracy_threshold, any_all_most) config.
 CONFIGS = [
     dict(d=d, accuracy_threshold=thr, any_all_most=aam)
-    for d in [16, 32, 64, 128]
+    for d in [16, 32, 64, 128, 256]
     for thr in [0.9, 1.0]
     for aam in ["any", "all", "most"]
 ]
@@ -67,9 +68,10 @@ CONFIGS = [
 testing = False  # small/cheap end-to-end validation run
 
 
-def precision_for(d):
-    """Binary-search stopping precision (stop when hi - lo < precision)."""
-    return d // 2
+# Binary search stops when the bracket is within this fraction of its top end
+# (hi - lo < PRECISION_FRACTION * hi), giving ~2% relative resolution on max_facts
+# at every scale.
+PRECISION_FRACTION = 0.02
 
 
 def _init_seed(attempt):
@@ -99,7 +101,7 @@ def _run_one(cell):
     """Train + evaluate one attempt for a given n_facts.
 
     Builds a FullyTrainedModel2 (random init, nothing frozen) and trains the
-    whole network with CE loss; returns the best best_guess_accuracy seen
+    whole network with CE loss; returns the best accuracy seen
     during training."""
     import sys
     if "/root" not in sys.path:
@@ -114,13 +116,13 @@ def _run_one(cell):
         seed=cell["seed"],
         init_seed=cell["init_seed"],
     )
-    best_guess_accuracy, epochs_run = train_full_network(
+    accuracy, epochs_run = train_full_network(
         model, n_epochs=N_EPOCHS, lr=LR, patience=PATIENCE)
     return {
         "n_facts": cell["n_facts"],
         "attempt": cell["attempt"],
         "init_seed": cell["init_seed"],
-        "best_guess_accuracy": best_guess_accuracy,
+        "accuracy": accuracy,
         "epochs_run": epochs_run,
     }
 
@@ -177,7 +179,7 @@ def _save_records(d, n_facts, records, n_attempts):
             "output_vocab_size": d,
             "d_ff": d,
             "seed": seed,
-            "metric": "best_guess_accuracy",
+            "metric": "accuracy",
             "model": "FullyTrainedModel2",
             "n_epochs": N_EPOCHS,
             "lr": LR,
@@ -229,7 +231,7 @@ def _evaluate_n_facts(d, n_attempts, n_facts,
         if verbose:
             print(f"    n_facts={n_facts}: wrote {len(records)} records to {path}")
 
-    accs = [r["best_guess_accuracy"] for r in records]
+    accs = [r.get("accuracy", r.get("best_guess_accuracy")) for r in records]
 
     # Reduce the runs to one score matching the rule, so success <=> score >= threshold.
     #   any -> max over runs ; all -> min over runs ; most -> median over runs
@@ -246,12 +248,13 @@ def _evaluate_n_facts(d, n_attempts, n_facts,
 
 # ── Binary search over n_facts ────────────────────────────────────────────────
 
-def find_max_facts(d, n_attempts, precision=1,
+def find_max_facts(d, n_attempts,
                    accuracy_threshold=1.0, any_all_most="any", verbose=False):
     """Binary-search the maximum storable n_facts. max_possible = (2*d)^2 = 4*d**2.
 
-    Returns (best_n_facts, best_score) with best_score the any/all/most score
-    at the largest passing n_facts.
+    Stops when the bracket is within PRECISION_FRACTION of its top end
+    (hi - lo < PRECISION_FRACTION * hi). Returns (best_n_facts, best_score) with
+    best_score the any/all/most score at the largest passing n_facts.
     """
     max_possible = 4 * d ** 2
     lo, hi = 1, max_possible
@@ -261,7 +264,7 @@ def find_max_facts(d, n_attempts, precision=1,
     if verbose:
         print(f"Searching for max storable facts in [{lo}, {hi}]  (d={d})\n")
 
-    while hi - lo >= precision:
+    while hi - lo >= PRECISION_FRACTION * hi:
         mid = (lo + hi) // 2
         if verbose:
             print(f"Trying n_facts = {mid} ...")
@@ -301,7 +304,7 @@ CAPACITY_RESULTS_PATH = os.path.join(RESULTS_DIR, "capacity_search_results_fullt
 
 
 def _append_capacity_result(d, max_facts, best_score, accuracy_threshold,
-                            any_all_most, n_attempts, precision):
+                            any_all_most, n_attempts):
     """Append one JSON line summarising a run; never touches previous lines."""
     os.makedirs(RESULTS_DIR, exist_ok=True)
     record = {
@@ -312,7 +315,7 @@ def _append_capacity_result(d, max_facts, best_score, accuracy_threshold,
         "accuracy_threshold": accuracy_threshold,
         "any_all_most": any_all_most,
         "n_attempts": n_attempts,
-        "precision": precision,
+        "precision_fraction": PRECISION_FRACTION,
         "model": "FullyTrainedModel2",
         "n_epochs": N_EPOCHS,
         "lr": LR,
@@ -328,7 +331,7 @@ def main():
     configs = CONFIGS
     attempts = n_attempts
     if testing:
-        # Cheap end-to-end validation: smallest d, few attempts, coarse precision.
+        # Cheap end-to-end validation: smallest d, few attempts.
         configs = [dict(d=16, accuracy_threshold=1.0, any_all_most="any")]
         attempts = 2
 
@@ -337,14 +340,13 @@ def main():
         d = cfg["d"]
         thr = cfg["accuracy_threshold"]
         aam = cfg["any_all_most"]
-        precision = 256 if testing else precision_for(d)
 
         print(f"\n===== d={d}, accuracy_threshold={thr}, any_all_most={aam} =====")
         best, score = find_max_facts(
-            d, attempts, precision=precision,
+            d, attempts,
             accuracy_threshold=thr, any_all_most=aam, verbose=False,
         )
         print(f"d={d}: max_facts={best}, score={score}")
         path = _append_capacity_result(
-            d, best, score, thr, aam, attempts, precision)
+            d, best, score, thr, aam, attempts)
         print(f"Appended result to {path}")

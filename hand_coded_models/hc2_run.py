@@ -22,7 +22,6 @@ def search_best_top_n2(
     n_facts: int,
     S: int,
     retries: int = 2,
-    metric: str = 'best_guess_accuracy',
     precomputed_conn: Optional[np.ndarray] = None,
     seed: int = 42,
     verbose: bool = True,
@@ -40,9 +39,6 @@ def search_best_top_n2(
 
     Returns (best_top_n, best_accuracy).
     """
-    if metric not in ('accuracy', 'best_guess_accuracy'):
-        raise ValueError("metric must be 'accuracy' or 'best_guess_accuracy'")
-
     # Build settings once and mutate only top_n inside the loop.
     settings = HandCodedModel2Settings(
         input_vocab_size=2 * d,
@@ -72,14 +68,13 @@ def search_best_top_n2(
         accuracy_for_top_n = 0.0
         for _ in range(retries):
             model = HandCodedModel2(settings, precomputed_conn=precomputed_conn)
-            acc, bga, _, _ = model.evaluate()
-            score = acc if metric == 'accuracy' else bga
-            accuracy_for_top_n = max(accuracy_for_top_n, score)
+            accuracy, _, _ = model.evaluate()
+            accuracy_for_top_n = max(accuracy_for_top_n, accuracy)
             if accuracy_for_top_n == 1.0:
                 break  # perfect score — no need for more retries
 
         if verbose:
-            print(f"    top_n={top_n}: {metric}={accuracy_for_top_n:.4f}")
+            print(f"    top_n={top_n}: accuracy={accuracy_for_top_n:.4f}")
 
         if accuracy_for_top_n > best_accuracy:
             best_accuracy = accuracy_for_top_n
@@ -105,7 +100,6 @@ def search_max_facts2(
     d: int,
     accuracy_threshold: float,
     retries: int = 2,
-    metric: str = 'best_guess_accuracy',
     max_S: Optional[int] = None,
     seed: int = 42,
     verbose: bool = True,
@@ -157,7 +151,7 @@ def search_max_facts2(
             """Return (ok, best_top_n, best_acc) for n_facts = k * d."""
             best_top_n_k, acc = search_best_top_n2(
                 d, k * d, S,
-                retries=retries, metric=metric,
+                retries=retries,
                 precomputed_conn=conn, seed=seed,
                 verbose=verbose,
             )
@@ -175,7 +169,7 @@ def search_max_facts2(
                 print(f"  [S={S}] Trying n_facts={hi * d} ...")
             ok, top_n, acc = passes(hi)
             if verbose:
-                print(f"  [S={S}] n_facts={hi * d}: {metric}={acc:.4f}, best_top_n={top_n} {'✓' if ok else '✗'}")
+                print(f"  [S={S}] n_facts={hi * d}: accuracy={acc:.4f}, best_top_n={top_n} {'✓' if ok else '✗'}")
             if not ok:
                 break
             lo        = hi
@@ -195,7 +189,7 @@ def search_max_facts2(
                 print(f"  [S={S}] Trying n_facts={mid * d} (binary search) ...")
             ok, top_n, acc = passes(mid)
             if verbose:
-                print(f"  [S={S}] n_facts={mid * d}: {metric}={acc:.4f}, best_top_n={top_n} {'✓' if ok else '✗'}")
+                print(f"  [S={S}] n_facts={mid * d}: accuracy={acc:.4f}, best_top_n={top_n} {'✓' if ok else '✗'}")
             if ok:
                 lo        = mid
                 lo_result = (top_n, acc)
@@ -206,7 +200,7 @@ def search_max_facts2(
         best_top_n_for_S, best_acc_for_S = lo_result
 
         if verbose:
-            print(f"  [S={S}] max_facts={max_facts_for_S}, best_top_n={best_top_n_for_S}, {metric}={best_acc_for_S:.4f}")
+            print(f"  [S={S}] max_facts={max_facts_for_S}, best_top_n={best_top_n_for_S}, accuracy={best_acc_for_S:.4f}")
 
         if max_facts_for_S > overall_best_n_facts:
             overall_best_n_facts = max_facts_for_S
@@ -216,7 +210,7 @@ def search_max_facts2(
 
     if verbose:
         print(f"\nBest overall: n_facts={overall_best_n_facts}, S={overall_best_S}, "
-              f"top_n={overall_best_top_n}, {metric}={overall_best_acc:.4f}")
+              f"top_n={overall_best_top_n}, accuracy={overall_best_acc:.4f}")
     return overall_best_n_facts, overall_best_S, overall_best_top_n, overall_best_acc
 
 

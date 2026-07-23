@@ -1,0 +1,95 @@
+{
+  "settings": {
+    "d": 128,
+    "n_facts": 26624,
+    "n_attempts": 11,
+    "input_vocab_size": 256,
+    "output_vocab_size": 128,
+    "d_ff": 128,
+    "seed": 42,
+    "metric": "best_guess_accuracy",
+    "model": "FullyTrainedModel2",
+    "n_epochs": 5000,
+    "lr": 0.01,
+    "patience": 100
+  },
+  "results": [
+    {
+      "n_facts": 26624,
+      "attempt": 0,
+      "init_seed": 0,
+      "best_guess_accuracy": 0.988619327545166,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 26624,
+      "attempt": 1,
+      "init_seed": 1,
+      "best_guess_accuracy": 0.9921499490737915,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 26624,
+      "attempt": 2,
+      "init_seed": 2,
+      "best_guess_accuracy": 0.9838491678237915,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 26624,
+      "attempt": 3,
+      "init_seed": 3,
+      "best_guess_accuracy": 0.991549015045166,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 26624,
+      "attempt": 4,
+      "init_seed": 4,
+      "best_guess_accuracy": 0.983811616897583,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 26624,
+      "attempt": 5,
+      "init_seed": 5,
+      "best_guess_accuracy": 0.9867037534713745,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 26624,
+      "attempt": 6,
+      "init_seed": 6,
+      "best_guess_accuracy": 0.9888822436332703,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 26624,
+      "attempt": 7,
+      "init_seed": 7,
+      "best_guess_accuracy": 0.9927133917808533,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 26624,
+      "attempt": 8,
+      "init_seed": 8,
+      "best_guess_accuracy": 0.9921875596046448,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 26624,
+      "attempt": 9,
+      "init_seed": 9,
+      "best_guess_accuracy": 0.9938777685165405,
+      "epochs_run": 5000
+    },
+    {
+      "n_facts": 26624,
+      "attempt": 10,
+      "init_seed": 10,
+      "best_guess_accuracy": 0.9957557320594788,
+      "epochs_run": 5000
+    }
+  ]
+}

@@ -8,8 +8,8 @@ Because the up matrix changes every step, the hidden activations cannot be
 precomputed the way train_down_matrix does — train_full_network runs the full
 forward pass each epoch (the one-hot input encoding, which IS constant, is
 precomputed once). The training recipe is otherwise identical: full-batch CE,
-plain Adam, early stopping on best_guess_accuracy (stop at 1.0, or when it
-hasn't improved for `patience` epochs).
+plain Adam, early stopping on accuracy (stop at 1.0, or when it hasn't improved
+for `patience` epochs).
 """
 
 from typing import Optional
@@ -36,20 +36,19 @@ def train_full_network(
     verbose: bool = False,
     early_stopping: bool = True,
 ) -> tuple:
-    """Train up_matrix + down_matrix + down_bias on the model's facts with CE loss.
+    """Train up_matrix + down_matrix on the model's facts with CE loss.
 
     Mirrors hc2_hybrid.train_down_matrix (plain Adam, full batch, same early
     stopping), but backpropagates through the whole network, so the hidden
     activations are recomputed every epoch.
 
     early_stopping (default True) keeps the historical behaviour: stop as soon as
-    best_guess_accuracy hits 1.0, or when it has not improved for `patience`
-    epochs. Set it False to always run the full `n_epochs` (no stopping at all) —
-    e.g. when you want the fully-converged final weights rather than the earliest
-    passing ones.
+    accuracy hits 1.0, or when it has not improved for `patience` epochs. Set it
+    False to always run the full `n_epochs` (no stopping at all) — e.g. when you
+    want the fully-converged final weights rather than the earliest passing ones.
 
     Returns (best_accuracy, epochs_run) where best_accuracy is the highest
-    best_guess_accuracy observed during training.
+    accuracy observed during training.
     """
     inputs = model.facts["inputs"]
     targets = model.facts["targets"]
@@ -62,7 +61,7 @@ def train_full_network(
         x_enc = torch.cat([first, second], dim=-1)  # (n_facts, 2*n_vocab)
 
     optimizer = torch.optim.Adam(
-        [model.up_matrix, model.down_matrix, model.down_bias], lr=lr)
+        [model.up_matrix, model.down_matrix], lr=lr)
 
     best_accuracy = 0.0
     epochs_since_improvement = 0
@@ -71,7 +70,7 @@ def train_full_network(
     for epoch in range(1, n_epochs + 1):
         optimizer.zero_grad()
         hidden = torch.relu(x_enc @ model.up_matrix.T)
-        logits = hidden @ model.down_matrix.T + model.down_bias
+        logits = hidden @ model.down_matrix.T
         loss = F.cross_entropy(logits, targets)
         loss.backward()
         optimizer.step()

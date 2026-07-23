@@ -5,15 +5,15 @@ model is a HybridModel2 — its up matrix is generated exactly like
 HandCodedModel2's (and frozen), while its down matrix + bias are randomly
 initialised and trained with full-batch CE loss (plain Adam, lr=1e-2, up to
 5000 epochs, early stopping — see hc2_hybrid.py). The cell's score is the best
-best_guess_accuracy observed during training.
+accuracy observed during training.
 
 Everything else mirrors hc2_capacity_search.py: the same (S, knob) hyper-
 parameter grids (knob = top_n or top_fraction, selected by use_top_fraction),
 the same 11 attempts per cell with the same per-attempt column permutation and
-tie-seeding, the same any/all/most reduction, and the same binary search over
-n_facts with precision d//2. The connection-matrix Volume (hc2-conn-cache) is
-shared with the original search — the matrices are identical, so nothing is
-rebuilt.
+tie-seeding, the same any/all/most reduction, and a binary search over n_facts
+that stops at a 2%-relative bracket (hi - lo < 0.02 * hi). The connection-matrix
+Volume (hc2-conn-cache) is shared with the original search — the matrices are
+identical, so nothing is rebuilt.
 
 Cost note: a cell is now a training run (up to 5000 epochs) instead of one
 forward pass, so this sweep is FAR more expensive than the hand-coded one —
@@ -77,15 +77,9 @@ CONFIGS = [
 
 testing = False  # small/cheap end-to-end validation run
 
-# Refine mode: instead of running CONFIGS, rescan the capacity log and CONTINUE
-# every binary search whose logged precision is more than REFINE_FRACTION of its
-# max_facts, using precision = REFINE_FRACTION * that max_facts. The finer
-# search replays the cached grids (identical probes cost nothing) and only pays
-# for the new, finer probes; the refined result is appended to the log, where
-# the plots take the latest row per config. Idempotent: once everything is
-# refined, there is nothing left to run.
-refine = True
-REFINE_FRACTION = 0.05
+# Binary search stops when the bracket is within this fraction of its top end
+# (hi - lo < PRECISION_FRACTION * hi), giving ~2% relative resolution on max_facts.
+PRECISION_FRACTION = 0.02
 
 
 def S_sweep_for(d):
@@ -100,11 +94,6 @@ def S_sweep_for(d):
         return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     else:
         return list(range(1, 25))
-
-
-def precision_for(d):
-    """Binary-search stopping precision (stop when hi - lo < precision)."""
-    return d // 2
 
 
 def top_n_sweep_for(S):
@@ -183,7 +172,7 @@ def _run_one(cell):
     """Train + evaluate one (S, attempt, knob) cell for a given n_facts.
 
     Builds a HybridModel2 (hand-coded frozen up matrix, random down matrix) and
-    trains the down matrix with CE loss; returns the best best_guess_accuracy
+    trains the down matrix with CE loss; returns the best accuracy
     seen during training. Per-attempt variety comes from permuting the matrix's
     label columns, re-seeding the constructor's tie-breaking, and the down-
     matrix init — no connection matrix is rebuilt."""
@@ -234,7 +223,7 @@ def _run_one(cell):
     )
     model = HybridModel2(settings, precomputed_conn=conn,
                          init_seed=tie_seed + knob_index)
-    best_guess_accuracy, epochs_run = train_down_matrix(
+    accuracy, epochs_run = train_down_matrix(
         model, n_epochs=N_EPOCHS, lr=LR, patience=PATIENCE)
     knob_key = "top_fraction" if use_top_fraction else "top_n"
     return {
@@ -243,7 +232,7 @@ def _run_one(cell):
         knob_key: knob_value,
         "attempt": attempt,
         "tie_seed": tie_seed,
-        "best_guess_accuracy": best_guess_accuracy,
+        "accuracy": accuracy,
         "epochs_run": epochs_run,
     }
 
@@ -347,7 +336,7 @@ def _save_records(d, n_facts, records, n_attempts, S_sweep):
             "output_vocab_size": d,
             "d_ff": d,
             "seed": seed,
-            "metric": "best_guess_accuracy",
+            "metric": "accuracy",
             "search_mode": KNOB,
             "model": "HybridModel2",
             "n_epochs": N_EPOCHS,
@@ -399,7 +388,7 @@ def _evaluate_n_facts(d, n_attempts, n_facts, S_sweep,
     for r in records:
         key = (r["S"], r[KNOB])
         if key in wanted:
-            cells[key].append(r["best_guess_accuracy"])
+            cells[key].append(r.get("accuracy", r.get("best_guess_accuracy")))
 
     # Reduce each cell to one score matching the rule, so success <=> best >= threshold.
     #   any -> max over runs ; all -> min over runs ; most -> median over runs
@@ -424,11 +413,13 @@ def _evaluate_n_facts(d, n_attempts, n_facts, S_sweep,
 
 # ── Binary search over n_facts ────────────────────────────────────────────────
 
-def find_max_facts(d, n_attempts, S_sweep, precision=1,
+def find_max_facts(d, n_attempts, S_sweep,
                    accuracy_threshold=1.0, any_all_most="any", verbose=False):
     """Binary-search the maximum storable n_facts. max_possible = (2*d)^2 = 4*d**2.
 
-    Returns (best_n_facts, best_combination) with best_combination = (knob, S).
+    Stops when the bracket is within PRECISION_FRACTION of its top end
+    (hi - lo < PRECISION_FRACTION * hi). Returns (best_n_facts, best_combination)
+    with best_combination = (knob, S).
     """
     # Ensure the connection matrices for this d are on the Volume ONCE (one per S).
     _ensure_conn(d, S_sweep, verbose=verbose)
@@ -441,7 +432,7 @@ def find_max_facts(d, n_attempts, S_sweep, precision=1,
     if verbose:
         print(f"Searching for max storable facts in [{lo}, {hi}]  (d={d})\n")
 
-    while hi - lo >= precision:
+    while hi - lo >= PRECISION_FRACTION * hi:
         mid = (lo + hi) // 2
         if verbose:
             print(f"Trying n_facts = {mid} ...")
@@ -483,7 +474,7 @@ CAPACITY_RESULTS_PATH = os.path.join(RESULTS_DIR, f"capacity_search_results_{_mo
 
 
 def _append_capacity_result(d, max_facts, best_combo, accuracy_threshold,
-                            any_all_most, n_attempts, precision, S_sweep):
+                            any_all_most, n_attempts, S_sweep):
     """Append one JSON line summarising a run; never touches previous lines."""
     os.makedirs(RESULTS_DIR, exist_ok=True)
     best_knob, best_S = (best_combo if best_combo is not None else (None, None))
@@ -496,7 +487,7 @@ def _append_capacity_result(d, max_facts, best_combo, accuracy_threshold,
         "accuracy_threshold": accuracy_threshold,
         "any_all_most": any_all_most,
         "n_attempts": n_attempts,
-        "precision": precision,
+        "precision_fraction": PRECISION_FRACTION,
         "S_sweep": S_sweep,
         "search_mode": KNOB,
         "model": "HybridModel2",
@@ -509,46 +500,12 @@ def _append_capacity_result(d, max_facts, best_combo, accuracy_threshold,
     return CAPACITY_RESULTS_PATH
 
 
-def _refine_configs():
-    """Configs whose LATEST logged run has precision > REFINE_FRACTION*max_facts.
-
-    Each returned config carries the finer precision to continue its binary
-    search with. Refining can only raise max_facts (the finer search replays
-    the same cached probes, then keeps going), so a precision of
-    REFINE_FRACTION * the old max_facts is also <= that fraction of the final."""
-    latest = {}
-    if not os.path.exists(CAPACITY_RESULTS_PATH):
-        return []
-    with open(CAPACITY_RESULTS_PATH, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            r = json.loads(line)
-            latest[(r["d"], r["accuracy_threshold"], r["any_all_most"])] = r
-    configs = []
-    for (d, thr, aam), r in sorted(latest.items()):
-        mf = r.get("max_facts") or 0
-        if mf <= 0:
-            continue
-        # Largest precision STRICTLY below REFINE_FRACTION of max_facts, but
-        # never below 1 (precision 1 already resolves the search exactly).
-        target = int(REFINE_FRACTION * mf)
-        if target >= REFINE_FRACTION * mf:
-            target -= 1
-        target = max(1, target)
-        if r.get("precision", 0) > target:
-            configs.append(dict(d=d, accuracy_threshold=thr, any_all_most=aam,
-                                precision=target))
-    return configs
-
-
 @app.local_entrypoint()
 def main():
-    configs = _refine_configs() if refine else CONFIGS
+    configs = CONFIGS
     attempts = n_attempts
     if testing:
-        # Cheap end-to-end validation: smallest d, few attempts, coarse precision.
+        # Cheap end-to-end validation: smallest d, few attempts.
         configs = [dict(d=16, accuracy_threshold=1.0, any_all_most="any")]
         attempts = 2
 
@@ -558,14 +515,13 @@ def main():
         thr = cfg["accuracy_threshold"]
         aam = cfg["any_all_most"]
         S_sweep = S_sweep_for(d)
-        precision = 256 if testing else cfg.get("precision", precision_for(d))
 
         print(f"\n===== d={d}, accuracy_threshold={thr}, any_all_most={aam} =====")
         best, combo = find_max_facts(
-            d, attempts, S_sweep, precision=precision,
+            d, attempts, S_sweep,
             accuracy_threshold=thr, any_all_most=aam, verbose=False,
         )
         print(f"d={d}: max_facts={best}, best ({KNOB}, S)={combo}")
         path = _append_capacity_result(
-            d, best, combo, thr, aam, attempts, precision, S_sweep)
+            d, best, combo, thr, aam, attempts, S_sweep)
         print(f"Appended result to {path}")
